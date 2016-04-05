@@ -1,4 +1,4 @@
-module bus
+module HardwareCNN
 (
   clk,
   rst,
