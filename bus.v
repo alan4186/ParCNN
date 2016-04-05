@@ -16,8 +16,8 @@ module bus
 
 
 parameter
-          bw = 15,
-          im_size = 28,
+          bw = 31,
+          im_size = 32,
           im_s = im_size -1;
          
 integer i,j,k;
@@ -46,18 +46,19 @@ always@(posedge clk or negedge rst) begin
     end
     rom_addr <= `rom_addr_size'd0;
     ss <= 4'd0;
-    full_row <= 1'b0;
+//    full_row <= 1'b0;
   ////////////////////////////////////////
   //        next sample button
   ////////////////////////////////////////
   end else if (nextSampleBtn == 1'b1) begin
     rom_addr <= `rom_addr_size'd0; 
     ss <= ss + 4'd1;
+    row_count <= 5'd0;
   ////////////////////////////////////////
   //      shift in data
   ////////////////////////////////////////
   end else if(en == 1'b1) begin
-    if(row_count <= 5'd28) begin
+    if(row_count <= 6'd32) begin
       pOut[0] <= rom_data;
       for(i=1;i<im_size;i=i+1) begin
         pOut[i] <= pOut[i-1]; // shift
@@ -65,12 +66,19 @@ always@(posedge clk or negedge rst) begin
       rom_addr <= rom_addr + `rom_addr_size'd1;
       row_count <= row_count + 5'd1;
       full_row <= 1'b0;
-    end else begin
-      row_count <= 5'd0;
+    end else if(row_count == 6'd33) begin
+      row_count <= row_count + 6'd1;
       full_row <= 1'b1;
+      rom_addr <= rom_addr; // dont incriment address
+    end else if( row_count == 6'd34) begin
+      row_count <= 6'd0;
+      rom_addr <= rom_addr;
+      full_row <= 1'b0;
+      // shift into FFT
       for(i=0;i<im_size;i=i+1) begin
         test_reg[i] <= pOut[i];
       end
+      
     end
   end
     
