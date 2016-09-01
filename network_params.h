@@ -1,0 +1,1 @@
+`define NEIGHBORHOOD_SIZE 4
