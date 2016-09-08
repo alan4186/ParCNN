@@ -1,9 +1,9 @@
-`include <network_parameters.h>
+`include "../network_params.h"
 module rect_linear(
   input clock,
   input reset,
   input [`NN_BITWIDTH:0] rect_in, 
-  output [`NN_BITWIDTH:0] rect_out;
+  output reg [`NN_BITWIDTH:0] rect_out
 		   );
    
    always@(posedge clock or negedge reset)begin

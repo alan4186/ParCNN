@@ -1,8 +1,9 @@
+`include "../network_params.h"
 module rect_linear_tb;
  reg clock;
  reg reset;
  reg [`NN_BITWIDTH:0] rect_in;
- wire [`NN_BITWIDHT:0] rect_out;
+ wire [`NN_BITWIDTH:0] rect_out;
 
 rect_linear dut(
   .clock(clock),
@@ -18,7 +19,7 @@ initial begin
 end
 
 always 
-  #5 clk = !clk;
+  #5 clock = !clock;
 
 initial begin
   #20 reset = 1'b1;
@@ -26,59 +27,50 @@ initial begin
   #20 reset = 1'b0;
 
   #20 
-  reest = 1'b1;
+  reset = 1'b1;
   rect_in = $random;
   
   # 10
-  if(rect_in[`NN_BITWIDTH] == 1'b1) && rect_out == `NN_WIDTH'd0) begin
+  if(rect_in[`NN_BITWIDTH] == 1'b1 && rect_out == `NN_WIDTH'd0) begin
     $display ("Pass");
-  else if(rect_in[`NN_BITWIDTH] == 1'b0) && rect_out == rect_in) begin
+  end else if(rect_in[`NN_BITWIDTH] == 1'b0 && rect_out == rect_in) begin
     $display ("Pass");
-  else
+  end else begin
     $display ("Fail!!!");
     $display ("rect_in: %d", rect_in);
     $display ("rect_out: %d", rect_out); 
-
+  end 
+ 
   #20 
   rect_in = $random;
   
   # 10
-  if(rect_in[`NN_BITWIDTH] == 1'b1) && rect_out == `NN_WIDTH'd0) begin
+  if(rect_in[`NN_BITWIDTH] == 1'b1 && rect_out == `NN_WIDTH'd0) begin
     $display ("Pass");
-  else if(rect_in[`NN_BITWIDTH] == 1'b0) && rect_out == rect_in) begin
+  end else if(rect_in[`NN_BITWIDTH] == 1'b0 && rect_out == rect_in) begin
     $display ("Pass");
-  else
+  end else begin
     $display ("Fail!!!");
     $display ("rect_in: %d", rect_in);
     $display ("rect_out: %d", rect_out); 
-
-  #20 
+  end 
+ 
+   #20 
   rect_in = $random;
   
   # 10
-  if(rect_in[`NN_BITWIDTH] == 1'b1) && rect_out == `NN_WIDTH'd0) begin
+  if(rect_in[`NN_BITWIDTH] == 1'b1 && rect_out == `NN_WIDTH'd0) begin
     $display ("Pass");
-  else if(rect_in[`NN_BITWIDTH] == 1'b0) && rect_out == rect_in) begin
+  end else if(rect_in[`NN_BITWIDTH] == 1'b0 && rect_out == rect_in) begin
     $display ("Pass");
-  else
+  end else begin
     $display ("Fail!!!");
     $display ("rect_in: %d", rect_in);
     $display ("rect_out: %d", rect_out); 
-
-  #20 
-  rect_in = $random;
+  end 
   
-  # 10
-  if(rect_in[`NN_BITWIDTH] == 1'b1) && rect_out == `NN_WIDTH'd0) begin
-    $display ("Pass");
-  else if(rect_in[`NN_BITWIDTH] == 1'b0) && rect_out == rect_in) begin
-    $display ("Pass");
-  else
-    $display ("Fail!!!");
-    $display ("rect_in: %d", rect_in);
-    $display ("rect_out: %d", rect_out); 
-
  # 100
-   $finish
+   $finish;
+	
 end
 endmodule
