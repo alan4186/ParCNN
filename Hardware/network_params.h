@@ -1,5 +1,4 @@
-// General Network Parameters
-`define INPUT_SIZE 28 // dimension of square input image
+// General Network Parameters `define INPUT_SIZE 28 // dimension of square input image
 `define NUM_KERNELS 10
 `define KERNEL_SIZE 9 // square kernel
 `define FEATURE_SIZE `INPUT_SIZE - KERNEL_SIZE + 1 // The dimension of the convolved image
@@ -30,6 +29,7 @@
 `define FFN_BITWIDTH `FFN_WIDTH - 1
 `define FFN_OUT_WIDTH `FFN_WIDTH * 2 + `CLOG2(`NUM_INPUT_N) // The width of the outputs of the feed forward network
 `define FFN_OUT_BITWIDTH `FFN_OUT_WIDTH - 1 
+`define SUM_WIRE_LEN ( `NUM_INPUT_N * 2 ) - 1 // The number of indexes in the adder tree vector
 
 // Math macros
 `define CLOG2(x) \
