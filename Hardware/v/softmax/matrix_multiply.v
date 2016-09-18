@@ -20,8 +20,8 @@ wire [`FFN_OUT_BITWIDTH:0] sum_wire [`SUM_WIRE_LEN][`NUM_OUTPUT_N];
 genvar i;
 genvar j;
 generate 
-  for(i=0; i < `NUM_INPUT_N; i=i+1) begin
-    for(j=0; j < `NUM_OUTPUT_N; j=j+1) begin
+  for(i=0; i < `NUM_INPUT_N; i=i+1) begin : loop_a // rename to virticlle /horizontal after weitgh matrex wire is created
+    for(j=0; j < `NUM_OUTPUT_N; j=j+1) begin : loop_b
       multiply2 multiply2_inst(
         .clock(clock),
         .reset(reset),
@@ -35,14 +35,14 @@ endgenerate
 
 genvar x;
 generate
-  for(x=0; x < `NUM_INPUT_N; x=x+1) begin
+  for(x=0; x < `NUM_INPUT_N; x=x+1) begin : connect_input_neurons
     assign input_n_wire[x] = input_neurons[(`FFN_WIDTH*x)+`FFN_BITWIDTH:`FFN_WIDTH*x];
   end
 endgenerate
 
 genvar y;
 generate
-  for(y=0; y < `NUM_INPUT_N; y=y+1) begin
+  for(y=0; y < `NUM_INPUT_N; y=y+1) begin : connect_sums_to_outputs
     // connect the top of the adder tree to the output 
     assign sum_wire[1][y] = output_neurons[(`FFN_WIDTH*y)+`FFN_BITWIDTH:`FFN_WIDTH*y];
   end
@@ -51,8 +51,8 @@ endgenerate
 genvar z;
 genvar w;
 generate
-  for(z=`SUM_WIRE_LEN-2 ; z <= 2; z=z-2) begin
-    for(w=0; w < `NUM_OUTPUT_N; w=w+1) begin
+  for(z=`SUM_WIRE_LEN-2 ; z <= 2; z=z-2) begin : loop_c
+    for(w=0; w < `NUM_OUTPUT_N; w=w+1) begin :loop_d
       sum2 sum2_inst(
         .clock(clock),
         .reset(reset),
