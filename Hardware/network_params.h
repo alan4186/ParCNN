@@ -7,6 +7,10 @@
 `define NN_WIDTH 16
 `define NN_BITWIDTH `NN_WIDTH - 1
 
+
+// Rect Linear
+
+
 // Sub sampling
 `define NEIGHBORHOOD_SIZE 4
 `define NH_VECTOR_WIDTH `NEIGHBORHOOD_SIZE*`NN_WIDTH
@@ -15,22 +19,24 @@
 `define ADDER_TREE_BITWIDTH `NN_BITWIDTH+`NUM_NH_LAYERS
 
 // Softmax 
-`define SOFTMAX_IN_VECTOR_LENGTH TBD // the number of inputs to the softmax layer
+//`define SOFTMAX_IN_VECTOR_LENGTH TBD // the number of inputs to the softmax layer
 `define NUM_CLASSES 10 // number of output classes for the entire nn
 
 // Matrix multiply (for Softmax)
 `define NUM_INPUT_IM 1 // The number of images input to the layer at a time
 `define NUM_INPUT_N  `NUM_KERNELS * `FEATURE_SIZE * `FEATURE_SIZE // The number of input neurons to the layer
 `define NUM_OUTPUT_N `NUM_OUTPUT_CLASSES
-`define FFN_WIDTH TBD // The width of the inputs to the feed forward network
+`define FFN_WIDTH `NN_WIDTH // The width of the inputs to the feed forward network. Should be the same as the output width of the softmax layer.
 `define FFN_BITWIDTH `FFN_WIDTH - 1
 `define FFN_OUT_WIDTH `FFN_WIDTH * 2 + `CLOG2(`NUM_INPUT_N) // The width of the outputs of the feed forward network
 `define FFN_OUT_BITWIDTH `FFN_OUT_WIDTH - 1 
 `define SUM_WIRE_LEN ( `NUM_INPUT_N * 2 ) - 1 // The number of indexes in the adder tree vector
 
 // Normalization (for Softmax)
-`define NUM_NORM_LAYERS `CLOG(`NUM_CLASSES) ????
-`define NORM_OUT_WIDTH TBD
+`define NORM_IN_WIDTH `FFN_OUT_WIDTH
+`define NORM_IN_BITWIDTH `NORM_IN_WIDTH - 1
+`define NUM_NORM_LAYERS `CLOG(`NUM_CLASSES)
+`define NORM_OUT_WIDTH `NORM_IN_WIDTH + `NUN_NORM_LAYERS
 `define NORM_OUT_BITWIDTH `NORM_OUT_WIDTH - 1
 
 // Math macros

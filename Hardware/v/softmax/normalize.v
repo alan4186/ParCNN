@@ -6,7 +6,7 @@ module normalize(
 );
 
 // wire declarations
-wire [`FFN_OUT_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
+wire [`NORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
 wire [`NORM_OUT_BITWIDTH:0] adder_tree_wire [(`NUM_CLASSES*2)-1];
 wire [`NORM_OUT_BITWIDTH:0] out_vector_wire [`NUM_CLASSES];
 
