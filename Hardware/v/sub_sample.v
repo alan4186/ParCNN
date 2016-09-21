@@ -2,7 +2,7 @@
 module sub_sample( // Mean pooling
   input clock,
   input reset,
-  input [NH_VECTOR_BITWIDTH:0] nh_vector, // ` indicates a difined macro
+  input [`NH_VECTOR_BITWIDTH:0] nh_vector, // ` indicates a difined macro
   output [`NN_BITWIDTH:0] pool_out
 );
 

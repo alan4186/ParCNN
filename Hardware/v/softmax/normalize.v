@@ -1,12 +1,13 @@
+`include "network_params.h"
 module normalize(
   input clock,
   input reset,
   input [`NN_WIDTH*`NUM_CLASSES-1:0] in_vector,
   output [`NORM_OUT_BITWIDTH*`NUM_CLASSES-1:0] out_vector
 );
-
+parameter PNORM_IN_BITWIDTH = `NORM_IN_BITWIDTH;
 // wire declarations
-wire [`NORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
+wire [PNORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
 wire [`NORM_OUT_BITWIDTH:0] adder_tree_wire [(`NUM_CLASSES*2)-1];
 
 // reg declarations
@@ -59,3 +60,4 @@ endgenerate
 
 
 endmodule
+

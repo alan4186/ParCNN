@@ -4,7 +4,7 @@ module matrix_multiply( // a matrix multiply implementaion of a single layer fee
   input reset,
 
   input [(`FFN_WIDTH*`NUM_INPUT_N)-1:0] input_neurons,
-  input [(`FFN_WIDTH*NUM_INPUT_N*NUM_OUTPUT_N)-1:0] weight_matrix,
+  input [(`FFN_WIDTH*`NUM_INPUT_N*`NUM_OUTPUT_N)-1:0] weight_matrix,
   output [(`FFN_WIDTH*2*`NUM_OUTPUT_N)-1:0] output_neurons
 
 );
@@ -13,6 +13,7 @@ module matrix_multiply( // a matrix multiply implementaion of a single layer fee
 wire [`FFN_BITWIDTH:0] input_n_wire [`NUM_INPUT_N];
 wire [`FFN_OUT_BITWIDTH:0] output_n_wire [`NUM_OUTPUT_N];
 wire [`FFN_OUT_BITWIDTH:0] product_wire [`NUM_INPUT_N][`NUM_OUTPUT_N]; // Connects to the output of the multiplieres
+wire [`FFN_OUT_BITWIDTH:0] weight_matrix_wire [`NUM_INPUT_N][`NUM_OUTPUT_N];
 wire [`FFN_OUT_BITWIDTH:0] sum_wire [`SUM_WIRE_LEN][`NUM_OUTPUT_N]; 
 
 // reg declarations
@@ -26,7 +27,7 @@ generate
         .clock(clock),
         .reset(reset),
         .operand_a(input_n_wire[i]),
-        .operand_b(wieght_matrix[i][j]),
+        .operand_b(weight_matrix_wire[i][j]),
         .product(product_wire[i][j])
       );
     end // for j (output dim)
