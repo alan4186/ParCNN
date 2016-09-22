@@ -12,7 +12,7 @@ module normalize(
 
 // wire declarations
 wire [`NORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
-wire [`NORM_OUT_BITWIDTH:0] adder_tree_wire [(`NUM_CLASSES*2)-1];
+wire [`NORM_OUT_BITWIDTH:0] adder_tree_wire [((`NUM_CLASSES)*2)-1];
 
 // reg declarations
 reg [`NORM_OUT_BITWIDTH:0] out_vector_wire [`NUM_CLASSES];
@@ -23,19 +23,20 @@ genvar i;
 generate
 for(i = 0; i < `NUM_CLASSES; i=i+1) begin : connect_in_vector
     assign in_vector_wire[i] = in_vector[(`NN_WIDTH*i)+`NN_BITWIDTH:`NN_WIDTH*i];
+    assign adder_tree_wire[i+`NUM_CLASSES-1] = in_vector[(`NN_WIDTH*i)+`NN_BITWIDTH:`NN_WIDTH*i];
   end
 endgenerate
 
 // sum inputs
 genvar j;
 generate
-for(j= (`NUM_CLASSES*2)-1 ; j <=3 ; j=j-2) begin : sum_inputs
+for(j= (`NUM_CLASSES*2)-1 ; j <=2 ; j=j-2) begin : sum_inputs
   add2 add2_inst(
     .clock(clock),
     .reset(reset),
-    .opperand_a(adder_tree_wire[j-2]),
-    .opperand_b(adder_tree_wire[j-1]),
-    .sum(adder_tree_wire[((j-1)/2)-1])
+    .opperand_a(adder_tree_wire[j-1]),
+    .opperand_b(adder_tree_wire[j]),
+    .sum(adder_tree_wire[(j/2)-1])
   );  
 end // for
 endgenerate
