@@ -2,12 +2,16 @@
 module normalize(
   input clock,
   input reset,
-  input [`NN_WIDTH*`NUM_CLASSES-1:0] in_vector,
-  output [`NORM_OUT_BITWIDTH*`NUM_CLASSES-1:0] out_vector
+  input [(`NN_WIDTH*`NUM_CLASSES)-1:0] in_vector,
+  output [(`NORM_OUT_WIDTH*`NUM_CLASSES)-1:0] out_vector
 );
-parameter PNORM_IN_BITWIDTH = `NORM_IN_BITWIDTH;
+
+//parameter declarations
+//parameter `NUM_NORM_LAYERS = `LOG2(`NUM_CLASSES);
+//parameter `FFN_OUT_WIDTH = `FFN_WIDTH * 2 + `LOG2(`NUM_INPUT_N);
+
 // wire declarations
-wire [PNORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
+wire [`NORM_IN_BITWIDTH:0] in_vector_wire [`NUM_CLASSES];
 wire [`NORM_OUT_BITWIDTH:0] adder_tree_wire [(`NUM_CLASSES*2)-1];
 
 // reg declarations
@@ -18,7 +22,7 @@ reg [`NORM_OUT_BITWIDTH:0] out_vector_wire [`NUM_CLASSES];
 genvar i;
 generate
 for(i = 0; i < `NUM_CLASSES; i=i+1) begin : connect_in_vector
-    assign in_vector_wire[i] = in_vector[`NN_WIDTH*i:(`NN_WIDTH*i)-1];
+    assign in_vector_wire[i] = in_vector[(`NN_WIDTH*i)+`NN_BITWIDTH:`NN_WIDTH*i];
   end
 endgenerate
 
@@ -44,7 +48,7 @@ for (k=0; k < `NUM_CLASSES; k=k+1) begin : divide_by_sum
     if(reset == 1'b0) begin
       out_vector_wire[k] <= `NORM_OUT_BITWIDTH'd0;
     end else begin 
-      out_vector_wire[k] <= in_vector_wire[k] / adder_tree_wire[0];
+      out_vector_wire[k] <= in_vector_wire[k] / adder_tree_wire[1];
     end
   end // always
 end // for

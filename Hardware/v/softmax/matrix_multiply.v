@@ -9,6 +9,10 @@ module matrix_multiply( // a matrix multiply implementaion of a single layer fee
 
 );
 
+// parameter declarations
+//parameter `FFN_OUT_WIDTH = `FFN_WIDTH * 2 + `LOG2(`NUM_INPUT_N);
+
+
 // wire declarations
 wire [`FFN_BITWIDTH:0] input_n_wire [`NUM_INPUT_N];
 wire [`FFN_OUT_BITWIDTH:0] output_n_wire [`NUM_OUTPUT_N];

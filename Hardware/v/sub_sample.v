@@ -6,10 +6,13 @@ module sub_sample( // Mean pooling
   output [`NN_BITWIDTH:0] pool_out
 );
 
-// wires
+// parameter declarations
+//parameter `NUM_NH_LAYERS = `LOG2(`NEIGHBORHOOD_SIZE);
+
+// wire declarations
 wire [`ADDER_TREE_BITWIDTH:0] adder_tree_wire [`NUM_NH_LAYERS+1][`NEIGHBORHOOD_SIZE];
 
-// regs
+// reg declarations
 
 
 // assign statments
