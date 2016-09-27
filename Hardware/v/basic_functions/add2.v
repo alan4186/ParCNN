@@ -1,10 +1,11 @@
+`include "../../network_params.h"
 module add2(
   input clock,
   input reset,
 
   input [`FFN_OUT_BITWIDTH:0] operand_a,
   input [`FFN_OUT_BITWIDTH:0] operand_b,
-  output [`FFN_OUT_BITWIDTH:0] sum
+  output reg[`FFN_OUT_BITWIDTH:0] sum
 );
 
 always@(posedge clock or negedge reset) begin

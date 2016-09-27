@@ -10,8 +10,6 @@ module matrix_multiply( // a matrix multiply implementaion of a single layer fee
 );
 
 // parameter declarations
-//parameter `FFN_OUT_WIDTH = `FFN_WIDTH * 2 + `LOG2(`NUM_INPUT_N);
-
 
 // wire declarations
 wire [`FFN_BITWIDTH:0] input_n_wire [`NUM_INPUT_N];
@@ -27,7 +25,7 @@ genvar j;
 generate 
   for(i=0; i < `NUM_INPUT_N; i=i+1) begin : loop_a // rename to virticlle /horizontal after weitgh matrex wire is created
     for(j=0; j < `NUM_OUTPUT_N; j=j+1) begin : loop_b
-      multiply2 multiply2_inst(
+      mult2 mult2_inst(
         .clock(clock),
         .reset(reset),
         .operand_a(input_n_wire[i]),
@@ -47,7 +45,7 @@ endgenerate
 
 genvar y;
 generate
-  for(y=0; y < `NUM_INPUT_N; y=y+1) begin : connect_sums_to_outputs
+  for(y=0; y < `NUM_OUTPUT_N; y=y+1) begin : connect_sums_to_outputs
     // connect the top of the adder tree to the output 
     assign sum_wire[1][y] = output_neurons[(`FFN_WIDTH*y)+`FFN_BITWIDTH:`FFN_WIDTH*y];
   end
