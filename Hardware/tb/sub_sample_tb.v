@@ -52,6 +52,15 @@ initial begin
   
   tb_mean = tb_mean/`NEIGHBORHOOD_SIZE;
   $display ("tb_mean %d", tb_mean);	
+  $display ("dut mean: %d", sub_out);
+
+  if(tb_mean == sub_out) begin
+    $display("PASS!");
+  end else begin
+    $display("FAIL!");
+  end
+
+
  # 100
    $finish;
 	
