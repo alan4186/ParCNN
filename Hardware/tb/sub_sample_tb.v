@@ -24,6 +24,18 @@ end
 always 
   #5 clock = !clock;
 
+// loop ints
+//integer i;
+integer j;
+
+genvar i;
+generate
+	for(i=0; i < `NH_VECTOR_WIDTH; i=i+`NN_WIDTH) begin : nh_assignment
+		assign element[i] = sub_in[i+`NN_BITWIDTH:i];
+	end  
+endgenerate
+
+
 initial begin
   #20 reset = 1'b1;
 
@@ -32,24 +44,13 @@ initial begin
   #20 
   reset = 1'b1;
   sub_in = $random;
-
-  #20 
   
-  sub_in = $random;
-  
-	for(int i=0; i < `NH_VECTOR_WIDTH; i=i+`NN_WIDTH) begin
-		element[i] = sub_in[i+`NN_BITWIDTH:i];
-		$display ("Element %d = %d", i, element[i]);
-	end  
   #10
-
-  for(i=0; i < `NEIGHBORHOOD_SIZE; i=i+1) begin 
-		tb_mean = tb_mean +element[i];
-		$display ("tb_mean %d sum = %d", i, tb_mean);
+  for(j=0; j < `NEIGHBORHOOD_SIZE; j=j+1) begin 
+	  $display ("Element %d = %d", j, element[j]);
+		tb_mean = tb_mean +element[j];
   end
-  
-  #10
-  
+	$display ("tb_mean %d sum = %d", j, tb_mean);
   tb_mean = tb_mean/`NEIGHBORHOOD_SIZE;
   $display ("tb_mean %d", tb_mean);	
   $display ("dut mean: %d", sub_out);
