@@ -1,9 +1,22 @@
 import math
+
+# print resourse usage estimates?
+estimate_resources = 1
+
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
 NUM_KERNELS = 10
 KERNEL_SIZE = 9 # square kernel
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
+
+# Shift window size
+CAMERA_PIXEL_WIDTH = 8
+WINDOW_SIZE = 28 # INPUT_SIZE
+
+# Multiply Adder Tree 
+CONV_MULT_WIDTH = 9
+CONV_PRODUCT_WIDTH = CONV_MULT_WIDTH * 2 # the width of the product
+CONV_ADD_WIDTH = 10
 
 # General Bitwidths
 NN_WIDTH = 16
@@ -11,9 +24,11 @@ NN_BITWIDTH = NN_WIDTH - 1
 
 
 # Rect Linear
-
+# RECT_IN_WIDTH = CONV_ADD_WIDTH
+# RECT_OUT_WIDTH = RECT_IN_WIDTH
 
 # Sub sampling
+NUM_POOLERS = NUM_KERNELS
 NEIGHBORHOOD_SIZE = 4
 NH_VECTOR_WIDTH = NEIGHBORHOOD_SIZE*NN_WIDTH
 NH_VECTOR_BITWIDTH = NH_VECTOR_WIDTH - 1 
@@ -24,6 +39,7 @@ POOL_OUT_BITWIDTH = POOL_OUT_WIDTH - 1
 MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
 # POOL_RESET= 1 # uncomment to add reset signal to sub sampleing/pooling adder tree
 POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
+
 # Softmax 
 SOFTMAX_IN_VECTOR_LENGTH = ((FEATURE_SIZE * FEATURE_SIZE) / NEIGHBORHOOD_SIZE ) * NUM_KERNELS  # the number of inputs to the softmax layer
 NUM_CLASSES = 4 # number of output classes for the entire nn, MUST BE A POWER OF 2!!! set unneeded class inputs to 0
@@ -81,4 +97,44 @@ with open("../Hardware/network_params.h", 'w') as f:
     for macro in macroList:
         f.write("`define " + str(macro[0]) + ' ' + str(macro[1]) + '\n')
 
+
+if estimate_resources:
+    le = 0;
+    mult = 0;
+    memory_bits = 0;
+
+
+    # Shift Window usage
+    le = le + (WINDOW_SIZE**2 * CAMERA_PIXEL_WIDTH)
     
+    # mult-adder tree usage
+    for i in range(0,NUM_KERNELS):
+        mult = mult + (KERNEL_SIZE**2)
+        x = KERNEL_SIZE**2
+        if x % 2:
+            le = le + CONV_PRODUCT_WIDTH + 1
+            x = x - 1
+
+        while x > 0:
+            le = le + (x* (CONV_PRODUCT_WIDTH + 1))
+            x = x/2
+    # rect-linear usage
+    le = le + (CONV_ADD_WIDTH)
+    # buffer 1 usage
+    memory_bits = memory_bits + (FEATURE_SIZE*NUM_KERNELS*CONV_ADD_WIDTH)
+    # pooling usage
+    for i in range(0,NUM_POOLERS):
+        le = le + ( (NEIGHBORHOOD_SIZE *2)-1)* NN_WIDTH
+        le = le + NN_WIDTH # a guess about division's area
+    # buffer 2 usage
+    memory_bits = memory_bits + (FEATURE_SIZE*NUM_KERNELS*CONV_ADD_WIDTH)/4
+    # matrix mult usage
+    mult = mult + NUM_CLASSES
+    le = le + (NUM_CLASSES* NN_WIDTH)
+    # softmax/ final acivation usgae
+    le = le + (NN_WIDTH *2 * NUM_CLASSES)
+
+    print "Estimated number of Logic elements: " + str(le)
+    print "Estimated number of 9 bit multipliers: " + str(mult)
+    print "Estimated number of memory bits: " + str(memory_bits)
+
