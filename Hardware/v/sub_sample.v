@@ -1,4 +1,4 @@
-`include "network_params.h"
+`include "../network_params.h"
 module sub_sample( // Mean pooling
   input clock,
   input reset,
