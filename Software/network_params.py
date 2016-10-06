@@ -11,7 +11,14 @@ FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved ima
 
 # Shift window size
 CAMERA_PIXEL_WIDTH = 8
-WINDOW_SIZE = 28 # INPUT_SIZE
+CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDHT - 1
+BUFFER_W = 9
+BUFFER_BW = BUFFER_W - 1 
+BUFFER_H = 9
+BUFFER_BH = BUFFER_H - 1 
+BUFFER_SIZE = BUFFER_W * BUFFER_H
+BUFFER_OUT_VECTOR_WIDTH = BUFFER_W * BUFFER_H * CAMERA_PIXEL_WIDTH
+BUFFER_OUT_VECTOR_BITWIDTH = BUFFER_OUT_VECTOR_WIDTH - 1
 
 # Multiply Adder Tree 
 CONV_MULT_WIDTH = 9
@@ -105,7 +112,7 @@ if estimate_resources:
 
 
     # Shift Window usage
-    le = le + (WINDOW_SIZE**2 * CAMERA_PIXEL_WIDTH)
+    le = le + (BUFFER_SIZE**2 * CAMERA_PIXEL_WIDTH)
     
     # mult-adder tree usage
     for i in range(0,NUM_KERNELS):
