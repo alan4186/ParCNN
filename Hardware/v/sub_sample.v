@@ -9,7 +9,7 @@ module sub_sample( // Mean pooling
 // parameter declarations
 
 // wire declarations
-wire [`POOL_OUT_BITWIDTH:0] adder_tree_wire [(`NEIGHBORHOOD_SIZE*2)-1];
+wire [`POOL_OUT_BITWIDTH:0] adder_tree_wire [(`NEIGHBORHOOD_SIZE*2)-1-1:0]; // use n-1:0 notation to appease modelsim
 
 // reg declarations
 
