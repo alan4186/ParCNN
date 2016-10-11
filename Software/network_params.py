@@ -6,15 +6,15 @@ estimate_resources = 1
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
 NUM_KERNELS = 10
-KERNEL_SIZE = 9 # square kernel
+KERNEL_SIZE = 7 # square kernel
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
 # Shift window size
 CAMERA_PIXEL_WIDTH = 8
-CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDHT - 1
-BUFFER_W = 9
+CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDTH - 1
+BUFFER_W = INPUT_SIZE 
 BUFFER_BW = BUFFER_W - 1 
-BUFFER_H = 9
+BUFFER_H = INPUT_SIZE
 BUFFER_BH = BUFFER_H - 1 
 BUFFER_SIZE = BUFFER_W * BUFFER_H
 BUFFER_OUT_VECTOR_WIDTH = BUFFER_W * BUFFER_H * CAMERA_PIXEL_WIDTH
@@ -112,8 +112,11 @@ if estimate_resources:
 
 
     # Shift Window usage
-    le = le + (BUFFER_SIZE**2 * CAMERA_PIXEL_WIDTH)
-    
+    le = le + (BUFFER_SIZE * CAMERA_PIXEL_WIDTH)
+    # window xy lookup
+    lookup_size = 350 # a guess
+    le = le + (lookup_size * KERNEL_SIZE**2)
+
     # mult-adder tree usage
     for i in range(0,NUM_KERNELS):
         mult = mult + (KERNEL_SIZE**2)
