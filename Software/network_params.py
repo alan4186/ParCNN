@@ -20,6 +20,10 @@ BUFFER_SIZE = BUFFER_W * BUFFER_H
 BUFFER_OUT_VECTOR_WIDTH = BUFFER_W * BUFFER_H * CAMERA_PIXEL_WIDTH
 BUFFER_OUT_VECTOR_BITWIDTH = BUFFER_OUT_VECTOR_WIDTH - 1
 
+# Shift window control (window_ctrl)
+BUFFER_X_POS = 0 # the X/Y position of the shifting window/ buffer on the screen
+BUFFER_Y_POS = 0 
+
 # Multiply Adder Tree 
 CONV_MULT_WIDTH = 9
 CONV_PRODUCT_WIDTH = CONV_MULT_WIDTH * 2 # the width of the product
