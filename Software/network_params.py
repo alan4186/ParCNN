@@ -5,16 +5,16 @@ estimate_resources = 1
 
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
-NUM_KERNELS = 3
+NUM_KERNELS = 10
 KERNEL_SIZE = 7 # square kernel
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
 # Shift window 
 CAMERA_PIXEL_WIDTH = 8
 CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDTH - 1
-BUFFER_W = 28
+BUFFER_W = INPUT_SIZE 
 BUFFER_BW = BUFFER_W - 1 
-BUFFER_H = 28
+BUFFER_H = INPUT_SIZE
 BUFFER_BH = BUFFER_H - 1 
 BUFFER_SIZE = BUFFER_W * BUFFER_H
 BUFFER_OUT_VECTOR_WIDTH = BUFFER_W * BUFFER_H * CAMERA_PIXEL_WIDTH
@@ -30,6 +30,10 @@ X_COORD_BITWIDTH = X_COORD_WIDTH - 1
 Y_COORD_WIDTH = int(math.ceil(math.log(BUFFER_H,2)))
 Y_COORD_BITWIDTH = Y_COORD_WIDTH - 1 
 
+
+# Shift window control (window_ctrl)
+BUFFER_X_POS = 0 # the X/Y position of the shifting window/ buffer on the screen
+BUFFER_Y_POS = 0 
 
 # Multiply Adder Tree 
 CONV_MULT_WIDTH = 9
@@ -108,15 +112,7 @@ if __name__ == "__main__":
     macroList = []
     blacklist = ['__', 'math', 'macroList','blacklist']
 
-    for k, v in list(locals().iteritems()):
-        if not any(substring in k for substring in blacklist):
-            macroList.append((k,v))
-    
-    with open("../Hardware/network_params.h", 'w') as f:
-        for macro in macroList:
-            f.write("`define " + str(macro[0]) + ' ' + str(macro[1]) + '\n')
-    
-    
+
     if estimate_resources:
         le = 0;
         mult = 0;
@@ -124,8 +120,11 @@ if __name__ == "__main__":
     
     
         # Shift Window usage
-        le = le + (BUFFER_SIZE**2 * CAMERA_PIXEL_WIDTH)
-        
+        le = le + (BUFFER_SIZE * CAMERA_PIXEL_WIDTH)
+        # window xy lookup
+        lookup_size = 350 # a guess
+        le = le + (lookup_size * KERNEL_SIZE**2)
+    
         # mult-adder tree usage
         for i in range(0,NUM_KERNELS):
             mult = mult + (KERNEL_SIZE**2)
@@ -137,7 +136,6 @@ if __name__ == "__main__":
             while x > 0:
                 le = le + (x* (CONV_PRODUCT_WIDTH + 1))
                 x = x/2
-        
         # rect-linear usage
         le = le + (CONV_ADD_WIDTH)
         # buffer 1 usage
@@ -157,4 +155,3 @@ if __name__ == "__main__":
         print "Estimated number of Logic elements: " + str(le)
         print "Estimated number of 9 bit multipliers: " + str(mult)
         print "Estimated number of memory bits: " + str(memory_bits)
-    
