@@ -13,7 +13,11 @@ module mult_adder_ctrl(
 // wire declarations
 
 // reg declarations
+reg rdy_shift_reg [`RDY_SHIFT_REG_SIZE]
 
+// assign statments
+assign rdy_shift_reg[`RDY_SHIFT_REG_SIZE-1] = buffer_rdy;
+assign rdy_shift_reg[0] = pixel_rdy;
 
 // x and y counters for window selectors
 always@(posedge clock or negedge reset) begin
@@ -36,3 +40,17 @@ always@(posedge clock or negedge reset) begin
     y_counter <= `Y_COORD_WIDTH'd0;
   end // reset
 end // always
+
+
+// shift register to hold ready signal
+genvar i;
+generate
+for (i=0; i < `RDY_SHIFT_REG_SIZE-1; i=i+1) begin
+  always@(posedge clock) begin
+    rdy_shift_reg[i] <= rdy_shift_reg[i+1];
+  end // always
+end // for
+endgenerate
+
+
+endmodule

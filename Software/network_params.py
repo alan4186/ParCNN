@@ -47,6 +47,7 @@ CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
+RDY_SHIFT_REG_SIZE = math.ceil(math.log(KERNEL_SIZE_SQ))
 # General Bitwidths
 NN_WIDTH = CONV_ADD_WIDTH
 NN_BITWIDTH = NN_WIDTH - 1
@@ -136,13 +137,19 @@ if __name__ == "__main__":
         for i in range(0,NUM_KERNELS):
             mult = mult + (KERNEL_SIZE**2)
             x = KERNEL_SIZE**2
+            """
+            # optimized tree
             if x % 2:
                 le = le + CONV_ADD_WIDTH + 1
                 x = x - 1
-    
+            
             while x > 0:
                 le = le + (x* (CONV_ADD_WIDTH + 1))
                 x = x/2
+            """
+            # unoptimized tree
+            le = le + ((CONV_ADD_WIDTH)*((2**math.ceil(math.log(x,2))*2)-1))
+
         # rect-linear usage
         le = le + (CONV_ADD_WIDTH)
         # buffer 1 usage
