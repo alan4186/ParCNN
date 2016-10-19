@@ -7,6 +7,7 @@ estimate_resources = 1
 INPUT_SIZE = 28 # dimension of square input image
 NUM_KERNELS = 10
 KERNEL_SIZE = 7 # square kernel
+KERNEL_SIZE_SQ = KERNEL_SIZE**2
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
 # Shift window 
@@ -37,9 +38,14 @@ BUFFER_Y_POS = 0
 
 # Multiply Adder Tree 
 CONV_MULT_WIDTH = 9
+CONV_MULT_BITWIDTH = CONV_MULT_WIDTH - 1
+MULT_ADDER_IN_BITWIDTH = KERNEL_SIZE_SQ * CONV_MULT_WIDTH
 CONV_PRODUCT_WIDTH = CONV_MULT_WIDTH * 2 # the width of the product
-CONV_ADD_WIDTH = 10
+CONV_PRODUCT_BITWIDTH = CONV_PRODUCT_WIDTH - 1
+CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH
+CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 
+CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
 # General Bitwidths
 NN_WIDTH = 16
 NN_BITWIDTH = NN_WIDTH - 1
@@ -130,11 +136,11 @@ if __name__ == "__main__":
             mult = mult + (KERNEL_SIZE**2)
             x = KERNEL_SIZE**2
             if x % 2:
-                le = le + CONV_PRODUCT_WIDTH + 1
+                le = le + CONV_ADD_WIDTH + 1
                 x = x - 1
     
             while x > 0:
-                le = le + (x* (CONV_PRODUCT_WIDTH + 1))
+                le = le + (x* (CONV_ADD_WIDTH + 1))
                 x = x/2
         # rect-linear usage
         le = le + (CONV_ADD_WIDTH)
