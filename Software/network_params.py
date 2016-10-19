@@ -30,7 +30,8 @@ X_COORD_WIDTH = int(math.ceil(math.log(BUFFER_W,2)))
 X_COORD_BITWIDTH = X_COORD_WIDTH - 1 
 Y_COORD_WIDTH = int(math.ceil(math.log(BUFFER_H,2)))
 Y_COORD_BITWIDTH = Y_COORD_WIDTH - 1 
-
+X_COORD_MAX = INPUT_SIZE
+Y_COORD_MAX = INPUT_SIZE
 
 # Shift window control (window_ctrl)
 BUFFER_X_POS = 0 # the X/Y position of the shifting window/ buffer on the screen
@@ -47,7 +48,7 @@ CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
 # General Bitwidths
-NN_WIDTH = 16
+NN_WIDTH = CONV_ADD_WIDTH
 NN_BITWIDTH = NN_WIDTH - 1
 
 
