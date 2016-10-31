@@ -71,6 +71,13 @@ MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
 # POOL_RESET= 1 # uncomment to add reset signal to sub sampleing/pooling adder tree
 POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
 
+
+# Feature Map Buffer Contorl module
+FM_ADDR_WIDTH = math.ceil(math.log(FEATURE_SIZE**2,2))
+FM_ADDR_BITWIDTH = FM_ADDR_WIDTH - 1
+FM_WIDTH = FEATURE_SIZE # the size of the y dimension of the feature map
+ADDR_MAX = FEATURE_SIZE**2
+
 # Softmax 
 SOFTMAX_IN_VECTOR_LENGTH = ((FEATURE_SIZE * FEATURE_SIZE) / NEIGHBORHOOD_SIZE ) * NUM_KERNELS  # the number of inputs to the softmax layer
 NUM_CLASSES = 4 # number of output classes for the entire nn, MUST BE A POWER OF 2!!! set unneeded class inputs to 0
