@@ -71,6 +71,11 @@ MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
 # POOL_RESET= 1 # uncomment to add reset signal to sub sampleing/pooling adder tree
 POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
 
+# Sub Sampling control (nh_shift_reg_ctrl)
+NH_WIDTH = CONV_ADD_WIDTH
+NH_BITWIDTH = NH_WIDTH - 1
+NH_SIZE = NEIGHTBORHOOD_SIZE
+NH_DIM = math.sqrt(NH_SIZE)
 
 # Feature Map Buffer Contorl module
 FM_ADDR_WIDTH = math.ceil(math.log(FEATURE_SIZE**2,2))

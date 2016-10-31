@@ -12,11 +12,15 @@ module nh_shift_reg_ctrl(
 
 // wire declarations
 wire [`NH_BITWIDTH:0] shift_ins [`NH_DIM-1:0]; 
+wire [(`NH_SIZE*2)-1:0] reg_valid;
 
 // reg declarations
 reg [`NH_BITWIDTH:0] nh_reg [`NH_DIM-1:0][`NH_DIM-1:0]
 
 // assign statments
+assign dval = reg_rdy[0];
+
+
 
 // instantiate the shift registers to hold the current nh
 genvar i;
@@ -24,6 +28,9 @@ genvar j;
 generate 
 for (j=0; j<`NH_DIM-1; j=j+1) begin : nh_row_loop
   for (i=0; i<`NH_DIM-1; i=i+1) begin : le_sr_inst 
+    // assign dval signal to wire 
+    assign reg_valid[(j*`NH_DIM+i)+`NH_SIZE] = nh_reg[i][j];
+    // connect nh le's into shift reg
     always@(posedge clock or negedge reset) begin
       if(reset == 1'b0) begin
         nh_reg[i][j] <= `NH_WIDTH'd0;
@@ -48,5 +55,12 @@ for( k=0; k<`NH_DIM-1; i=i+1) begin : ram_sr_inst
 end // for
 endgenerate
 
-
+// OR the data valid signals
+genvar m;
+generate
+for (m=0; m<(`NH_SIZE*2)-1; m=m+1) begin: or_loop
+  assign reg_valid[(m/2)-1] = reg_valid[m] | reg_valid[m-1];
+end // for
+endgenerate
+  
 endmodule
