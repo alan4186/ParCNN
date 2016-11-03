@@ -4,8 +4,8 @@ module mult_adder_ctrl(
   input reset,
   
   input buffer_rdy,
-  output reg [`X_COORD_BITWIDTH:0] x_coord,
-  output reg [`Y_COORD_BITWIDTH:0] y_coord,
+  output [`X_COORD_BITWIDTH:0] x_coord,
+  output [`Y_COORD_BITWIDTH:0] y_coord,
 
   output pixel_rdy // indicates valid data at end of tree/pipeline
 );
@@ -13,11 +13,17 @@ module mult_adder_ctrl(
 // wire declarations
 
 // reg declarations
-reg rdy_shift_reg [`RDY_SHIFT_REG_SIZE]
+reg rdy_shift_reg [`RDY_SHIFT_REG_SIZE];
+reg [`X_COORD_BITWIDTH:0] x_counter;
+reg [`Y_COORD_BITWIDTH:0] y_counter;
+
 
 // assign statments
-assign rdy_shift_reg[`RDY_SHIFT_REG_SIZE-1] = buffer_rdy;
-assign rdy_shift_reg[0] = pixel_rdy;
+assign pixel_rdy = rdy_shift_reg[0];
+
+assign x_coord = x_counter;
+assign y_coord = y_counter;
+
 
 // x and y counters for window selectors
 always@(posedge clock or negedge reset) begin
@@ -45,12 +51,15 @@ end // always
 // shift register to hold ready signal
 genvar i;
 generate
-for (i=0; i < `RDY_SHIFT_REG_SIZE-1; i=i+1) begin
+for (i=0; i < `RDY_SHIFT_REG_SIZE-1; i=i+1) begin : shift_reg_loop
   always@(posedge clock) begin
     rdy_shift_reg[i] <= rdy_shift_reg[i+1];
   end // always
 end // for
 endgenerate
-
+// connect input to shift reg
+always@(posedge clock) begin
+  rdy_shift_reg[`RDY_SHIFT_REG_SIZE-1] <= buffer_rdy;
+end
 
 endmodule

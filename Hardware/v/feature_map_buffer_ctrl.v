@@ -1,11 +1,12 @@
 module feature_map_buffer_ctrl(
   input clock,
   input reset,
-  input [`FM_ADDR_BITWIDTH:0] addr,
   input data_rdy,
   
   input [`X_COORD_BITWIDTH:0] xcoord,
   input [`Y_COORD_BITWIDTH:0] ycoord, 
+
+  output reg [`FM_ADDR_BITWIDTH:0] addr,
   output reg buffer_full
 );
 

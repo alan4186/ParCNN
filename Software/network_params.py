@@ -10,6 +10,10 @@ KERNEL_SIZE = 7 # square kernel
 KERNEL_SIZE_SQ = KERNEL_SIZE**2
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
+# Screen resolution
+X_RES = 800
+Y_RES = 600
+
 # Shift window 
 CAMERA_PIXEL_WIDTH = 8
 CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDTH - 1
@@ -32,6 +36,10 @@ Y_COORD_WIDTH = int(math.ceil(math.log(BUFFER_H,2)))
 Y_COORD_BITWIDTH = Y_COORD_WIDTH - 1 
 X_COORD_MAX = INPUT_SIZE
 Y_COORD_MAX = INPUT_SIZE
+SCREEN_X_WIDTH = int(math.ceil(math.log(X_RES,2)))
+SCREEN_X_BITWIDTH = SCREEN_X_WIDTH - 1
+SCREEN_Y_WIDTH = int(math.ceil(math.log(Y_RES,2)))
+SCREEN_Y_BITWIDTH = SCREEN_Y_WIDTH - 1
 
 # Shift window control (window_ctrl)
 BUFFER_X_POS = 0 # the X/Y position of the shifting window/ buffer on the screen
@@ -47,7 +55,7 @@ CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
-RDY_SHIFT_REG_SIZE = math.ceil(math.log(KERNEL_SIZE_SQ))
+RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ)))
 # General Bitwidths
 NN_WIDTH = CONV_ADD_WIDTH
 NN_BITWIDTH = NN_WIDTH - 1
@@ -60,7 +68,7 @@ RECT_OUT_WIDTH = RECT_IN_WIDTH
 # Sub sampling
 NUM_POOLERS = NUM_KERNELS
 NEIGHBORHOOD_SIZE = 4
-NH_DIM = math.sqrt(NEIGHBORHOOD_SIZE)
+NH_DIM = int(math.sqrt(NEIGHBORHOOD_SIZE))
 NH_VECTOR_WIDTH = NEIGHBORHOOD_SIZE*NN_WIDTH
 NH_VECTOR_BITWIDTH = NH_VECTOR_WIDTH - 1 
 NUM_NH_LAYERS = int(math.ceil(math.log(NEIGHBORHOOD_SIZE,2)))
@@ -74,11 +82,11 @@ POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
 # Sub Sampling control (nh_shift_reg_ctrl)
 NH_WIDTH = CONV_ADD_WIDTH
 NH_BITWIDTH = NH_WIDTH - 1
-NH_SIZE = NEIGHTBORHOOD_SIZE
-NH_DIM = math.sqrt(NH_SIZE)
+NH_SIZE = NEIGHBORHOOD_SIZE
+NH_DIM = int(math.sqrt(NH_SIZE))
 
 # Feature Map Buffer Contorl module
-FM_ADDR_WIDTH = math.ceil(math.log(FEATURE_SIZE**2,2))
+FM_ADDR_WIDTH = int(math.ceil(math.log(FEATURE_SIZE**2,2)))
 FM_ADDR_BITWIDTH = FM_ADDR_WIDTH - 1
 FM_WIDTH = FEATURE_SIZE # the size of the y dimension of the feature map
 ADDR_MAX = FEATURE_SIZE**2
@@ -91,9 +99,9 @@ NUM_CLASSES = 4 # number of output classes for the entire nn, MUST BE A POWER OF
 NUM_INPUT_IM = 1 # The number of images input to the layer at a time
 NUM_INPUT_N  = (NUM_KERNELS * FEATURE_SIZE * FEATURE_SIZE )# The number of input neurons to the layer
 NUM_OUTPUT_N = NUM_CLASSES
-FFN_WIDTH = NN_WIDTH # The width of the inputs to the feed forward network. Should be the same as the output width of the softmax layer.
-FFN_BITWIDTH = (FFN_WIDTH - 1)
-FFN_OUT_WIDTH = (FFN_WIDTH * 2) + int(math.ceil(math.log(NUM_INPUT_N,2))) # The width of the outputs of the feed forward network
+FFN_IN_WIDTH =  CONV_ADD_WIDTH # The width of the inputs to the feed forward network. Should be the same as the output width of the softmax layer.
+FFN_IN_BITWIDTH = (FFN_IN_WIDTH - 1)
+FFN_OUT_WIDTH = (FFN_IN_WIDTH * 2) + int(math.ceil(math.log(NUM_INPUT_N,2))) # The width of the outputs of the feed forward network
 FFN_OUT_BITWIDTH = (FFN_OUT_WIDTH - 1)
 SUM_WIRE_LEN = ( NUM_INPUT_N * 2 ) - 1 # The number of indexes in the adder tree vector
 
@@ -133,13 +141,19 @@ if __name__ == "__main__":
     macroList = []
     blacklist = ['__', 'math', 'macroList','blacklist']
 
+ 
+    for k, v in list(locals().iteritems()):
+        if not any(substring in k for substring in blacklist):
+            macroList.append((k,v))
+            with open("../Hardware/network_params.h", 'w') as f:
+                for macro in macroList:
+                    f.write("`define " + str(macro[0]) + ' ' + str(macro[1]) + '\n')
 
     if estimate_resources:
         le = 0;
         mult = 0;
         memory_bits = 0;
-    
-    
+        
         # Shift Window usage
         le = le + (BUFFER_SIZE * CAMERA_PIXEL_WIDTH)
         # window xy lookup
