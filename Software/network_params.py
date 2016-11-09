@@ -90,6 +90,9 @@ FM_ADDR_WIDTH = int(math.ceil(math.log(FEATURE_SIZE**2,2)))
 FM_ADDR_BITWIDTH = FM_ADDR_WIDTH - 1
 FM_WIDTH = FEATURE_SIZE # the size of the y dimension of the feature map
 ADDR_MAX = FEATURE_SIZE**2
+NP_MAX_COUNT = ADDR_MAX # same variable, different name for inside matrix_mult.v
+NP_COUNT_WIDTH = FM_ADDR_WIDTH
+NP_COUNT_BITWIDTH = FM_ADDR_BITWIDTH
 
 # Softmax 
 SOFTMAX_IN_VECTOR_LENGTH = ((FEATURE_SIZE * FEATURE_SIZE) / NEIGHBORHOOD_SIZE ) * NUM_KERNELS  # the number of inputs to the softmax layer
