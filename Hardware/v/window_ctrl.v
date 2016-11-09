@@ -12,7 +12,7 @@ module window_ctrl (
   // video stream in
   input [`SCREEN_X_BITWIDTH:0] screen_x, // the x coordinate of the current pixel input
   input [`SCREEN_Y_BITWIDTH:0] screen_y, // the y coordinate of the current pixel input
-  input [`CAMERA_PIXEL_BITWIDTH:0] pixel_in,
+  // input [`CAMERA_PIXEL_BITWIDTH:0] pixel_in,
 
   // window/ buffer control signals
   output reg shift_up,
@@ -61,6 +61,8 @@ always@(posedge clock or negedge reset) begin
            screen_y == buffer_y_pos + `SCREEN_Y_WIDTH'd`BUFFER_H)
     // the buffer is full 
     buffer_rdy <= 1'b1;
+  else
+    buffer_rdy <= buffer_rdy;
 end // always
 
 endmodule
