@@ -21,6 +21,9 @@ wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
 wire [`NUM_KERNELS-1:0] fm_pixel_vector; // one pixel from the end of each multiply adder tree
 wire [`NUM_KERNELS-1:0] rectified_vector; // one pixel from the output of each rect-linear module 
 
+// feature map RAM buffer wires
+wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr;
+
 // reg declarations
 
 // parameters
@@ -89,15 +92,37 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
   fm_buffer fm_buffer_inst(
     .clock(clock),
     .reset(reset),
-    // addr
-    // data
-    // q
+    .wraddress(),
+    .data(rectified_vector[tree_count]),
+    .wren(),
+    .rdaddress(),
+    .q()
   );
 
   // Weight Matrix Buffer
 
 end // for
 end generate
+
+fm_coord_sr fm_coord_sr_inst(
+  .clock(clock),
+  .reset(reset),
+  .x_coord(ma_x_coord),
+  .y_coord(ma_y_coord),
+  .fm_x_coord(fm_x_coord),
+  .fm_y_coord(fm_y_coord)
+);
+
+
+feature_map_buffer_ctrl(
+  .clock(clock),
+  .reset(reset),
+  .data_rdy(),
+  .xcoord(fm_y_coord),// must hold coords through tree
+  .ycoord(fm_y_coord),
+  .addr(fm_wr_addr),
+  .buffer_full()
+);
 
 
 // read port mux
