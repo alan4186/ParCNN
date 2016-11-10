@@ -25,7 +25,8 @@ wire [`NUM_KERNELS-1:0] rectified_vector; // one pixel from the output of each r
 
 // feature map RAM buffer wires
 wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr;
-wire [(`FFN_IN_WIDTH*NUM_KERNELS)-1:0] buffer_data_vector;
+wire [(`FFN_IN_WIDTH*NUM_KERNELS)-1:0] fm_buffer_data_vector;
+wire [(`FFN_IN_WIDTH*NUM_KERNELS)-1:0] w_buffer_data_vector;
 wire [`FFN_IN_BITWIDTH:0] fm_mux_q;
 wire fm_buffer_full;
 
@@ -164,10 +165,20 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .data(rectified_vector[tree_count]),
     .wren(pixel_rdy),
     .rdaddress(fm_rd_addr),
-    .q(buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
+    .q(fm_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
   );
 
   // Weight Matrix Buffer
+  weight_rom weight_buffer_inst(
+    .clock(clock),
+    .reset(reset),
+//    .wraddress(weight_wr_addr),
+//    .data()
+//    .wren(pixel_rdy),
+    .rdaddress(fm_rd_addr),
+    .q(w_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
+  );
+
 
 end // for
 end generate
@@ -194,14 +205,21 @@ feature_map_buffer_ctrl(
 
 
 // read port mux
-read_port_mux port_mux_inst(
+read_port_mux fm_port_mux_inst(
   .clock(clock),
   .reset(reset),
   .ram_select(fm_buffer_select),
-  .buffer_data_vector(buffer_data_vector),
+  .buffer_data_vector(fm_buffer_data_vector),
   .data_out(fm_mux_q)
 );
 
+read_port_mux w_port_mux_inst(
+  .clock(clock),
+  .reset(reset),
+  .ram_select(fm_buffer_select),
+  .buffer_data_vector(w_buffer_data_vector),
+  .data_out(w_mux_q)
+);
 // matrix multiply
 genvar np_counter;
 generate
@@ -210,10 +228,8 @@ for (np_counter=0; np_counter<`NUM_CLASSES; np_counter=np_counter+1) begin : np_
     .clock(clock),
     .reset(reset),
     .feature_pixel(fm_mux_q),
-    .weight(),
+    .weight(w_mux_q),
     .sum(),
-    .dval(),
-    .buf_addr()
   );
 end // for
 endgenerate
