@@ -55,7 +55,7 @@ CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
-RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ)))
+RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) + 1 + 1# +1 for rect linar and multipliers
 # General Bitwidths
 NN_WIDTH = CONV_ADD_WIDTH
 NN_BITWIDTH = NN_WIDTH - 1
