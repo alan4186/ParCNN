@@ -19,7 +19,8 @@ assign carry_wire [(`KERNEL_SIZE_SQ*2)-1-1:`KERNEL_SIZE_SQ-1] = `KERNEL_SIZE_SQ'
 // connect input vector to multipliers
 genvar i;
 generate
-for(i = 0; i < `KERNEL_SIZE_SQ; i=i+1) begin : connect_mul
+//for(i = 0; i < `KERNEL_SIZE_SQ; i=i+1) begin : connect_mul
+for(i = 0; i < `MA_TREE_SIZE; i=i+1) begin : connect_mul
    mult_adder_mult ma_mult_inst(
     .clock(clock),
     .reset(reset),
@@ -33,7 +34,8 @@ endgenerate
 // map products to adder tree wire
 genvar i;
 generate
-for(i = 0; i < `KERNEL_SIZE_SQ; i=i+1) begin : connect_in_vector
+//for(i = 0; i < `KERNEL_SIZE_SQ; i=i+1) begin : connect_in_vector
+for(i = 0; i < `MA_TREE_SIZE; i=i+1) begin : connect_in_vector
     assign adder_tree_wire[i+`KERNEL_SIZE_SQ-1] = { `MA_ADDER_TREE_PAD'd0,
       in[(`CONV_PRODUCT_WIDTH*i)+`CONV_PRODUCT_BITWIDTH:`CONV_PRODUCT_WIDTH*i] };
   end
@@ -42,7 +44,8 @@ endgenerate
 // connect adder tree
 genvar j;
 generate
-for(j= (`KERNIL_SIZE_SQ*2)-2 ; j >=1 ; j=j-2) begin : sum_products
+//for(j= (`KERNIL_SIZE_SQ*2)-2 ; j >=1 ; j=j-2) begin : sum_products
+for(j= (`MA_TREE_SIZE*2)-2 ; j >=1 ; j=j-2) begin : sum_products
   mult_adder_add ma_add_inst(
     .clock(clock),
     .reset(reset),

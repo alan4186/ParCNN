@@ -5,7 +5,7 @@ estimate_resources = 1
 
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
-NUM_KERNELS = 10
+NUM_KERNELS = 8
 KERNEL_SIZE = 7 # square kernel
 KERNEL_SIZE_SQ = KERNEL_SIZE**2
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
@@ -15,7 +15,7 @@ X_RES = 800
 Y_RES = 600
 
 # Shift window 
-CAMERA_PIXEL_WIDTH = 8
+CAMERA_PIXEL_WIDTH = 9
 CAMERA_PIXEL_BITWIDTH = CAMERA_PIXEL_WIDTH - 1
 BUFFER_W = INPUT_SIZE 
 BUFFER_BW = BUFFER_W - 1 
@@ -53,9 +53,12 @@ CONV_PRODUCT_WIDTH = CONV_MULT_WIDTH * 2 # the width of the product
 CONV_PRODUCT_BITWIDTH = CONV_PRODUCT_WIDTH - 1
 CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
-
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
 RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) + 1 + 1# +1 for rect linar and multipliers
+WINDOW_PAD_WIDTH = 2**int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) - KERNEL_SIZE_SQ
+WINDOW_PAD_BITWIDTH = WINDOW_PAD_WIDTH - 1
+MA_TREE_SIZE = 2**int(math.ceil(math.log(KENEL_SIZE_SQ,2))) # the number of elements in hte base of the tree, equivilant to the number of multipliers needed in each tree
+
 # General Bitwidths
 NN_WIDTH = CONV_ADD_WIDTH
 NN_BITWIDTH = NN_WIDTH - 1
@@ -165,7 +168,7 @@ if __name__ == "__main__":
     
         # mult-adder tree usage
         for i in range(0,NUM_KERNELS):
-            mult = mult + (KERNEL_SIZE**2)
+            mult = mult + (2**math.ceil(math.log(KERNEL_SIZE**2,2)))
             x = KERNEL_SIZE**2
             """
             # optimized tree
