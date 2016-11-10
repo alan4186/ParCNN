@@ -8,13 +8,13 @@ module mult_adder(
 		  );
 
 // wire declarations
-wire [`CONV_PRODUCT_WIDTH:0] in_add_vector_wire [`KERNEL_SIZE_SQ];
-wire [`CONV_PRODUCT_WIDTH:0] adder_tree_wire [(`KERNEL_SIZE_SQ*2)-1];
-wire carry_wire [(`KERNEL_SIZE_SQ*2)-1];  
+wire [`CONV_PRODUCT_BITWIDTH:0] in_add_vector_wire [`MA_TREE_SIZE];
+wire [`CONV_ADD_BITWIDTH:0] adder_tree_wire [(`MA_TREE_SIZE*2)-1];
+wire carry_wire [(`MA_TREE_SIZE*2)-1];  
 
 // assign statments
 assign out = adder_tree_wire[0];
-assign carry_wire [(`KERNEL_SIZE_SQ*2)-1-1:`KERNEL_SIZE_SQ-1] = `KERNEL_SIZE_SQ'd0;
+assign carry_wire [(`MA_TREE_SIZE*2)-1-1:`MA_TREE_SIZE-1] = `MA_TREE_SIZE'd0;
 
 // connect input vector to multipliers
 genvar i;
@@ -33,11 +33,16 @@ endgenerate
 
 // map products to adder tree wire
 genvar i;
+genvar pad_count
 generate
 //for(i = 0; i < `KERNEL_SIZE_SQ; i=i+1) begin : connect_in_vector
 for(i = 0; i < `MA_TREE_SIZE; i=i+1) begin : connect_in_vector
-    assign adder_tree_wire[i+`KERNEL_SIZE_SQ-1] = { `MA_ADDER_TREE_PAD'd0,
-      in[(`CONV_PRODUCT_WIDTH*i)+`CONV_PRODUCT_BITWIDTH:`CONV_PRODUCT_WIDTH*i] };
+    // assign the lsbs here
+    assign adder_tree_wire[i+`MA_TREE_SIZE-1][`CONV_PRODUCT_BITWIDTH:0] = in[(`CONV_PRODUCT_WIDTH*i)+`CONV_PRODUCT_BITWIDTH:`CONV_PRODUCT_WIDTH*i];
+    // loop over msb and assign sign bit here
+    for(pad_count=0; pad_count<`MULT_PAD_WIDTH; pad_count=pad_count+1) begin sign_bit_extention_loop
+      assign adder_tree_wire[i+`MA_TREE_SIZE-1][`CONV_PRODUCT_WIDTH+pad_count] = in[(`CONV_PRODUCT_WIDTH*i)+`CONV_PRODUCT_BITWIDTH];
+    end // pad count 
   end
 endgenerate
 
