@@ -8,11 +8,13 @@ module top(
   input [`CAMERA_PIXEL_BITWIDTH:0] test_pixel,
   // hex outputs
   
-  output [`RECT_OUT_BITWIDTH:0] rect1
+  output [`RECT_OUT_BITWIDTH:0] rect1,
+  output [`RECT_OUT_BITWIDTH:0] rect2
 );
 
 // FOR TESTING
 assign rect1 = rectified_vector[0];
+assign rect2 = rectified_vector[1];
 parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0;
 parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 

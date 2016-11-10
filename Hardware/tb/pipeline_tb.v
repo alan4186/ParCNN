@@ -9,6 +9,7 @@ reg [`SCREEN_Y_BITWIDTH:0] screen_y;
 reg [`CAMERA_PIXEL_BITWIDTH:0] pixel;
 
 wire [`RECT_OUT_BITWIDTH:0] rect1;
+wire [`RECT_OUT_BITWIDTH:0] rect2;
 
 // DUT
 top top_inst(
@@ -17,7 +18,8 @@ top top_inst(
   .scree_x_pos(screen_x),
   .screen_y_pos(screen_y),
   .test_pixel(pixel),
-  .rect1(rect1)
+  .rect1(rect1),
+  .rect2(rect2)
 );
 
 always begin
