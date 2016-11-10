@@ -4,7 +4,7 @@ module mult_adder(
 		  input     reset, 
 		  input [`MULT_ADDER_IN_BITWIDTH:0]  in,
 		  input [`MULT_ADDER_IN_BITWIDTH:0]  kernal,
-		  output [`CONV_PRODUCT_WIDTH:0] out	
+		  output [`CONV_ADD_BITWIDTH:0] out	
 		  );
 
 // wire declarations
