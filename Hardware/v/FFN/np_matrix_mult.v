@@ -6,14 +6,14 @@ module np_matrix_mult(
    
   input [`FFN_IN_BITWIDTH:0] feature_pixel,
   input [`FFN_IN_BITWIDTH:0] weight,
-
+  input en,
 //  input [`NUM_MM_BUFFER-1:0] frame_rdy, assume frame is ready
   //output reg [`NUM_MM_BUFFER-1:0] reading_frame, // a vector of boolean signals. one signal per frame/feature buffer
 
-  output reg [`FFN_OUT_BITWIDTH:0] sum,
-  output reg d_val,
+  output reg [`FFN_OUT_BITWIDTH:0] sum
+//  output reg d_val,
 
-  output [`FM_ADDR_BITWIDTH:0] buf_addr
+//  output [`FM_ADDR_BITWIDTH:0] buf_addr
 );
 
 // parameter declaration
@@ -23,18 +23,21 @@ wire [`FFN_OUT_BITWIDTH:0] sum_prelatch;
 wire overflow_wire;
 
 // reg declaration
-reg [`FM_ADDR_BITWIDTH:0] count;
+//reg [`FM_ADDR_BITWIDTH:0] count;
 
 // assign statments
-assign buf_addr = count;
+// assign buf_addr = count;
+assign fp = en ? feature_pixel : `FFN_IN_WIDTH'd0;
+assign w = en ? weight : `FFN_IN_WIDTH'd0;
+assign s = en ? sum : `FFN_OUT_WIDTH'd0;
 
 // instantiate multiplyer
 // there should be no registers in mult module
 mult_np_mm mult_inst(
   .clock(clock),
   .reset(reset),
-  .operand_a(feature_pixel),
-  .operand_b(weight),
+  .operand_a(fm),
+  .operand_b(w),
   .product(product)
 );
 
@@ -44,28 +47,39 @@ add_np_mm add_inst(
   .clock(clock), 
   .reset(reset),
   .operand_a(product),
-  .operand_b(sum),
+  .operand_b(s),
   .sum(sum_prelatch),
   .overflow(overflow_wire)
 );
 
-// counter and data valid logic
+
 always@(posedge clock or negedge reset) begin
   if( reset == 1'b0) begin
-    d_val <= 1'd0;
-    count <= `NP_COUNT_WIDTH'd0;
     sum <= `FFN_OUT_WIDTH'd0;
-  end else if( count == `NP_COUNT_WIDTH'd`NP_MAX_COUNT) begin
-    d_val <= 1'd1;
-    count <= `NP_COUNT_WIDTH'd0;
-    sum <= `FFN_OUT_WIDTH'd0; 
   end else begin 
-    d_val <= 1'd0;
-    count <= count + `NP_COUNT_WIDTH'd1;
     sum <= sum_prelatch; // output current sum
   end
 end // always
 
+
+/*
+// counter and data valid logic
+always@(posedge clock or negedge reset) begin
+  if( reset == 1'b0) begin
+//    d_val <= 1'd0;
+//    count <= `NP_COUNT_WIDTH'd0;
+    sum <= `FFN_OUT_WIDTH'd0;
+  end else if( count == `NP_COUNT_WIDTH'd`NP_MAX_COUNT) begin
+//    d_val <= 1'd1;
+//    count <= `NP_COUNT_WIDTH'd0;
+    sum <= `FFN_OUT_WIDTH'd0; 
+  end else begin 
+//    d_val <= 1'd0;
+//    count <= count + `NP_COUNT_WIDTH'd1;
+    sum <= sum_prelatch; // output current sum
+  end
+end // always
+*/
 
 /*
 // buffer select logic
