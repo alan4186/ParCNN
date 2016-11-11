@@ -157,7 +157,7 @@ window_ctrl window_ctrl_inst(
 mult_adder_ctrl ma_inst(
   .clock(clock),
   .reset(reset),
-  .buffer_rdy(buffer_rdy),
+  .start(buffer_rdy),
   .x_coord(ma_x_coord),
   .y_coord(ma_y_coord),
   .pixel_rdy(pixel_rdy) // rdy sr includes regs for mult and rect linear stages

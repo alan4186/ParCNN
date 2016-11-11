@@ -54,7 +54,7 @@ end // always
 always@(posedge clock or negedge reset) begin
   if (reset == 1'b0) begin
     buffer_rdy <= 1'b0;
-  else if( screen_x == buffer_x_pos + `SCREEN_X_WIDTH'd`BUFFER_W &&
+  end else if( screen_x == buffer_x_pos + `SCREEN_X_WIDTH'd`BUFFER_W &&
            screen_y == buffer_y_pos + `SCREEN_Y_WIDTH'd`BUFFER_H)
     // the buffer is full 
     buffer_rdy <= 1'b1;
