@@ -8,8 +8,8 @@ module mult_adder(
 		  );
 
 // wire declarations
-wire [`CONV_PRODUCT_BITWIDTH:0] in_add_vector_wire [`MA_TREE_SIZE];
-wire [`CONV_ADD_BITWIDTH:0] adder_tree_wire [(`MA_TREE_SIZE*2)-1];
+wire [`CONV_PRODUCT_BITWIDTH:0] in_add_vector_wire [`MA_TREE_SIZE-1:0];
+wire [`CONV_ADD_BITWIDTH:0] adder_tree_wire [((`MA_TREE_SIZE*2)-1)-1:0];
 wire [(`MA_TREE_SIZE*2)-1-1:0]carry_wire ;  
 
 // assign statments

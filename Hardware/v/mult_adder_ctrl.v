@@ -13,7 +13,7 @@ module mult_adder_ctrl(
 // wire declarations
 
 // reg declarations
-reg rdy_shift_reg [`RDY_SHIFT_REG_SIZE];
+reg rdy_shift_reg [`RDY_SHIFT_REG_SIZE-1:0];
 reg [`X_COORD_BITWIDTH:0] x_counter;
 reg [`Y_COORD_BITWIDTH:0] y_counter;
 

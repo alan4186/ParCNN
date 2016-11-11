@@ -1,3 +1,4 @@
+`include "../network_params.h"
 module top(
   input clock, 
   input reset,
@@ -12,11 +13,6 @@ module top(
   output [`RECT_OUT_BITWIDTH:0] rect2
 );
 
-// FOR TESTING
-assign rect1 = rectified_vector[0];
-assign rect2 = rectified_vector[1];
-parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0;
-parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 
 //////////////////////
 // wire declaratations
@@ -54,8 +50,15 @@ wire fm_buffer_full;
 // reg declarations
 
 // parameters
-//parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd300;
+//parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd300; // changed for testing
 //parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd300;
+
+// FOR TESTING
+assign rect1 = rectified_vector[0];
+assign rect2 = rectified_vector[1];
+parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0;
+parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
+
 
 
 // camera refrence design

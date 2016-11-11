@@ -1,5 +1,5 @@
 `include "../network_params.h"
-module pipline_tb();
+module pipeline_tb();
 reg clock;
 reg reset;
 
@@ -15,7 +15,7 @@ wire [`RECT_OUT_BITWIDTH:0] rect2;
 top top_inst(
   .clock(clock),
   .reset(reset),
-  .scree_x_pos(screen_x),
+  .screen_x_pos(screen_x),
   .screen_y_pos(screen_y),
   .test_pixel(pixel),
   .rect1(rect1),
@@ -30,6 +30,8 @@ initial begin
   clock = 1'b0;
   reset = 1'b1;
   pixel = 9'b001000000; // 0.25
+  
+  #1000000 $stop;
 end
 
 always@(posedge clock) begin
