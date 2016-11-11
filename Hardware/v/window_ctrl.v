@@ -19,6 +19,7 @@ module window_ctrl (
   output reg shift_left,
 
   // mult_adder tree ready signal to indicate valid data
+  // will strobe once when data is ready
   output reg buffer_rdy
 
 );
@@ -52,17 +53,13 @@ end // always
 // buffer ready control
 always@(posedge clock or negedge reset) begin
   if (reset == 1'b0) begin
-
-  end else if (buffer_x_pos == screen_x &&
-               buffer_y_pos == screen_y )
-    // a new frame is starting, writing over old buffer
     buffer_rdy <= 1'b0;
   else if( screen_x == buffer_x_pos + `SCREEN_X_WIDTH'd`BUFFER_W &&
            screen_y == buffer_y_pos + `SCREEN_Y_WIDTH'd`BUFFER_H)
     // the buffer is full 
     buffer_rdy <= 1'b1;
   else
-    buffer_rdy <= buffer_rdy;
+    buffer_rdy <= 1'b0;
 end // always
 
 endmodule
