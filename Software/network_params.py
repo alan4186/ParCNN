@@ -48,20 +48,20 @@ BUFFER_X_POS = 0 # the X/Y position of the shifting window/ buffer on the screen
 BUFFER_Y_POS = 0 
 
 # Multiply Adder Tree 
+MA_TREE_SIZE = 2**int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) # the number of elements in hte base of the tree, equivilant to the number of multipliers needed in each tree
 CONV_MULT_WIDTH = 9
 CONV_MULT_BITWIDTH = CONV_MULT_WIDTH - 1
-MULT_ADDER_IN_BITWIDTH = KERNEL_SIZE_SQ * CONV_MULT_WIDTH
 CONV_PRODUCT_WIDTH = CONV_MULT_WIDTH * 2 # the width of the product
 CONV_PRODUCT_BITWIDTH = CONV_PRODUCT_WIDTH - 1
-CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH + int(math.ceil(math.log(KERNEL_SIZE_SQ,2)))
+CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH + int(math.ceil(math.log(MA_TREE_SIZE,2)))
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
 RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) + 1 + 1# +1 for rect linar and multipliers
+FM_COORD_SR_DEPTH = RDY_SHIFT_REG_SIZE
 WINDOW_PAD_WIDTH = 2**int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) - KERNEL_SIZE_SQ
 WINDOW_PAD_BITWIDTH = WINDOW_PAD_WIDTH - 1
-MA_TREE_SIZE = 2**int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) # the number of elements in hte base of the tree, equivilant to the number of multipliers needed in each tree
 MULT_PAD_WIDTH = int(math.ceil(math.log(KERNEL_SIZE_SQ,2)))
-
+MULT_ADDER_IN_BITWIDTH =  MA_TREE_SIZE * CONV_MULT_WIDTH
  
 
 # General Bitwidths
@@ -71,7 +71,7 @@ NN_BITWIDTH = NN_WIDTH - 1
 
 # Rect Linear
 RECT_IN_WIDTH = CONV_ADD_WIDTH
-RECT_IN_BITWIDTH = REC_IN_WIDTH - 1
+RECT_IN_BITWIDTH = RECT_IN_WIDTH - 1
 RECT_OUT_WIDTH = RECT_IN_WIDTH
 RECT_OUT_BITWIDTH = RECT_OUT_WIDTH - 1
 

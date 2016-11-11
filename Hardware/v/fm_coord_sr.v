@@ -1,9 +1,12 @@
 `include "../network_params.h"
 module fm_coord_sr (
+  input clock,
+  input reset,
+  
   input [`X_COORD_BITWIDTH:0] x_coord, // from mult adder ctrl
   input [`Y_COORD_BITWIDTH:0] y_coord, // from mult adder ctrl
   output [`X_COORD_BITWIDTH:0] fm_x_coord, // from mult adder ctrl
-  output [`Y_COORD_BITWIDTH:0] fm_y_coord, // from mult adder ctrl
+  output [`Y_COORD_BITWIDTH:0] fm_y_coord // from mult adder ctrl
 );
 
 // reg declarations
@@ -30,9 +33,7 @@ end // always
 // loop to build shift reg
 genvar i;
 generate
-                            // plus 1 for rect linear stage, - 1 for always
-                            // block outside gen loop
-for (i=0; i<`MULT_ADDER_DEPTH; i=i+1) begin : coord_sr_gen
+for (i=0; i<`FM_COORD_SR_DEPTH-1; i=i+1) begin : coord_sr_gen
   always@(posedge clock or negedge reset) begin 
     if(reset == 1'b0) begin
       xc[i+1] <= `X_COORD_WIDTH'd0;
@@ -42,6 +43,7 @@ for (i=0; i<`MULT_ADDER_DEPTH; i=i+1) begin : coord_sr_gen
       yc[i+1] <= yc[i];
     end // reset
   end // always
+end // for
 endgenerate
 
 endmodule

@@ -21,6 +21,10 @@ module np_matrix_mult(
 // wire declaration
 wire [`FFN_OUT_BITWIDTH:0] sum_prelatch;
 wire overflow_wire;
+wire [`FFN_IN_BITWIDTH:0] fp;
+wire [`FFN_IN_BITWIDTH:0] w;
+wire [`FFN_OUT_BITWIDTH:0] s;
+wire [`FFN_OUT_BITWIDTH:0] product;
 
 // reg declaration
 //reg [`FM_ADDR_BITWIDTH:0] count;
@@ -36,7 +40,7 @@ assign s = en ? sum : `FFN_OUT_WIDTH'd0;
 mult_np_mm mult_inst(
   .clock(clock),
   .reset(reset),
-  .operand_a(fm),
+  .operand_a(fp),
   .operand_b(w),
   .product(product)
 );

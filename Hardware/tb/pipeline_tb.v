@@ -34,7 +34,7 @@ end
 
 always@(posedge clock) begin
   if(screen_x < 35) begin
-    screen_x <= screen_x + 1
+    screen_x <= screen_x + 1;
   end else begin
     screen_x <= 0;
     if (screen_y < 35)

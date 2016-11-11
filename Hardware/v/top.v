@@ -36,12 +36,16 @@ wire [`X_COORD_BITWIDTH:0] ma_x_coord;
 wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
 wire [`CONV_ADD_BITWIDTH:0] fm_pixel_vector[`NUM_KERNELS-1:0]; // one pixel from the end of each multiply adder tree
 wire [`RECT_OUT_BITWIDTH:0] rectified_vector[`NUM_KERNELS-1:0]; // one pixel from the output of each rect-linear module 
+wire pixel_rdy;
 
+// feature map sr wires
+wire [`X_COORD_BITWIDTH:0] fm_x_coord;  // connected to fm sr outputs
+wire [`Y_COORD_BITWIDTH:0] fm_y_coord;
 
 // feature map RAM buffer wires
 wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr;
-wire [(`FFN_IN_WIDTH*NUM_KERNELS)-1:0] fm_buffer_data_vector;
-wire [(`FFN_IN_WIDTH*NUM_KERNELS)-1:0] w_buffer_data_vector;
+wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] fm_buffer_data_vector;
+wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] w_buffer_data_vector;
 wire [`FFN_IN_BITWIDTH:0] fm_mux_q;
 wire fm_buffer_full;
 
@@ -131,17 +135,18 @@ window_wrapper window_inst(
 
   // the kernel sized view of the buffer to be fed into the multipliers
   .window_out(window_content)
-)
+);
+
 window_ctrl window_ctrl_inst(
   .clock(clock),
   .reset(reset),
-  .buffer_x(BUFFER_X_POS),
-  .buffer_y(BUFFER_Y_POS),
+  .buffer_x_pos(BUFFER_X_POS),
+  .buffer_y_pos(BUFFER_Y_POS),
   .screen_x(screen_x_pos), // from demo
   .screen_y(screen_y_pos),
   .shift_up(shift_up),
   .shift_left(shift_left),
-  .buffer_rdy(buffer_rdy),
+  .buffer_rdy(buffer_rdy)
 );
 
 
@@ -162,7 +167,7 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .clock(clock),
     .reset(reset),
     .in({`WINDOW_PAD_WIDTH'd0, window_content}),
-    .kernel({`WINDOW_PAD_WIDTH'd0, kernel[tree_size]}),
+    .kernal({`WINDOW_PAD_WIDTH'd0, k[tree_count]}),
     .out(fm_pixel_vector[tree_count])
   );
 
@@ -171,7 +176,7 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .clock(clock),
     .reset(reset),
     .rect_in(fm_pixel_vector[tree_count]),
-    .rect_out(rectified_vector[tree_count]),
+    .rect_out(rectified_vector[tree_count])
   );
 /*
   // Feature Map RAM buffer
@@ -198,7 +203,8 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
 */
 
 end // for
-end generate
+endgenerate
+
 fm_coord_sr fm_coord_sr_inst(
   .clock(clock),
   .reset(reset),
@@ -214,7 +220,7 @@ feature_map_buffer_ctrl(
   .clock(clock),
   .reset(reset),
   .data_rdy(pixel_rdy),
-  .xcoord(fm_y_coord),// must hold coords through tree
+  .xcoord(fm_x_coord),// must hold coords through tree
   .ycoord(fm_y_coord),
   .addr(fm_wr_addr),
   .buffer_full(fm_buffer_full)
