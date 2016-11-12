@@ -30,10 +30,11 @@ always@(posedge clock or negedge reset) begin
   if(reset == 1'b0) begin
     buffer_rdy <= 1'b0; 
   end else begin
-    if(start) begin
+    if(start) begin 
       buffer_rdy <= 1'b1; 
-    end else if (x_counter == `X_COORD_MAX &
-                 y_counter == `Y_COORD_MAX) begin
+		                                         // extra - 1 to prevent counter overflow from being latched
+    end else if (x_counter == `X_COORD_MAX - 1 - 1 &
+                 y_counter == `Y_COORD_MAX - 1) begin
       buffer_rdy <= 1'b0;
     end else begin
       buffer_rdy <= buffer_rdy;
@@ -47,12 +48,12 @@ always@(posedge clock or negedge reset) begin
     x_counter <= `X_COORD_WIDTH'd0;
     y_counter <= `Y_COORD_WIDTH'd0;
   end else if(buffer_rdy) begin
-    if(x_counter < `X_COORD_MAX) begin
+    if(x_counter < `X_COORD_MAX - 1) begin
       x_counter <= x_counter +`X_COORD_WIDTH'd1;
       y_counter <= y_counter;
     end else begin
       x_counter <= `X_COORD_WIDTH'd0;
-      if(y_counter < `Y_COORD_MAX)
+      if(y_counter < `Y_COORD_MAX - 1)
         y_counter <= y_counter + `Y_COORD_WIDTH'd1;
       else
         y_counter <= `Y_COORD_WIDTH'd0;
