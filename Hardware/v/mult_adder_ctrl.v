@@ -48,7 +48,7 @@ always@(posedge clock or negedge reset) begin
     y_counter <= `Y_COORD_WIDTH'd0;
   end else if(buffer_rdy) begin
     if(x_counter < `X_COORD_MAX) begin
-      x_counter <= `X_COORD_WIDTH'd1;
+      x_counter <= x_counter +`X_COORD_WIDTH'd1;
       y_counter <= y_counter;
     end else begin
       x_counter <= `X_COORD_WIDTH'd0;
