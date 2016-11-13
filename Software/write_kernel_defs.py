@@ -31,12 +31,14 @@ if __name__ == '__main__':
     name = 'kernel'
     count = 0
 
-    kernel_def = 'wire [(`KERNEL_SIZE_SQ*`CAMERA_PIXEL_WIDTH)-1:0] k[`NUM_KERNELS-1:0];\n'
+    # kernel_def = '`include "network_params.h"\nwire [(`KERNEL_SIZE_SQ*`CAMERA_PIXEL_WIDTH)-1:0] k[`NUM_KERNELS-1:0];\n'
+    kernel_def = ''
+
     for kf in kf_list:
         k_wire = genKernelWire(kp,kf,name+str(count))
         kernel_def = kernel_def + k_wire 
         count = count + 1
 
-    with open('../Hardware/kernel_defs.v','w') as f:
+    with open('../Hardware/kernel_defs.h','w') as f:
         f.write(kernel_def)
 

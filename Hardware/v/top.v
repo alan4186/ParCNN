@@ -10,16 +10,19 @@ module top(
   // hex outputs
   
   output [`RECT_OUT_BITWIDTH:0] rect1,
-  output [`RECT_OUT_BITWIDTH:0] rect2
+  output [`RECT_OUT_BITWIDTH:0] rect2,
+  output [`RECT_OUT_BITWIDTH:0] rect3,
+  output [`RECT_OUT_BITWIDTH:0] rect4,
+  output [`RECT_OUT_BITWIDTH:0] rect5,
+  output [`RECT_OUT_BITWIDTH:0] rect6,
+  output [`RECT_OUT_BITWIDTH:0] rect7,
+  output [`RECT_OUT_BITWIDTH:0] rect0
 );
 
 
 //////////////////////
 // wire declaratations
 //////////////////////
-
-// kernel files
-`include "../kernel_defs.h"
 
 // window wires
 wire [`WINDOW_VECTOR_BITWIDTH:0] window_content;
@@ -33,6 +36,7 @@ wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
 wire [`CONV_ADD_BITWIDTH:0] fm_pixel_vector[`NUM_KERNELS-1:0]; // one pixel from the end of each multiply adder tree
 wire [`RECT_OUT_BITWIDTH:0] rectified_vector[`NUM_KERNELS-1:0]; // one pixel from the output of each rect-linear module 
 wire pixel_rdy;
+wire [(`KERNEL_SIZE_SQ*`CAMERA_PIXEL_WIDTH)-1:0] k[`NUM_KERNELS-1:0];
 
 // feature map sr wires
 wire [`X_COORD_BITWIDTH:0] fm_x_coord;  // connected to fm sr outputs
@@ -54,11 +58,26 @@ wire fm_buffer_full;
 //parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd300;
 
 // FOR TESTING
-assign rect1 = rectified_vector[0];
-assign rect2 = rectified_vector[1];
+assign rect0 = rectified_vector[0];
+assign rect1 = rectified_vector[1];
+assign rect2 = rectified_vector[2];
+assign rect3 = rectified_vector[3];
+assign rect4 = rectified_vector[4];
+assign rect5 = rectified_vector[5];
+assign rect6 = rectified_vector[6];
+assign rect7 = rectified_vector[7];
 parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0;
 parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 
+
+
+//////////////////////
+// assign statments
+//////////////////////
+
+
+// kernel files
+`include "../kernel_defs.h"
 
 
 // camera refrence design

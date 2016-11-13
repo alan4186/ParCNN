@@ -10,6 +10,12 @@ wire [`CAMERA_PIXEL_BITWIDTH:0] pixel;
 
 wire [`RECT_OUT_BITWIDTH:0] rect1;
 wire [`RECT_OUT_BITWIDTH:0] rect2;
+wire [`RECT_OUT_BITWIDTH:0] rect3;
+wire [`RECT_OUT_BITWIDTH:0] rect4;
+wire [`RECT_OUT_BITWIDTH:0] rect5;
+wire [`RECT_OUT_BITWIDTH:0] rect6;
+wire [`RECT_OUT_BITWIDTH:0] rect7;
+wire [`RECT_OUT_BITWIDTH:0] rect0;
 
 parameter X_RES_MAX = 600;
 parameter Y_RES_MAX = 800;
@@ -22,7 +28,13 @@ top top_inst(
   .screen_y_pos(screen_y),
   .test_pixel(pixel),
   .rect1(rect1),
-  .rect2(rect2)
+  .rect2(rect2),
+  .rect3(rect3),
+  .rect4(rect4),
+  .rect5(rect5),
+  .rect6(rect6),
+  .rect7(rect7),
+  .rect0(rect0)
 );
 
 always begin
