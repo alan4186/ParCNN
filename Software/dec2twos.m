@@ -43,8 +43,8 @@ elseif nbits < nbits_min
     warning('dec2twos:nbitsTooSmall', ['Minimum number of bits to ' ...
         'represent maximum input x is %i, which is greater than ' ...
         'input nbits = %i. Setting nbits = %i.'], ...
-        nbits_min, nbits, nbits_min)
-    nbits = nbits_min;
+        nbits_min, nbits, nbits)
+%     nbits = nbits_min;
 end
 
 t = repmat('0', numel(x), nbits); % Initialize output:  Case for x = 0
