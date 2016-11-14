@@ -1,3 +1,10 @@
 **/*.DS_store
 **/*.bak
 **/*.swp
+trash/**/*
+
+**/*.qpf
+**/*.qsf
+**/*.rpt
+**/*.qip
+**/*.pyc
