@@ -72,11 +72,11 @@ endmodule // mult_adder
 module mult_adder_mult(
   input clock,
   input reset,
-  input [`CONV_MULT_BITWIDTH:0] operand_a,
-  input [`CONV_MULT_BITWIDTH:0] operand_b,
+  input signed [`CONV_MULT_BITWIDTH:0] operand_a,
+  input signed [`CONV_MULT_BITWIDTH:0] operand_b,
   output [`CONV_PRODUCT_BITWIDTH:0] out 
 );
-   reg [`CONV_PRODUCT_BITWIDTH:0]    product;
+   reg signed[`CONV_PRODUCT_BITWIDTH:0]    product;
    
    assign out = product[`CONV_PRODUCT_BITWIDTH:0];
 
