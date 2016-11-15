@@ -10,7 +10,7 @@ module top(
   // test inputs
   input [`RECT_OUT_BITWIDTH:0] rect0,
   input [`RECT_OUT_BITWIDTH:0] rect1,
-  input [`FM_ADDR_BITWIDTH:0] fm_wr_addr,
+  //input [`FM_ADDR_BITWIDTH:0] fm_wr_addr,
   input [`X_COORD_BITWIDTH:0] ma_x_coord,
   input [`Y_COORD_BITWIDTH:0] ma_y_coord,
   input pixel_rdy,
@@ -44,15 +44,19 @@ wire [`X_COORD_BITWIDTH:0] fm_x_coord;  // connected to fm sr outputs
 wire [`Y_COORD_BITWIDTH:0] fm_y_coord;
 
 // feature map RAM buffer wires
-//wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr; // commented out for testing
+wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr;
+wire [`FM_ADDR_BITWIDTH:0] fm_rd_addr;
 wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] fm_buffer_data_vector;
 wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] w_buffer_data_vector;
 wire [`FFN_IN_BITWIDTH:0] fm_mux_q;
+wire [`FFN_IN_BITWIDTH:0] w_mux_q;
+wire [`NUM_KERNELS-1:0] fm_buffer_select; // read side
 wire fm_buffer_full;
 
 // matrix multiply wires
 // wire product_rdy;
 wire [`FFN_OUT_BITWIDTH:0] network_output [`NUM_CLASSES-1:0];
+wire mult_en;
 
 // reg declarations
 
@@ -202,7 +206,6 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
   // Feature Map RAM buffer
   fm_ram_1024w fm_buffer_inst(
     .clock(clock),
-    .reset(reset),
     .wraddress(fm_wr_addr),
     .data(rectified_vector[tree_count]),
     .wren(pixel_rdy),
@@ -229,7 +232,7 @@ fm_coord_sr fm_coord_sr_inst(
 
 
 
-feature_map_buffer_ctrl(
+feature_map_buffer_ctrl fm_buffer_ctrl_inst(
   .clock(clock),
   .reset(reset),
   .data_rdy(pixel_rdy),
@@ -263,6 +266,7 @@ for (np_counter=0; np_counter<`NUM_CLASSES; np_counter=np_counter+1) begin : np_
   np_matrix_mult mm_inst(
     .clock(clock),
     .reset(reset),
+	 .en(mult_en),
     .feature_pixel(fm_mux_q),
     .weight(w_mux_q),
     .sum(network_output[np_counter])
@@ -274,6 +278,7 @@ np_matrix_mult_ctrl mm_ctrl_inst(
   .clock(clock),
   .reset(reset),
   .start(fm_buffer_full),
+  .mult_en(mult_en),
   .addr(fm_rd_addr),
   .ram_select(fm_buffer_select),
   .product_rdy(product_rdy)

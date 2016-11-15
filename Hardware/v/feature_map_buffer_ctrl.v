@@ -1,3 +1,4 @@
+`include "../network_params.h"
 module feature_map_buffer_ctrl(
   input clock,
   input reset,

@@ -7,6 +7,7 @@ module np_matrix_mult_ctrl(
   
   output reg [`FM_ADDR_BITWIDTH:0] addr,
   output reg [`NUM_KERNELS-1:0] ram_select,
+  output reg mult_en,
   output reg product_rdy
 );
 
@@ -40,6 +41,18 @@ always@(posedge clock or negedge reset) begin
       product_rdy <= 1'b0;
     end // select max
   end // reset
+end // always
+
+// enable signal logic multipler module
+always@(posedge clock or negedge reset) begin
+	if (reset == 1'b0)
+	  mult_en <= 1'b0;
+	else if (start)
+	  mult_en <= 1'b1;
+	else if (ram_select == `NUM_KERNELS & addr == `ADDR_MAX)
+	  mult_en <= 1'b0;
+	else
+	  mult_en <= mult_en;
 end // always
 
 endmodule
