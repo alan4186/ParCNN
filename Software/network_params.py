@@ -5,10 +5,10 @@ estimate_resources = 1
 
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
-NUM_KERNELS = 8
-#NUM_KERNELS = 2
-KERNEL_SIZE = 7 # square kernel
-#KERNEL_SIZE = 3 # square kernel
+#NUM_KERNELS = 8
+NUM_KERNELS = 2
+#KERNEL_SIZE = 7 # square kernel
+KERNEL_SIZE = 3 # square kernel
 KERNEL_SIZE_SQ = KERNEL_SIZE**2
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
