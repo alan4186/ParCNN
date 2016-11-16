@@ -4,19 +4,20 @@ module top(
   input reset,
 
   // video inputs
-  input [`SCREEN_X_BITWIDTH:0] screen_x_pos,
-  input [`SCREEN_Y_BITWIDTH:0] screen_y_pos,
-  input [`CAMERA_PIXEL_BITWIDTH:0] test_pixel,
-  // hex outputs
+//  input [`SCREEN_X_BITWIDTH:0] screen_x_pos,
+//  input [`SCREEN_Y_BITWIDTH:0] screen_y_pos,
+//  
+  // test inputs
+  input [`RECT_OUT_BITWIDTH:0] rect0,
+  input [`RECT_OUT_BITWIDTH:0] rect1,
+  input [`FM_ADDR_BITWIDTH:0] fm_wr_addr,
+  input [`X_COORD_BITWIDTH:0] ma_x_coord,
+  input [`Y_COORD_BITWIDTH:0] ma_y_coord,
+  input pixel_rdy,
   
-  output [`RECT_OUT_BITWIDTH:0] rect1,
-  output [`RECT_OUT_BITWIDTH:0] rect2,
-  output [`RECT_OUT_BITWIDTH:0] rect3,
-  output [`RECT_OUT_BITWIDTH:0] rect4,
-  output [`RECT_OUT_BITWIDTH:0] rect5,
-  output [`RECT_OUT_BITWIDTH:0] rect6,
-  output [`RECT_OUT_BITWIDTH:0] rect7,
-  output [`RECT_OUT_BITWIDTH:0] rect0
+  output [`FFN_OUT_BITWIDTH:0] n0,
+  output [`FFN_OUT_BITWIDTH:0] n1,
+  output product_rdy
 );
 
 
@@ -31,11 +32,11 @@ wire shift_up;
 wire buffer_rdy; // indicates that the shifting window buffer is full
 
 // multiply adder wires
-wire [`X_COORD_BITWIDTH:0] ma_x_coord;
-wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
+//wire [`X_COORD_BITWIDTH:0] ma_x_coord;
+//wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
 wire [`CONV_ADD_BITWIDTH:0] fm_pixel_vector[`NUM_KERNELS-1:0]; // one pixel from the end of each multiply adder tree
 wire [`RECT_OUT_BITWIDTH:0] rectified_vector[`NUM_KERNELS-1:0]; // one pixel from the output of each rect-linear module 
-wire pixel_rdy;
+//wire pixel_rdy;
 wire [(`KERNEL_SIZE_SQ*`CAMERA_PIXEL_WIDTH)-1:0] k[`NUM_KERNELS-1:0];
 
 // feature map sr wires
@@ -43,13 +44,15 @@ wire [`X_COORD_BITWIDTH:0] fm_x_coord;  // connected to fm sr outputs
 wire [`Y_COORD_BITWIDTH:0] fm_y_coord;
 
 // feature map RAM buffer wires
-wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr;
+//wire [`FM_ADDR_BITWIDTH:0] fm_wr_addr; // commented out for testing
 wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] fm_buffer_data_vector;
 wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] w_buffer_data_vector;
 wire [`FFN_IN_BITWIDTH:0] fm_mux_q;
 wire fm_buffer_full;
 
 // matrix multiply wires
+// wire product_rdy;
+wire [`FFN_OUT_BITWIDTH:0] network_output [`NUM_CLASSES-1:0];
 
 // reg declarations
 
@@ -58,17 +61,10 @@ wire fm_buffer_full;
 //parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd300;
 
 // FOR TESTING
-assign rect0 = rectified_vector[0];
-assign rect1 = rectified_vector[1];
-assign rect2 = rectified_vector[2];
-assign rect3 = rectified_vector[3];
-assign rect4 = rectified_vector[4];
-assign rect5 = rectified_vector[5];
-assign rect6 = rectified_vector[6];
-assign rect7 = rectified_vector[7];
-parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0;
-parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
-
+assign n0 = network_output[0];
+assign n1 = network_output[1];
+assign rectified_vector[0] = rect0;
+assign rectified_vector[1] = rect1;
 
 
 //////////////////////
@@ -142,7 +138,7 @@ module DE2_115_CAMERA(
 );
 
 */
-
+/*
 // shifting window and window selectors
 window_wrapper window_inst(
   .clock(clock),
@@ -181,9 +177,11 @@ mult_adder_ctrl ma_inst(
   .y_coord(ma_y_coord),
   .pixel_rdy(pixel_rdy) // rdy sr includes regs for mult and rect linear stages
 );
+*/
 genvar tree_count;
 generate
 for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin : inst_mult_adder_trees
+/*
   // multiply adder trees
   mult_adder mult_adder_inst(
     .clock(clock),
@@ -200,9 +198,9 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .rect_in(fm_pixel_vector[tree_count]),
     .rect_out(rectified_vector[tree_count])
   );
-/*
+*/
   // Feature Map RAM buffer
-  fm_buffer fm_buffer_inst(
+  fm_ram_1024w fm_buffer_inst(
     .clock(clock),
     .reset(reset),
     .wraddress(fm_wr_addr),
@@ -212,20 +210,13 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .q(fm_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
   );
 
-  // Weight Matrix Buffer
-  weight_rom weight_buffer_inst(
-    .clock(clock),
-    .reset(reset),
-//    .wraddress(weight_wr_addr),
-//    .data()
-//    .wren(pixel_rdy),
-    .rdaddress(fm_rd_addr),
-    .q(w_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
-  );
-*/
-
 end // for
 endgenerate
+
+
+///////////////////////////////
+`include "../ffn_weight_rams.h"
+///////////////////////////////
 
 fm_coord_sr fm_coord_sr_inst(
   .clock(clock),
@@ -237,7 +228,7 @@ fm_coord_sr fm_coord_sr_inst(
 );
 
 
-/*
+
 feature_map_buffer_ctrl(
   .clock(clock),
   .reset(reset),
@@ -274,7 +265,7 @@ for (np_counter=0; np_counter<`NUM_CLASSES; np_counter=np_counter+1) begin : np_
     .reset(reset),
     .feature_pixel(fm_mux_q),
     .weight(w_mux_q),
-    .sum(),
+    .sum(network_output[np_counter])
   );
 end // for
 endgenerate
@@ -285,9 +276,9 @@ np_matrix_mult_ctrl mm_ctrl_inst(
   .start(fm_buffer_full),
   .addr(fm_rd_addr),
   .ram_select(fm_buffer_select),
-  .product_rdy()
+  .product_rdy(product_rdy)
 );
-*/
+
 // hex decode
 
 

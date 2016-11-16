@@ -2,7 +2,7 @@ import network_params
 
 ram_str = ''
 ram_init = ''
-module_name = 'weight_ram'
+module_name = 'feature_map_ram_1024w'
 file_name = '../Hardware/ffn_weight_rams.h'
 
 for i in range(0,network_params.NUM_KERNELS):
