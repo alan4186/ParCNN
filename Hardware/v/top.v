@@ -43,7 +43,7 @@ wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] fm_buffer_data_vector;
 wire [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] w_buffer_data_vector;
 wire [`FFN_IN_BITWIDTH:0] fm_mux_q;
 wire [`FFN_IN_BITWIDTH:0] w_mux_q;
-wire [`NUM_KERNELS-1:0] fm_buffer_select; // read side
+wire [`RAM_SELECT_BITWIDTH:0] fm_buffer_select; // read side
 wire fm_buffer_full;
 
 // matrix multiply wires
