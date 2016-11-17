@@ -197,12 +197,22 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .rect_out(rectified_vector[tree_count])
   );
 
+  // sub-sampling / max pooling
+  nh_shift_reg nh_shift_reg_inst(
+    .clock(clock),
+    .reset(reset),
+    .shift_in_rdy(pixel_rdy),
+    .shift_in(rectified_vector[tree_count]),
+    .dval(nh_rdy),
+    .nh_max(nh_max)
+  );
+
   // Feature Map RAM buffer
   fm_ram_1024w fm_buffer_inst(
     .clock(clock),
     .wraddress(fm_wr_addr),
-    .data({2'd0,rectified_vector[tree_count]}),
-    .wren(pixel_rdy),
+    .data({2'd0,nh_max}),
+    .wren(nh_rdy),
     .rdaddress(fm_rd_addr),
     .q(fm_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
   );
@@ -260,7 +270,7 @@ for (np_counter=0; np_counter<`NUM_CLASSES; np_counter=np_counter+1) begin : np_
   np_matrix_mult mm_inst(
     .clock(clock),
     .reset(reset),
-	 .en(mult_en),
+	  .en(mult_en),
     .feature_pixel(fm_mux_q),
     .weight(w_mux_q),
     .sum(network_output[np_counter])
