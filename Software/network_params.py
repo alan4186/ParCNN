@@ -5,10 +5,13 @@ estimate_resources = 1
 
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
-#NUM_KERNELS = 8
-NUM_KERNELS = 2
-#KERNEL_SIZE = 7 # square kernel
-KERNEL_SIZE = 3 # square kernel
+
+NUM_KERNELS = 8
+KERNEL_SIZE = 7 # square kernel
+
+#NUM_KERNELS = 2
+#KERNEL_SIZE = 3 # square kernel
+
 KERNEL_SIZE_SQ = KERNEL_SIZE**2
 FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
 
@@ -76,7 +79,6 @@ RECT_OUT_WIDTH = RECT_IN_WIDTH
 RECT_OUT_BITWIDTH = RECT_OUT_WIDTH - 1
 
 # Sub sampling
-NUM_POOLERS = NUM_KERNELS
 NEIGHBORHOOD_SIZE = 4
 NH_DIM = int(math.sqrt(NEIGHBORHOOD_SIZE))
 NH_VECTOR_WIDTH = NEIGHBORHOOD_SIZE*NN_WIDTH
@@ -85,16 +87,17 @@ NUM_NH_LAYERS = int(math.ceil(math.log(NEIGHBORHOOD_SIZE,2)))
 #NUM_NH_LAYERS PNUM_NH_LAYERS
 POOL_OUT_WIDTH = NN_WIDTH + NUM_NH_LAYERS 
 POOL_OUT_BITWIDTH = POOL_OUT_WIDTH - 1 
-MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
+#MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
 # POOL_RESET= 1 # uncomment to add reset signal to sub sampleing/pooling adder tree
 POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
+
 
 # Sub Sampling control (nh_shift_reg_ctrl)
 NH_WIDTH = CONV_ADD_WIDTH
 NH_BITWIDTH = NH_WIDTH - 1
 NH_SIZE = NEIGHBORHOOD_SIZE
 NH_DIM = int(math.sqrt(NH_SIZE))
-
+NH_SR_DEPTH = INPUT_SIZE - NH_SIZE
 # Feature Map Buffer Contorl module
 FM_ADDR_WIDTH = int(math.ceil(math.log(FEATURE_SIZE**2,2)))
 FM_ADDR_BITWIDTH = FM_ADDR_WIDTH - 1
@@ -197,7 +200,7 @@ if __name__ == "__main__":
         # buffer 1 usage
         memory_bits = memory_bits + (FEATURE_SIZE*NUM_KERNELS*CONV_ADD_WIDTH)
         # pooling usage
-        for i in range(0,NUM_POOLERS):
+        for i in range(0,NUM_KERNELS):
             le = le + ( (NEIGHBORHOOD_SIZE *2)-1)* NN_WIDTH
             le = le + NN_WIDTH # a guess about division's area
         # buffer 2 usage
