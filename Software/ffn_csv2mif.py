@@ -3,7 +3,7 @@
 # takes in a two column csv file and outputs a mif
 # example
 """
-addresses base 16,data base10
+addresses base 10,data base16
 0,ff
 1,fe
 2,fd
@@ -45,12 +45,18 @@ with open(outFile, 'w') as of:
 with open(inFile, 'r') as csvfile:
     csvreader = csv.reader(csvfile, delimiter=',',quotechar='|')
     headers = next(csvreader)
+    rc =0;
     for row in csvreader:
         # assume no headers
         with open(outFile,'a') as of:
             hexData = (row[1])
             #line = row[0] + "\t:\t" + hexFill(int(hexData,16)) + ";\n"
-            line = row[0] + "\t:\t" + hexFill(row[1]) + ";\n"
+            line = row[0] + "\t:\t" + row[1] + ";\n"
+            rc = row[0]
+            of.write(line)
+    for addr in range(int(rc)+1,1024):
+        with open(outFile,'a') as of:
+            line = str(addr) + "\t:\t00000000;\n"
             of.write(line)
 
 with open(outFile,'a') as of:
