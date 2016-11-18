@@ -8,8 +8,9 @@ module add_np_mm(
   output [`FFN_OUT_BITWIDTH:0] sum
 );
 
-wire [`FFN_OUT_BITWIDTH+1:0] sum_c; // sum with carry
-assign sum_c = operand_a + operand_b;
-assign overflow = sum_c[`FFN_OUT_BITWIDTH+1];
-assign sum = sum_c[`FFN_OUT_BITWIDTH:0];
+//wire [`FFN_OUT_BITWIDTH+1:0] sum_c; // sum with carry
+//assign sum_c = operand_a + operand_b;
+//assign overflow = sum_c[`FFN_OUT_BITWIDTH+1];
+assign sum = operand_a + operand_b;
+//assign sum = sum_c[`FFN_OUT_BITWIDTH:0];
 endmodule

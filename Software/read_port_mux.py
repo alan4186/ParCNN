@@ -5,7 +5,7 @@ module read_port_mux( // combinds several sram read ports into one address space
   input clock,
   input reset,
  
-  input [`NUM_KERNELS-1:0] ram_select,
+  input [`RAM_SELECT_BITWIDTH:0] ram_select,
   input [(`FFN_IN_WIDTH*`NUM_KERNELS)-1:0] buffer_data_vector,
 
   output reg [`FFN_IN_BITWIDTH:0] data_out

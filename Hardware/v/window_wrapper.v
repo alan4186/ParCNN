@@ -16,7 +16,7 @@ module window_wrapper(
 
 // wire declarations
 wire [`BUFFER_OUT_VECTOR_BITWIDTH:0] buffer_vector;
-wire [`CAMERA_PIXEL_BITWIDTH:0] window_wire [`KERNEL_SIZE][`KERNEL_SIZE];
+wire [`CAMERA_PIXEL_BITWIDTH:0] window_wire [`KERNEL_SIZE-1:0][`KERNEL_SIZE-1:0];
 
 // reg declarations
 
