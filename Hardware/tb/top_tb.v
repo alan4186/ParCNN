@@ -6,7 +6,7 @@ reg reset;
 reg [`SCREEN_X_BITWIDTH:0] screen_x;
 reg [`SCREEN_Y_BITWIDTH:0] screen_y;
 
-reg [`CAMERA_PIXEL_BITWIDTH:0] pixel;
+wire [`CAMERA_PIXEL_BITWIDTH:0] pixel;
 
 wire [`FFN_OUT_BITWIDTH:0] n0;
 wire [`FFN_OUT_BITWIDTH:0] n1;
@@ -31,13 +31,13 @@ always begin
   #5 clock <= ~clock;
 end
 
-always begin
-  #10
-  pixel = 9'b100000000;
-  #10
-  pixel = 9'b011111111;
-end
-// assign pixel = screen_x;
+//always begin
+//  #10
+//  pixel = 9'b100000000;
+//  #10
+//  pixel = 9'b011111111;
+//end
+assign pixel = screen_x;
 
 initial begin
   clock = 1'b0;
@@ -46,7 +46,7 @@ initial begin
   #10 reset = 1'b1;
   //pixel = 9'b001000000; // 0.25
   
-  #1000000 $stop;
+  #300000 $stop;
 end
 
 

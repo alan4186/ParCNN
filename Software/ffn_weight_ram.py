@@ -12,13 +12,13 @@ for i in range(0,network_params.NUM_KERNELS):
     ram_init = module_name + ' ' + inst_name  
     ram_init = ram_init +  """ (
     .clock(clock),
-//  .data(),
+    .data(`FFN_IN_WIDTH'd0),
   .rdaddress(fm_rd_addr),
-//  .wraddress(),
+  .wraddress(`FM_ADDR_WIDTH'd0),
   .wren(1'b0),\n"""
     ram_init = ram_init + "  .q(w_buffer_data_vector["+str(index_max) + ':' + str(index_min)+"])\n);\ndefparam "
  
-    ram_init = ram_init + inst_name + '.init_file = "../Software/ffn_weight_mifs/ffn_weight' + str(int(i)) + '.mif";\n\n'
+    ram_init = ram_init + inst_name + '.init_file = "M:/ECE448/Hardware-CNN/Software/ffn_weight_mifs/ffn_weight' + str(int(i)) + '.mif";\n\n'
 
     ram_str = ram_str + ram_init
 

@@ -7,12 +7,24 @@ module feature_map_buffer_ctrl(
   input [`X_COORD_BITWIDTH:0] xcoord,
   input [`Y_COORD_BITWIDTH:0] ycoord, 
 
-  output [`FM_ADDR_BITWIDTH:0] addr,
+  output reg [`FM_ADDR_BITWIDTH:0] addr,
   output reg buffer_full
 );
 
 
-assign addr = xcoord + (ycoord * `FM_ADDR_WIDTH'd`FM_WIDTH);
+//assign addr = xcoord + (ycoord * `FM_ADDR_WIDTH'd`FM_WIDTH);
+always@(posedge clock or negedge reset) begin
+  if(reset == 1'b0) 
+    addr <= `FM_ADDR_WIDTH'd0;
+  else if (data_rdy)
+    if(xcoord[0]&ycoord[0])
+	   addr <= addr + `FM_ADDR_WIDTH'd1;
+	 else 
+	   addr <= addr;
+  else
+    addr <= `FM_ADDR_WIDTH'd0;
+end // always
+
 //// incriment address
 //always@(*/*posedge clock or negedge reset*/) begin
 //  if(reset == 1'b0) begin

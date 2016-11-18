@@ -10,6 +10,14 @@ module top(
   
   output [`FFN_OUT_BITWIDTH:0] n0,
   output [`FFN_OUT_BITWIDTH:0] n1,
+  output [`FFN_OUT_BITWIDTH:0] n2,
+  output [`FFN_OUT_BITWIDTH:0] n3,
+  output [`FFN_OUT_BITWIDTH:0] n4,
+  output [`FFN_OUT_BITWIDTH:0] n5,
+  output [`FFN_OUT_BITWIDTH:0] n6,
+  output [`FFN_OUT_BITWIDTH:0] n7,
+  output [`FFN_OUT_BITWIDTH:0] n8,
+  output [`FFN_OUT_BITWIDTH:0] n9,
   output product_rdy
 );
 
@@ -29,8 +37,12 @@ wire [`X_COORD_BITWIDTH:0] ma_x_coord;
 wire [`Y_COORD_BITWIDTH:0] ma_y_coord;
 wire [`CONV_ADD_BITWIDTH:0] fm_pixel_vector[`NUM_KERNELS-1:0]; // one pixel from the end of each multiply adder tree
 wire [`RECT_OUT_BITWIDTH:0] rectified_vector[`NUM_KERNELS-1:0]; // one pixel from the output of each rect-linear module 
-//wire pixel_rdy;
+wire pixel_rdy;
 wire [(`KERNEL_SIZE_SQ*`CAMERA_PIXEL_WIDTH)-1:0] k[`NUM_KERNELS-1:0];
+
+// Pooling wires
+wire nh_rdy [`NUM_KERNELS-1:0];
+wire [`NH_BITWIDTH:0] nh_max [`NUM_KERNELS-1:0];
 
 // feature map sr wires
 wire [`X_COORD_BITWIDTH:0] fm_x_coord;  // connected to fm sr outputs
@@ -60,6 +72,15 @@ wire mult_en;
 // FOR TESTING
 assign n0 = network_output[0];
 assign n1 = network_output[1];
+assign n2 = network_output[2];
+assign n3 = network_output[3];
+assign n4 = network_output[4];
+assign n5 = network_output[5];
+assign n6 = network_output[6];
+assign n7 = network_output[7];
+assign n8 = network_output[8];
+assign n9 = network_output[9];
+
 parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0; // changed for testing
 parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 
@@ -203,17 +224,17 @@ for (tree_count = 0; tree_count < `NUM_KERNELS; tree_count = tree_count+1) begin
     .reset(reset),
     .shift_in_rdy(pixel_rdy),
     .shift_in(rectified_vector[tree_count]),
-    .dval(nh_rdy),
-    .nh_max(nh_max)
+    .dval(nh_rdy[tree_count]),
+    .nh_max(nh_max[tree_count])
   );
 
   // Feature Map RAM buffer
   fm_ram_1024w fm_buffer_inst(
     .clock(clock),
-    .wraddress(fm_wr_addr),
-    .data({2'd0,nh_max}),
-    .wren(nh_rdy),
-    .rdaddress(fm_rd_addr),
+    .wraddress({3'd0, fm_wr_addr}),
+    .data(nh_max[tree_count]),
+    .wren(nh_rdy[tree_count]),
+    .rdaddress({3'd0, fm_rd_addr}),
     .q(fm_buffer_data_vector[(`FFN_IN_WIDTH*tree_count)+`FFN_IN_BITWIDTH:`FFN_IN_WIDTH*tree_count])
   );
 
@@ -239,7 +260,7 @@ fm_coord_sr fm_coord_sr_inst(
 feature_map_buffer_ctrl fm_buffer_ctrl_inst(
   .clock(clock),
   .reset(reset),
-  .data_rdy(pixel_rdy),
+  .data_rdy(nh_rdy[0]),
   .xcoord(fm_x_coord),// must hold coords through tree
   .ycoord(fm_y_coord),
   .addr(fm_wr_addr),
