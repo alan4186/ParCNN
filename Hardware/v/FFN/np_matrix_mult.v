@@ -6,11 +6,12 @@ module np_matrix_mult(
    
   input [`FFN_IN_BITWIDTH:0] feature_pixel,
   input [`FFN_IN_BITWIDTH:0] weight,
+  input [`FFN_OUT_BITWIDTH:0] bias,
   input en,
 //  input [`NUM_MM_BUFFER-1:0] frame_rdy, assume frame is ready
   //output reg [`NUM_MM_BUFFER-1:0] reading_frame, // a vector of boolean signals. one signal per frame/feature buffer
 
-  output reg [`FFN_OUT_BITWIDTH:0] sum
+  output [`FFN_OUT_BITWIDTH:0] sum_b
 //  output reg d_val,
 
 //  output [`FM_ADDR_BITWIDTH:0] buf_addr
@@ -27,13 +28,14 @@ wire [`FFN_OUT_BITWIDTH:0] s;
 wire [`FFN_OUT_BITWIDTH:0] product;
 
 // reg declaration
-//reg [`FM_ADDR_BITWIDTH:0] count;
+reg [`FFN_OUT_BITWIDTH:0] sum;
 
 // assign statments
 // assign buf_addr = count;
 assign fp = en ? feature_pixel : `FFN_IN_WIDTH'd0;
 assign w = en ? weight : `FFN_IN_WIDTH'd0;
 assign s = en ? sum : `FFN_OUT_WIDTH'd0;
+assign sum_b = sum + bias;
 
 // instantiate multiplyer
 // there should be no registers in mult module

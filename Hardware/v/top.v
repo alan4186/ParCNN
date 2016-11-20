@@ -1,30 +1,83 @@
 `include "../network_params.h"
 module top(
-  input clock, 
-  input reset,
+  //input clock, 
+  //input reset,
 
   // video inputs
-  input [`SCREEN_X_BITWIDTH:0] screen_x_pos,
-  input [`SCREEN_Y_BITWIDTH:0] screen_y_pos,
-  input [`CAMERA_PIXEL_WIDTH-1:0] test_pixel,
+//  input [`SCREEN_X_BITWIDTH:0] screen_x_pos,
+//  input [`SCREEN_Y_BITWIDTH:0] screen_y_pos,
+//  input [`CAMERA_PIXEL_WIDTH-1:0] test_pixel,
+//  
+//  output [`FFN_OUT_BITWIDTH:0] n0,
+//  output [`FFN_OUT_BITWIDTH:0] n1,
+//  output [`FFN_OUT_BITWIDTH:0] n2,
+//  output [`FFN_OUT_BITWIDTH:0] n3,
+//  output [`FFN_OUT_BITWIDTH:0] n4,
+//  output [`FFN_OUT_BITWIDTH:0] n5,
+//  output [`FFN_OUT_BITWIDTH:0] n6,
+//  output [`FFN_OUT_BITWIDTH:0] n7,
+//  output [`FFN_OUT_BITWIDTH:0] n8,
+//  output [`FFN_OUT_BITWIDTH:0] n9,
+//  output product_rdy,
   
-  output [`FFN_OUT_BITWIDTH:0] n0,
-  output [`FFN_OUT_BITWIDTH:0] n1,
-  output [`FFN_OUT_BITWIDTH:0] n2,
-  output [`FFN_OUT_BITWIDTH:0] n3,
-  output [`FFN_OUT_BITWIDTH:0] n4,
-  output [`FFN_OUT_BITWIDTH:0] n5,
-  output [`FFN_OUT_BITWIDTH:0] n6,
-  output [`FFN_OUT_BITWIDTH:0] n7,
-  output [`FFN_OUT_BITWIDTH:0] n8,
-  output [`FFN_OUT_BITWIDTH:0] n9,
-  output product_rdy
+//////////// CLOCK //////////
+input CLOCK_50,
+input CLOCK2_50,
+input CLOCK3_50,
+
+//////////// LED //////////
+output [8:0] LEDG,
+output [17:0] LEDR,
+
+//////////// KEY //////////
+input [3:0] KEY,
+//////////// SW //////////
+input [17:0] SW,
+
+output reg [6:0] HEX0,
+
+//////////// VGA //////////
+output [7:0] VGA_B,
+output VGA_BLANK_N,
+output VGA_CLK,
+output [7:0] VGA_G,
+output VGA_HS,
+output [7:0] VGA_R,
+output VGA_SYNC_N,
+output VGA_VS,
+//////////// SDRAM //////////
+output [12:0] DRAM_ADDR,
+output [1:0] DRAM_BA,
+output DRAM_CAS_N,
+output DRAM_CKE,
+output DRAM_CLK,
+output DRAM_CS_N,
+inout [31:0] DRAM_DQ,
+output [3:0] DRAM_DQM,
+output DRAM_RAS_N,
+output DRAM_WE_N,
+//////////// GPIO, GPIO connect to D5M - 5M Pixel Camera //////////
+input [11:0] D5M_D,
+input D5M_FVAL,
+input D5M_LVAL,
+input D5M_PIXLCLK,
+output D5M_RESET_N,
+output D5M_SCLK,
+inout D5M_SDATA,
+input D5M_STROBE,
+output D5M_TRIGGER,
+output D5M_XCLKIN
 );
 
 
 //////////////////////
 // wire declaratations
 //////////////////////
+wire clock;
+wire reset;
+wire [11:0] gray_pixel;
+wire [15:0] screen_x_pos;
+wire [15:0] screen_y_pos;
 
 // window wires
 wire [`WINDOW_VECTOR_BITWIDTH:0] window_content;
@@ -59,36 +112,42 @@ wire [`RAM_SELECT_BITWIDTH:0] fm_buffer_select; // read side
 wire fm_buffer_full;
 
 // matrix multiply wires
-//wire product_rdy;
+wire product_rdy;
 wire [`FFN_OUT_BITWIDTH:0] network_output [`NUM_CLASSES-1:0];
 wire mult_en;
+
+// hex decode wires
+wire [(`FFN_OUT_WIDTH*`NUM_CLASSES)-1:0] network_out_vector;
+wire [6:0] hex;
 
 // reg declarations
 
 // parameters
-//parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd300; // changed for testing
-//parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd300;
+parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd300; // changed for testing
+parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd300;
 
 // FOR TESTING
-assign n0 = network_output[0];
-assign n1 = network_output[1];
-assign n2 = network_output[2];
-assign n3 = network_output[3];
-assign n4 = network_output[4];
-assign n5 = network_output[5];
-assign n6 = network_output[6];
-assign n7 = network_output[7];
-assign n8 = network_output[8];
-assign n9 = network_output[9];
+//assign n0 = network_output[0];
+//assign n1 = network_output[1];
+//assign n2 = network_output[2];
+//assign n3 = network_output[3];
+//assign n4 = network_output[4];
+//assign n5 = network_output[5];
+//assign n6 = network_output[6];
+//assign n7 = network_output[7];
+//assign n8 = network_output[8];
+//assign n9 = network_output[9];
 
-parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0; // changed for testing
-parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
+//parameter BUFFER_X_POS = `SCREEN_X_WIDTH'd0; // changed for testing
+//parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 
 
 
 //////////////////////
 // assign statments
 //////////////////////
+assign clock = D5M_PIXLCLK;
+assign reset = KEY[0];
 
 
 // kernel files
@@ -96,74 +155,65 @@ parameter BUFFER_Y_POS = `SCREEN_Y_WIDTH'd0;
 
 
 // camera refrence design
-/*
-DE2_115_CAMERA(
-module DE2_115_CAMERA(
-
+DE2_115_CAMERA CAMERA_INST(
+   .screen_x_coord(screen_x_pos),
+	.screen_y_coord(screen_y_pos),
+	.gray_pixel(gray_pixel),
+	
 	//////////// CLOCK //////////
-  .CLOCK_50(),
-  .CLOCK2_50(),
-	.CLOCK3_50(),
+  .CLOCK_50(CLOCK_50),
+  .CLOCK2_50(CLOCK2_50),
+  .CLOCK3_50(CLOCK3_50),
 	//////////// LED //////////
-	.LEDG(),
-	.LEDR(),
+	.LEDG(LEDG),
+	.LEDR(LEDR),
 
 	//////////// KEY //////////
-	.KEY(),
+	.KEY(KEY),
 	//////////// SW //////////
-	.SW(),
+	.SW(SW),
 
-	//////////// SEG7 //////////
-	.HEX0(),
-	.HEX1(),
-	.HEX2(),
-	.HEX3(),
-	.HEX4(),
-	.HEX5(),
-	.HEX6(),
-	.HEX7(),
 
 	//////////// VGA //////////
-	.VGA_B(),
-	.VGA_BLANK_N(),
-	.VGA_CLK(),
-	.VGA_G(),
-	.VGA_HS(),
-	.VGA_R(),
-	.VGA_SYNC_N(),
-	.VGA_VS(),
+	.VGA_B(VGA_B),
+	.VGA_BLANK_N(VGA_BLANK_N),
+	.VGA_CLK(VGA_CLK),
+	.VGA_G(VGA_G),
+	.VGA_HS(VGA_HS),
+	.VGA_R(VGA_R),
+	.VGA_SYNC_N(VGA_SYNC_N),
+	.VGA_VS(VGA_VS),
 	//////////// SDRAM //////////
-	.DRAM_ADDR(),
-	.DRAM_BA(),
-	.DRAM_CAS_N(),
-	.DRAM_CKE(),
-	.DRAM_CLK(),
-	.DRAM_CS_N(),
-	.DRAM_DQ(),
-	.DRAM_DQM(),
-	.DRAM_RAS_N(),
-	.DRAM_WE_N(),
+	.DRAM_ADDR(DRAM_ADDR),
+	.DRAM_BA(DRAM_BA),
+	.DRAM_CAS_N(DRA_CAS_N),
+	.DRAM_CKE(DRAM_CKE),
+	.DRAM_CLK(DRAM_CLK),
+	.DRAM_CS_N(DRAM_CS_N),
+	.DRAM_DQ(DRAM_DQ),
+	.DRAM_DQM(DRAM_DQM),
+	.DRAM_RAS_N(DRAM_RAS_N),
+	.DRAM_WE_N(RAM_WE_N),
 	//////////// GPIO, GPIO connect to D5M - 5M Pixel Camera //////////
-	.D5M_D(),
-	.D5M_FVAL(),
-	.D5M_LVAL(),
-	.D5M_PIXLCLK(),
-	.D5M_RESET_N(),
-	.D5M_SCLK(),
-	.D5M_SDATA(),
-	.D5M_STROBE(),
-	.D5M_TRIGGER(),
-	.D5M_XCLKIN() 
+	.D5M_D(D5M_D),
+	.D5M_FVAL(D5M_FVAL),
+	.D5M_LVAL(D5M_LVAL),
+	.D5M_PIXLCLK(D5M_PIXLCLK),
+	.D5M_RESET_N(D5M_RESET_N),
+	.D5M_SCLK(D5M_SCLK),
+	.D5M_SDATA(D5M_SDATA),
+	.D5M_STROBE(D5M_STROBE),
+	.D5M_TRIGGER(D5M_TRIGGER),
+	.D5M_XCLKIN(D5M_XCLKIN) 
 );
 
-*/
 
 // shifting window and window selectors
 window_wrapper window_inst(
   .clock(clock),
   .reset(reset),
   // buffer inputs
-  .pixel_in(test_pixel),
+  .pixel_in(gray_pixel[11:3]),
   .shift_left(shift_left),
   .shift_up(shift_up),
   // window inputs
@@ -179,8 +229,8 @@ window_ctrl window_ctrl_inst(
   .reset(reset),
   .buffer_x_pos(BUFFER_X_POS),
   .buffer_y_pos(BUFFER_Y_POS),
-  .screen_x(screen_x_pos), // from demo
-  .screen_y(screen_y_pos),
+  .screen_x(screen_x_pos[`SCREEN_X_BITWIDTH:0]), // from demo
+  .screen_y(screen_y_pos[`SCREEN_Y_BITWIDTH:0]),
   .shift_up(shift_up),
   .shift_left(shift_left),
   .buffer_rdy(buffer_rdy)
@@ -310,6 +360,26 @@ np_matrix_mult_ctrl mm_ctrl_inst(
 );
 
 // hex decode
+genvar i;
+generate 
+for (i=0; i<`NUM_CLASSES; i=i+1) begin : out_vector_cat
+  assign network_out_vector[(`FFN_OUT_WIDTH*i)+`FFN_OUT_BITWIDTH:(`FFN_OUT_WIDTH*i)] = network_output[i];
+end // for
+endgenerate
 
+hex_out_not_shitty hex_out_inst(
+  .clock(clock),
+  .reset(reset),
+  .data(network_out_vector), 
+  .hex(hex)
+);
+
+always@(posedge clock or negedge reset) begin
+  if(reset == 1'b0) begin
+    HEX0 <= 7'd0;
+  end else if(product_rdy) begin
+    HEX0 <= hex;
+  end
+end // always
 
 endmodule

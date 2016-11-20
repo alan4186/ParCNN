@@ -4,6 +4,7 @@ module mult_adder(
 		  input     reset, 
 		  input [`MULT_ADDER_IN_BITWIDTH:0]  in,
 		  input [`MULT_ADDER_IN_BITWIDTH:0]  kernal,
+		  input [`CONV_ADD_BITWIDTH:0] bias,
 		  output [`CONV_ADD_BITWIDTH:0] out	
 		  );
 
@@ -13,7 +14,7 @@ wire [`CONV_ADD_BITWIDTH:0] adder_tree_wire [((`MA_TREE_SIZE*2)-1)-1:0];
 wire [(`MA_TREE_SIZE*2)-1-1:0]carry_wire ;  
 
 // assign statments
-assign out = adder_tree_wire[0];
+assign out = adder_tree_wire[0] + bias;
 assign carry_wire [(`MA_TREE_SIZE*2)-1-1:`MA_TREE_SIZE-1] = `MA_TREE_SIZE'd0;
 
 // connect input vector to multipliers
