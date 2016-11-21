@@ -550,9 +550,10 @@ assign reset = KEY[0];
 
 
 // kernel  and bias files
-`include "../kernel_defs.h"
-`include "../k_bias.h"
-`include "../ffn_bias.h"
+`include "../Hardware/kernel_defs.h"
+`include "../Hardware/k_bias.h"
+//`include "../Hardware/ffn_bias.h"
+`include "../Hardware/ffn_bias_rect.h"
 
 
 
@@ -785,15 +786,36 @@ VGA_Controller		u1	(	//	Host Side
 							.iZOOM_MODE_SW(SW[16])
 						);
 
-						
+		
+
+wire [8:0] test_pixel;
+wire [9:0] test_addr;		
 // Camera pixel normalization
 pixel_normalization norm_inst(
-  .norm_type(SW[5]),
-  .pixel_in(gray[11:3]),
+  .norm_type(SW[2]),
+  .pixel_in(test_pixel/*gray[11:3]*/),
+  .gray_scale(SW[3]),
   .pixel_out(pixel_norm),
   .screen_pixel(screen_pixel)
 );					
-						
+	
+	
+testIm_rom testIm_rom_inst(
+  .clock(clock),
+  .q(test_pixel),
+  .address(test_addr)
+);
+
+testIm_ctrl(
+  .clock(clock),
+  .reset(reset),
+  .x_coord(screen_x_pos[`SCREEN_X_BITWIDTH:0]), // from demo
+  .y_coord(screen_y_pos[`SCREEN_Y_BITWIDTH:0]),
+  .test_addr(test_addr)
+  );
+
+
+
 // shifting window and window selectors
 window_wrapper window_inst(
   .clock(clock),
@@ -881,7 +903,7 @@ endgenerate
 
 
 ///////////////////////////////
-`include "../ffn_weight_rams.h"
+`include "../Hardware/ffn_weight_rams.h"
 ///////////////////////////////
 
 fm_coord_sr fm_coord_sr_inst(
