@@ -974,11 +974,13 @@ np_matrix_mult_ctrl mm_ctrl_inst(
 // hex decode
 genvar i;
 generate 
-for (i=0; i<`NUM_CLASSES; i=i+1) begin : out_vector_cat
-  assign network_out_vector[(`FFN_OUT_WIDTH*i)+`FFN_OUT_BITWIDTH:(`FFN_OUT_WIDTH*i)] = network_output[i];
+for (i=1; i<`NUM_CLASSES; i=i+1) begin : out_vector_cat
+  assign network_out_vector[(`FFN_OUT_WIDTH*i)+`FFN_OUT_BITWIDTH:(`FFN_OUT_WIDTH*i)] = network_output[i-1];
 end // for
 endgenerate
 
+assign network_out_vector[(`FFN_OUT_WIDTH*0)+`FFN_OUT_BITWIDTH:(`FFN_OUT_WIDTH*0)] = network_output[9];
+  
 always@(posedge clock) begin
    network_out_vector_delay <= network_out_vector;
 end
