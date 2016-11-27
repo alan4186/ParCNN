@@ -793,26 +793,26 @@ wire [9:0] test_addr;
 // Camera pixel normalization
 pixel_normalization norm_inst(
   .norm_type(SW[2]),
-  .pixel_in(test_pixel/*gray[11:3]*/),
+  .pixel_in(/*test_pixel*/gray[11:3]),
   .gray_scale(SW[3]),
   .pixel_out(pixel_norm),
   .screen_pixel(screen_pixel)
 );					
 	
 	
-testIm_rom testIm_rom_inst(
-  .clock(clock),
-  .q(test_pixel),
-  .address(test_addr)
-);
-
-testIm_ctrl(
-  .clock(clock),
-  .reset(reset),
-  .x_coord(screen_x_pos[`SCREEN_X_BITWIDTH:0]), // from demo
-  .y_coord(screen_y_pos[`SCREEN_Y_BITWIDTH:0]),
-  .test_addr(test_addr)
-  );
+//testIm_rom testIm_rom_inst(
+//  .clock(clock),
+//  .q(test_pixel),
+//  .address(test_addr)
+//);
+//
+//testIm_ctrl(
+//  .clock(clock),
+//  .reset(reset),
+//  .x_coord(screen_x_pos[`SCREEN_X_BITWIDTH:0]), // from demo
+//  .y_coord(screen_y_pos[`SCREEN_Y_BITWIDTH:0]),
+//  .test_addr(test_addr)
+//  );
 
 
 
