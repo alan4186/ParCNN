@@ -1,4 +1,5 @@
 import math
+import project_settings as ps
 
 # print resourse usage estimates?
 estimate_resources = 1
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     for k, v in list(locals().iteritems()):
         if not any(substring in k for substring in blacklist):
             macroList.append((k,v))
-            with open("../Hardware/network_params.h", 'w') as f:
+            with open(ps.network_params, 'w') as f:
                 for macro in macroList:
                     f.write("`define " + str(macro[0]) + ' ' + str(macro[1]) + '\n')
 

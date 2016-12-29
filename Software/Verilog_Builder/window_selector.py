@@ -1,6 +1,5 @@
 import network_params
-
-save_path = "../Hardware/v/window_selector.v"
+import project_settings as ps
 
 file_content = """`include "../network_params.h"\
 module window_selector(
@@ -65,9 +64,9 @@ end // always
 
 endmodule
 """
-print "writing to " +save_path 
+print "writing to " + ps.window_selector
 
-with open(save_path,'w') as f:
+with open(ps.window_selector,'w') as f:
     f.write(file_content)
 
 print "done!"

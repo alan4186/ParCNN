@@ -6,3 +6,6 @@ python ffn_csv2mif.py ffn_weight_csvs/ffn_weight4.csv ffn_weight_mifs/ffn_weight
 python ffn_csv2mif.py ffn_weight_csvs/ffn_weight5.csv ffn_weight_mifs/ffn_weight5.mif
 python ffn_csv2mif.py ffn_weight_csvs/ffn_weight6.csv ffn_weight_mifs/ffn_weight6.mif
 python ffn_csv2mif.py ffn_weight_csvs/ffn_weight7.csv ffn_weight_mifs/ffn_weight7.mif
+
+echo 'cleaning up temporary csv files'
+rm -r ffn_weight_csvs

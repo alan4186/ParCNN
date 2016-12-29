@@ -1,4 +1,5 @@
 import network_params
+import project_settings as ps
 
 data = """`include "../network_params.h"
 module read_port_mux( // combinds several sram read ports into one address space
@@ -25,8 +26,8 @@ for x in range(0,network_params.NUM_KERNELS):
 data = data + "    endcase\n  end //reset\nend //always\nendmodule"
 
     
-print "writing to ../Hardware/v/read_port_mux.v"
-with open('../Hardware/v/read_port_mux.v','w') as f:
+print "writing to " + ps.read_port_mux
+with open(ps.read_port_mux,'w') as f:
     f.write(data)
 
 print "done!"

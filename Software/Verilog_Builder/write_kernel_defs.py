@@ -2,8 +2,8 @@
 import csv
 import network_params
 import os
-
-
+import project_settings as ps
+ 
 def genKernelWire(kp,kf,kw_name):
     with open(kp+kf,'rb') as f:
         reader = csv.reader(f)
@@ -26,8 +26,7 @@ def listdir_nohidden(path):
             yield f
 
 if __name__ == '__main__':
-    kp = './kernel_base2/'
-    kf_list = listdir_nohidden(kp)  
+    kf_list = listdir_nohidden(ps.kernel_path)  
     name = 'kernel'
     count = 0
 
@@ -35,10 +34,10 @@ if __name__ == '__main__':
     kernel_def = ''
 
     for kf in kf_list:
-        k_wire = genKernelWire(kp,kf,name+str(count))
+        k_wire = genKernelWire(ps.kernel_path,kf,name+str(count))
         kernel_def = kernel_def + k_wire 
         count = count + 1
 
-    with open('../Hardware/kernel_defs.h','w') as f:
+    with open(ps.kernel_defs,'w') as f:
         f.write(kernel_def)
 
