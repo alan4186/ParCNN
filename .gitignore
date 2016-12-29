@@ -9,3 +9,8 @@ trash/**/*
 **/*.qip
 **/*.pyc
 **/*.pin
+
+
+# configureable files
+Hardware/kernel_defs.h
+Hardware/network_params.h
