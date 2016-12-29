@@ -5,12 +5,16 @@ estimate_resources = 1
 
 # General Network Parameters
 INPUT_SIZE = 28 # dimension of square input image
+
 NUM_KERNELS = 8
-#NUM_KERNELS = 2
 KERNEL_SIZE = 7 # square kernel
+
+#NUM_KERNELS = 2
 #KERNEL_SIZE = 3 # square kernel
+
 KERNEL_SIZE_SQ = KERNEL_SIZE**2
-FEATURE_SIZE = INPUT_SIZE - KERNEL_SIZE + 1 # The dimension of the convolved image
+NEIGHBORHOOD_SIZE = 4
+FEATURE_SIZE = int((INPUT_SIZE - KERNEL_SIZE + 1) / math.sqrt(NEIGHBORHOOD_SIZE)) # The dimension of the convolved image
 
 # Screen resolution
 X_RES = 800
@@ -56,8 +60,8 @@ CONV_PRODUCT_BITWIDTH = CONV_PRODUCT_WIDTH - 1
 CONV_ADD_WIDTH = CONV_PRODUCT_WIDTH + int(math.ceil(math.log(MA_TREE_SIZE,2)))
 CONV_ADD_BITWIDTH = CONV_ADD_WIDTH - 1
 CARRY_VECTOR_WIDTH = (KERNEL_SIZE**2) - 1; 
-RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(KERNEL_SIZE_SQ,2))) + 1 + 1# +1 for rect linar and multipliers
-FM_COORD_SR_DEPTH = RDY_SHIFT_REG_SIZE
+RDY_SHIFT_REG_SIZE = int(math.ceil(math.log(MA_TREE_SIZE,2))) + 1 + 1 # +1 for rect linar and multipliers, -1 to set wren early
+FM_COORD_SR_DEPTH = RDY_SHIFT_REG_SIZE #+ INPUT_SIZE - KERNEL_SIZE + 1 + int(math.sqrt(NEIGHBORHOOD_SIZE))
 WINDOW_PAD_WIDTH = (MA_TREE_SIZE - KERNEL_SIZE_SQ) * CONV_MULT_WIDTH
 WINDOW_PAD_BITWIDTH = WINDOW_PAD_WIDTH - 1
 MULT_PAD_WIDTH = int(math.ceil(math.log(KERNEL_SIZE_SQ,2)))
@@ -65,8 +69,8 @@ MULT_ADDER_IN_WIDTH =  MA_TREE_SIZE * CONV_MULT_WIDTH
 MULT_ADDER_IN_BITWIDTH = MULT_ADDER_IN_WIDTH - 1 
 
 # General Bitwidths
-NN_WIDTH = CONV_ADD_WIDTH
-NN_BITWIDTH = NN_WIDTH - 1
+#NN_WIDTH = CONV_ADD_WIDTH
+#NN_BITWIDTH = NN_WIDTH - 1
 
 
 # Rect Linear
@@ -76,24 +80,24 @@ RECT_OUT_WIDTH = RECT_IN_WIDTH
 RECT_OUT_BITWIDTH = RECT_OUT_WIDTH - 1
 
 # Sub sampling
-NUM_POOLERS = NUM_KERNELS
-NEIGHBORHOOD_SIZE = 4
-NH_DIM = int(math.sqrt(NEIGHBORHOOD_SIZE))
-NH_VECTOR_WIDTH = NEIGHBORHOOD_SIZE*NN_WIDTH
-NH_VECTOR_BITWIDTH = NH_VECTOR_WIDTH - 1 
-NUM_NH_LAYERS = int(math.ceil(math.log(NEIGHBORHOOD_SIZE,2)))
+#NH_DIM = int(math.sqrt(NEIGHBORHOOD_SIZE))
+#NH_VECTOR_WIDTH = NEIGHBORHOOD_SIZE*NN_WIDTH
+#NH_VECTOR_BITWIDTH = NH_VECTOR_WIDTH - 1 
+#NUM_NH_LAYERS = int(math.ceil(math.log(NEIGHBORHOOD_SIZE,2)))
 #NUM_NH_LAYERS PNUM_NH_LAYERS
-POOL_OUT_WIDTH = NN_WIDTH + NUM_NH_LAYERS 
-POOL_OUT_BITWIDTH = POOL_OUT_WIDTH - 1 
-MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
+#POOL_OUT_WIDTH = NN_WIDTH + NUM_NH_LAYERS 
+#POOL_OUT_BITWIDTH = POOL_OUT_WIDTH - 1 
+#MEAN_DIVSION_CONSTANT = str(POOL_OUT_WIDTH) + "'d" + str(NEIGHBORHOOD_SIZE)
 # POOL_RESET= 1 # uncomment to add reset signal to sub sampleing/pooling adder tree
-POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
+#POOL_TREE_PAD = POOL_OUT_WIDTH - NN_WIDTH
+
 
 # Sub Sampling control (nh_shift_reg_ctrl)
 NH_WIDTH = CONV_ADD_WIDTH
 NH_BITWIDTH = NH_WIDTH - 1
 NH_SIZE = NEIGHBORHOOD_SIZE
 NH_DIM = int(math.sqrt(NH_SIZE))
+NH_SR_DEPTH = INPUT_SIZE - KERNEL_SIZE + 1 - NH_DIM #NH_SIZE
 
 # Feature Map Buffer Contorl module
 FM_ADDR_WIDTH = int(math.ceil(math.log(FEATURE_SIZE**2,2)))
@@ -103,10 +107,12 @@ ADDR_MAX = FEATURE_SIZE**2
 NP_MAX_COUNT = ADDR_MAX # same variable, different name for inside matrix_mult.v
 NP_COUNT_WIDTH = FM_ADDR_WIDTH
 NP_COUNT_BITWIDTH = FM_ADDR_BITWIDTH
+RAM_SELECT_WIDTH = int(math.ceil(math.log(NUM_KERNELS,2)))
+RAM_SELECT_BITWIDTH = RAM_SELECT_WIDTH - 1
 
 # Softmax 
 SOFTMAX_IN_VECTOR_LENGTH = ((FEATURE_SIZE * FEATURE_SIZE) / NEIGHBORHOOD_SIZE ) * NUM_KERNELS  # the number of inputs to the softmax layer
-NUM_CLASSES = 4 # number of output classes for the entire nn, MUST BE A POWER OF 2!!! set unneeded class inputs to 0
+NUM_CLASSES = 10 # number of output classes for the entire nn, MUST BE A POWER OF 2!!! set unneeded class inputs to 0
 
 # Matrix multiply (for Softmax)
 NUM_INPUT_IM = 1 # The number of images input to the layer at a time
@@ -195,16 +201,16 @@ if __name__ == "__main__":
         # buffer 1 usage
         memory_bits = memory_bits + (FEATURE_SIZE*NUM_KERNELS*CONV_ADD_WIDTH)
         # pooling usage
-        for i in range(0,NUM_POOLERS):
-            le = le + ( (NEIGHBORHOOD_SIZE *2)-1)* NN_WIDTH
-            le = le + NN_WIDTH # a guess about division's area
+        for i in range(0,NUM_KERNELS):
+            le = le + ( (NEIGHBORHOOD_SIZE *2)-1)*  NH_WIDTH
+            #le = le + NN_WIDTH # a guess about division's area
         # buffer 2 usage
         memory_bits = memory_bits + (FEATURE_SIZE*NUM_KERNELS*CONV_ADD_WIDTH)/4
         # matrix mult usage
         mult = mult + NUM_CLASSES
-        le = le + (NUM_CLASSES* NN_WIDTH)
+        le = le + (NUM_CLASSES* FFN_OUT_WIDTH)
         # softmax/ final acivation usgae
-        le = le + (NN_WIDTH *2 * NUM_CLASSES)
+        #le = le + (NN_WIDTH *2 * NUM_CLASSES)
     
         print "Estimated number of Logic elements: " + str(le)
         print "Estimated number of 9 bit multipliers: " + str(mult)
