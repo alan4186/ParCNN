@@ -1,6 +1,7 @@
+`include "../network_params.h"
 module mult_adder(
-      input     clock, 
-		  input     reset, 
+      input clock, 
+		  input reset, 
 		  input [8*`MA_TREE_SIZE-1:0]  in,
 		  input [8*`MA_TREE_SIZE-1:0]  kernal,
 		  output [31:0] out	
