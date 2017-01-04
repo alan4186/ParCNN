@@ -1,3 +1,5 @@
+from collections import OrderedDict
+import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
@@ -55,5 +57,15 @@ for i in range(5000):
 print("test accuracy %g"%accuracy.eval(feed_dict={
                                        x: mnist.test.images, y_: mnist.test.labels}))
 
-#np.savetxt("W.csv", W_val, delimiter=",")
-#np.savetxt("b.csv", b_val, delimiter=",")
+#########################################
+# Put TF variables in dict for exporting
+#########################################
+cnn = OrderedDict()
+cnn['W_conv1'] = W_conv1
+cnn['b_conv1'] = b_conv1
+cnn['W_fc1'] = W_fc1
+cnn['b_fc1'] = b_fc1
+
+#for k,v in cnn.iteritems():
+#    np.savetxt(k+".csv", v.eval(), delimiter=",")
+
