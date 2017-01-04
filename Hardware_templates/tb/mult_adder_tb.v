@@ -1,4 +1,3 @@
-`include "../network_params.h"
 // assume 4x4 kernel
 // with 4x4 kernel, tree is 3 registers deep
 module mult_adder_tb();
@@ -7,13 +6,15 @@ reg clock;
 reg reset;
 
 // mult-add operands
-reg [8*`MA_TREE_SIZE-1:0] in;
-reg [8*`MA_TREE_SIZE-1:0] kernel;
+reg [8*4*4-1:0] in;
+reg [8*4*4-1:0] kernel;
 
 wire [31:0] out;
 
 // DUT
-mult_adder dut(
+mult_adder dut #(
+  .MA_TREE_SIZE(4*4)
+)(
   .clock(clock),
   .reset(reset),
   .in(in),
