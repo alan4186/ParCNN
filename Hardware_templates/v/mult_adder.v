@@ -1,4 +1,3 @@
-`include "../network_params.h"
 module mult_adder #(
   parameter MA_TREE_SIZE = -1
 )
