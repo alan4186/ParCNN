@@ -1,3 +1,8 @@
+/*
+in->[0][1][2]->out
+    \/ \/ \/
+     p_out
+*/
 module parallel_out_sr #(
   parameter DEPTH = -1
 )(
