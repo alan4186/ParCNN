@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from Tkinter import *
+import math
 
 # A class to describe the network that will be implemented in hardware
 class Net:
@@ -56,9 +57,28 @@ class ConvLayer:
         self.P_SR_DEPTH = kx_size
         self.RAM_SR_DEPTH = ix_size - kx_size
         self.NUM_SR_ROWS = ky_size
-        self.MA_TREE_SIZE = 8 * kx_size * ky_size
+        # Round the tree size up to the next power of 2 
+        # to keep the tree code simple, extra resources should 
+        # be optimized away.
+        self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * kx_size * ky_size,2)))
         
 
+    def export(self, in_wire, out_wire):
+        inst = """
+  convolution conv_inst #(
+    .NUM_TREES("""+str(self.NUM_TREES)+"""),
+    .P_SR_DEPTH("""+str(self.P_SR_DEPTH)+"""), 
+    .RAM_SR_DEPTH("""+str(self.RAM_SR_DEPTH)+"""),
+    .NUM_SR_ROWS("""+str(self.NUM_SR_ROWS)+"""),
+    .MA_TREE_SIZE("""+str(self.MA_TREE_SIZE)+""")
+  )(
+    .clock(clock),
+    .reset(reset),
+    .pixel_in("""+in_wire+"""),
+    .pixel_out("""+out_wire+""")
+  );
+"""
+        print inst
 
 class ReluLayer:
 
@@ -74,3 +94,7 @@ class DenseLayer:
 
     def __init__(self):
         print 'under construction'
+
+
+c = ConvLayer(4,4,10,28,28,1)
+c.export('in_pixel','out_pixel')
