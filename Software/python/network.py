@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from Tkinter import *
+
 # A class to describe the network that will be implemented in hardware
 class Net:
 
@@ -9,15 +11,18 @@ class Net:
         self.layers[name] = ConvLayer(kx_size,ky_size,num_kernels,ix_size,iy_size,sharing_factor)
 
     def add_relu(self):
+        print 'under construction'
 
     def add_max_pool(self):
+        print 'under construction'
 
+    """
     def add_dense(self):
+        print 'under construction'
+    """
 
-    def export():
-
-
-
+    def export(self):
+        print 'under construction'
 
 
 class InputLayer:
@@ -37,13 +42,13 @@ class ConvLayer:
             raise ValueError('The kernel X dimension must' 
                     + 'be at least 1 less than the input X'
                     + 'dimension. Kernel X size: '
-                    + str(kx_size)', Input X size: ' +str(ix_size)
+                    + str(kx_size) + ', Input X size: ' +str(ix_size))
 
-        if iy_size-ky_size <0:
+        if iy_size-ky_size < 0:
             raise ValueError('The kernel Y dimension must' 
                     + 'be less than or equal to the input Y'
                     +  'dimension. Kernel Y size: '
-                    + str(ky_size)', Input Y size: ' +str(iy_size))
+                    + str(ky_size) + ', Input Y size: ' +str(iy_size))
 
         # compute parameters
         # tree sharing is not implemented yet, each kernel gets its own tree
@@ -58,11 +63,14 @@ class ConvLayer:
 class ReluLayer:
 
     def __init__(self):
+        print 'under construction'
 
 class MaxPoolingLayer:
 
     def __init__(self):
+        print 'under construction'
 
 class DenseLayer:
 
     def __init__(self):
+        print 'under construction'
