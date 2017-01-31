@@ -13,8 +13,16 @@ reg [7:0] sr [DEPTH-1:0];
 assign shift_out = sr[DEPTH-1];
 
 always@(posedge clock) begin
-  sr[DEPTH-1:1] <= sr[DEPTH-2:0];
-  sr[0] <= shift_in
+  sr[0] <= shift_in;
 end
+
+genvar i;
+generate
+for(i=0; i<DEPTH-1; i=i+1) begin : sr_loop
+  always@(posedge clock) begin
+    sr[i+1] <= sr[i];
+  end
+end
+endgenerate
 
 endmodule

@@ -12,14 +12,15 @@ reg [8*4*4-1:0] kernel;
 wire [31:0] out;
 
 // DUT
-mult_adder dut #(
+mult_adder #(
   .MA_TREE_SIZE(4*4)
-)(
+)
+dut (
   .clock(clock),
   .reset(reset),
   .in(in),
   .kernel(kernel),
-  .out(out);
+  .out(out)
 );
 
 always begin
@@ -60,5 +61,4 @@ initial begin
   $stop;
 end
 
-
-
+endmodule

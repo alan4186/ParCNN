@@ -13,7 +13,7 @@ module convolution #(
   input [7:0] pixel_in,
 
   output [31:0] pixel_out
-)
+);
 
 // reg declarations
 // wire declarations
@@ -24,9 +24,10 @@ genvar i;
 generate
 // generate the trees
 for(i=0; i<NUM_TREES; i=i+1) begin : tree_loop
-  mult_adder ma_inst #(
+  mult_adder #(
     .MA_TREE_SIZE(MA_TREE_SIZE)
-  )(
+  )
+  ma_inst (
     .clock(clock),
     .reset(reset),
     .in(window_wire[i]),
@@ -37,12 +38,13 @@ end
 
 // generate the shift registers
 // for now there will be one register for each tree
-for(i=0; i<NUM_TREES; i=i+1) begin : tree_loop
-  layer_sr conv_sr #(
+for(i=0; i<NUM_TREES; i=i+1) begin : sr_loop 
+  layer_sr #(
     .P_SR_DEPTH(P_SR_DEPTH),
     .RAM_SR_DEPTH(RAM_SR_DEPTH),
     .NUM_SR_ROWS(NUM_SR_ROWS)
-  )(
+  )
+  conv_sr (
     .clock(clock),
     .reset(reset),
     .shift_in(pixel_in),

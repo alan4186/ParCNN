@@ -9,7 +9,7 @@ in ->[0,0][1,0][2,0]->[0][1][2][3]->
 module layer_sr #( 
   parameter P_SR_DEPTH = -1,
   parameter RAM_SR_DEPTH = -1,
-  parameter NUM_SR_ROWS = -1, // the y dimension of the parallel out 'window'
+  parameter NUM_SR_ROWS = -1 // the y dimension of the parallel out 'window'
 )(
   input clock,
   input reset,
@@ -25,15 +25,16 @@ wire [7:0] p_shift_out [NUM_SR_ROWS-1:0];
 wire [8*P_SR_DEPTH-1:0] p_sr_vector [NUM_SR_ROWS-1:0];
 
 // assign statments
-assign p_shift_in = shift_in;
+assign p_shift_in[0] = shift_in;
 
 genvar i;
 generate
 // Instantiate Parallel Out Shift Regs
 for(i=0; i<NUM_SR_ROWS; i=i+1) begin : p_sr_loop
-  parallel_out_sr p_sr_inst #(
+  parallel_out_sr #(
     .DEPTH(P_SR_DEPTH)
-  )(
+  )
+  p_sr_inst (
     .clock(clock),
     .reset(reset),
     .shift_in(p_shift_in[i]),
@@ -44,9 +45,10 @@ end
 
 // Instantiate Ram Shift Regs
 for(i=0; i<NUM_SR_ROWS-1; i=i+1) begin : ram_sr_loop
-  ram_sr ram_sr_inst #(
+  ram_sr #(
     .DEPTH(RAM_SR_DEPTH)
-  )(
+  )
+  ram_sr_inst (
     .clock(clock),
     .reset(reset),
     .shift_in(p_shift_out[i]),

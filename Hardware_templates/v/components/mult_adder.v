@@ -5,7 +5,7 @@ module mult_adder #(
   input clock, 
 	input reset, 
 	input [8*MA_TREE_SIZE-1:0]  in,
-	input [8*MA_TREE_SIZE-1:0]  kernal,
+	input [8*MA_TREE_SIZE-1:0]  kernel,
 	output [31:0] out	
 );
 
@@ -23,10 +23,9 @@ generate
 for(i = 0; i < MA_TREE_SIZE; i=i+1) begin : connect_mul
    mult_8bit ma_mult_inst(
     .clock(clock),
-    .reset(reset),
-    .operand_a(in[8*(i+1)-1:i*8]),
-    .operand_b(kernal[8*(i+1)-1:i*8]),
-    .out(in_add_vector_wire[i])
+    .dataa(in[8*(i+1)-1:i*8]),
+    .datab(kernel[8*(i+1)-1:i*8]),
+    .result(in_add_vector_wire[i])
 	); 
   end
 endgenerate
@@ -54,9 +53,9 @@ generate
 for(j= (MA_TREE_SIZE*2)-2 ; j >=1 ; j=j-2) begin : sum_products
   add_32bit ma_add_inst(
     .clock(clock),
-    .operand_a(adder_tree_wire[j-1]),
-    .operand_b(adder_tree_wire[j]),
-    .out(adder_tree_wire[(j/2)-1]),
+    .dataa(adder_tree_wire[j-1]),
+    .datab(adder_tree_wire[j]),
+    .result(adder_tree_wire[(j/2)-1])
   );  
 
 end // for
