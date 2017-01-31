@@ -1,5 +1,6 @@
 // assume 4x4 kernel
 // with 4x4 kernel, tree is 3 registers deep
+`timescale 1 ps / 1 ps
 module mult_adder_tb();
 
 reg clock;
@@ -28,12 +29,12 @@ always begin
 end
 
 initial begin
-  clock = 1'b0;
+  clock = 1'b1;
   reset = 1'b1;
   in = 128'h03030303030303030303030303030303;
   kernel = 128'h02020202020202020202020202020202;
   
-  #5
+  #10
   reset = 1'b0;
   #10
   reset = 1'b1;
@@ -41,17 +42,21 @@ initial begin
   in = 128'h02020202020202020202020202020202;
   #10
   in = 128'h03030303030303030303030303030303;
+  #20
   #10
+  $display($time); 
   if (out == 32'd96)
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
   #10
+  $display($time); 
   if (out == 32'd64)
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
   #10
+  $display($time); 
   if (out == 32'd96)
     $display("out = %d, success!", out);
   else
