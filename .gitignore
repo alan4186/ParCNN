@@ -14,3 +14,6 @@ trash/**/*
 # configureable files
 Hardware/kernel_defs.h
 Hardware/network_params.h
+
+# Folders with Quartus Projects
+debug_project/
