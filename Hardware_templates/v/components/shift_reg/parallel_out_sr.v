@@ -21,7 +21,7 @@ wire [7:0] sr_wire [DEPTH:0];
 
 // assign statments
 assign sr_wire[0] = shift_in;
-assign sr_wire[DEPTH] = shift_out;
+assign shift_out = sr_wire[DEPTH];
 
 genvar i;
 generate
@@ -34,7 +34,7 @@ for(i=0; i<DEPTH; i=i+1) begin : parallel_out_sr_gen
     .shift_out(sr_wire[i+1])
   );
   // assign sr_wire to p_out
-  assign p_out[i*8-1:i] = sr_wire[i+1];
+  assign p_out[i*8+7:i*8] = sr_wire[i+1];
 end // for
 endgenerate
 

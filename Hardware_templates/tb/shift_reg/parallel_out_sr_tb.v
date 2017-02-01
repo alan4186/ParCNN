@@ -22,7 +22,36 @@ dut(
 );
 
 
+// shift_in counter
+always@(posedge clock or negedge reset) begin
+  if(reset == 1'b0) 
+    shift_in <= 8'd0;
+  else
+    shift_in <= shift_in + 8'd1;
+end
 
+always begin
+  #5 clock <= ~clock;
+end
 
+initial begin
+  clock = 1'b1;
+  reset = 1'b1;
+  
+  #10 reset = 1'b0;
+  #10 reset = 1'b1;
+
+  #30 // check output
+  $display($time);
+  $display("p_out = %h", p_out);
+  if( p_out == { 8'd0, 8'd1, 8'd2}) begin
+    $display("Pass!");
+  end else begin
+    $display("Fail!");
+  end // end if/else
+
+  #100
+  $stop;
+end
 
 endmodule
