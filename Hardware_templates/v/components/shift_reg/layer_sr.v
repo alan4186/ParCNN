@@ -58,7 +58,7 @@ end
 
 // connect p out vectors to window output
 for(i=0; i<NUM_SR_ROWS; i=i+1) begin : connect_window_wire
-  assign p_window_out[i*8+7:i*8] = p_sr_vector[i];
+  assign p_window_out[i*8*P_SR_DEPTH+8*P_SR_DEPTH-1:i*8*P_SR_DEPTH] = p_sr_vector[i];
 end
 
 endgenerate
