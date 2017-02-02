@@ -11,13 +11,14 @@ module convolution #(
   input reset,
 
   input [7:0] pixel_in,
+  input [8*NUM_TREES*MA_TREE_SIZE-1:0] kernel,
 
-  output [31:0] pixel_out
+  output [32*NUM_TREES-1:0] pixel_out
 );
 
 // reg declarations
 // wire declarations
-wire [MA_TREE_SIZE-1:0] window_wire [NUM_TREES-1:0]; // MA_TREE_SIZE = 8*P_SR_DEPTH*NUM_SR_ROWS
+wire [8*MA_TREE_SIZE-1:0] window_wire [NUM_TREES-1:0]; // MA_TREE_SIZE = 8*P_SR_DEPTH*NUM_SR_ROWS
 // assign statments
 
 genvar i;
@@ -31,8 +32,8 @@ for(i=0; i<NUM_TREES; i=i+1) begin : tree_loop
     .clock(clock),
     .reset(reset),
     .in(window_wire[i]),
-    .kernel(),
-    .out(pixel_out)
+    .kernel(kernel[i*8*MA_TREE_SIZE+8*MA_TREE_SIZE-1:i*8*MA_TREE_SIZE]),
+    .out(pixel_out[i*32+31:i*32])
   );
 end
 
@@ -53,8 +54,6 @@ for(i=0; i<NUM_TREES; i=i+1) begin : sr_loop
 end 
 
 endgenerate
-
-
 
 
 endmodule
