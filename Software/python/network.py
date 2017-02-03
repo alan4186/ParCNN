@@ -8,19 +8,14 @@ class Net(object):
     def __init__(self):
         self.layers = OrderedDict()
 
-    def add_conv(self, name, kx_size, ky_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min):
-        self.layers[name] = ConvLayer(kx_size,ky_size,num_kernels,ix_size,iy_size,sharing_factor, rq_max, rq_min)
+    def add_conv(self, name, kx_size, ky_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min, kernels):
+        self.layers[name] = ConvLayer(name,kx_size,ky_size,num_kernels,ix_size,iy_size,sharing_factor, rq_max, rq_min, kernels)
 
     def add_relu(self):
         print 'under construction'
 
     def add_max_pool(self):
         print 'under construction'
-
-    """
-    def add_dense(self):
-        print 'under construction'
-    """
 
     def export(self):
         print 'under construction'
@@ -39,7 +34,7 @@ output [7:0] pixel_out
 
         # create wire declarations
         num_wires = len(self.layers.keys()) + 2
-        wire8 = "wire [7:0] wire8 ["+str(num_wires)+":0];\n"
+        wire8 = "wire [7:0] wire8 ["+str(num_wires)+":0];\n\n"
         
         cnn_module = cnn_module + wire8 
         
@@ -51,7 +46,7 @@ output [7:0] pixel_out
             wire_index += 1 
             cnn_module += inst
 
-        cnn_module +="\nassign pixel_out = wire8["+str(wire_index)+"];\n"
+        cnn_module +="\nassign pixel_out = wire8["+str(wire_index)+"];\n\n"
 
         cnn_module += "endmodule"
         return cnn_module
@@ -64,8 +59,9 @@ class InputLayer:
 
 class ConvLayer:
 
-    def __init__(self, kx_size, ky_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min):
+    def __init__(self, name, kx_size, ky_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min, kernels):
         self.layer_type = 'conv'
+        self.name = name
         # make sure the kernel size is at least 1 
         # pixel smaller than the input in the x dimension and 
         # the same size as the input in the y dimension
@@ -80,6 +76,11 @@ class ConvLayer:
                     + 'be less than or equal to the input Y'
                     +  'dimension. Kernel Y size: '
                     + str(ky_size) + ', Input Y size: ' +str(iy_size))
+        
+        # store kernel data
+        # Kernel data should be unsigned decimal strings between [0,255]
+        self.kernels = kernels
+        self.kernels_wire_name = self.name+"_kernels"
 
         # compute parameters
         # tree sharing is not implemented yet, each kernel gets its own tree
@@ -110,7 +111,7 @@ class ConvLayer:
     .clock(clock),
     .reset(reset),
     .pixel_in(wire8["""+str(in_wire)+"""]),
-    .kernel(),
+    .kernel("""+self.kernels_wire_name+"""),
     .pixel_out(wire32_"""+str(in_wire)+""")
   );
 
@@ -118,15 +119,16 @@ class ConvLayer:
     .clock(clock),
     .reset(reset),
     .pixel_in(wire32_"""+str(in_wire)+"""),
-    .max_val("""+str(rq_max)+"""),
-    .min_val("""+str(rq_min)+"""),
+    .max_val("""+str(self.rq_max)+"""),
+    .min_val("""+str(self.rq_min)+"""),
     .pixel_out(wire8["""+str(out_wire)+"""])
   );
-
-
 """
         return inst
 
+    def write_kernel_file(self):
+        #TODO write kernel wire declaration in seperate file
+        "under construction"
 
 class ReluLayer:
 
@@ -137,10 +139,4 @@ class MaxPoolingLayer:
 
     def __init__(self):
         print 'under construction'
-
-class DenseLayer:
-
-    def __init__(self):
-        print 'under construction'
-
 
