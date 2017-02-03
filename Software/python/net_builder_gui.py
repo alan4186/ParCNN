@@ -6,6 +6,8 @@ class NetBuilderGUI:
 
     def __init__(self):
         self.top=Tk()
+        self.top.wm_title("CNN Builder")
+
         # Create Settings Frames
         self.conv_settings()
         self.relu_settings()
@@ -18,8 +20,7 @@ class NetBuilderGUI:
         
         # Create Controls Frame
         self.controls_frame()
-        
-      
+       
         # Run GUI
         self.top.mainloop()
 
@@ -63,26 +64,24 @@ class NetBuilderGUI:
         title = Label(self.cs,text='Convolution Settings')
         title.grid(row=0,column=1,columnspan=2)
 
-        in_x_size_l = Label(self.cs, text="Input X Size:")
-        in_x_size_l.grid(row=1,column=1)
-        in_x_size_e = Entry(self.cs)
-        in_x_size_e.grid(row=1,column=2)
-        
-        in_y_size_l = Label(self.cs, text="Input Y Size:")
-        in_y_size_l.grid(row=2,column=1)
-        in_y_size_e = Entry(self.cs)
-        in_y_size_e.grid(row=2,column=2)
-        
-        kernel_x_size_l = Label(self.cs, text="Kernel X Size:")
-        kernel_x_size_l.grid(row=3,column=1)
-        kernel_x_size_e = Entry(self.cs)
-        kernel_x_size_e.grid(row=3,column=2)
-        
-        kernel_y_size_l = Label(self.cs, text="Kernel Y Size:")
-        kernel_y_size_l.grid(row=4,column=1)
-        kernel_y_size_e = Entry(self.cs)
-        kernel_y_size_e.grid(row=4,column=2)
-        
+        setting_names = ["Input X Size", 
+                "Input Y Size",
+                "Kernel X Size",
+                "Kernel Y Size",
+                "Number of Kernels",
+                "Requantize Max",
+                "Requantize Min"
+                ]
+        setting_labels = {}
+        setting_entrys = {}
+        r = 1
+        for s in setting_names:
+            setting_labels[s] = Label(self.cs, text=s)
+            setting_labels[s].grid(row=r,column=1)
+            setting_entrys[s] = Entry(self.cs)
+            setting_entrys[s].grid(row=r,column=2)
+            r +=1
+         
         
     def relu_settings(self):
         self.rs = Frame(self.top)
@@ -90,15 +89,18 @@ class NetBuilderGUI:
         title = Label(self.rs,text='Relu Settings')
         title.grid(row=0,column=1,columnspan=2)
 
-        max_range_l = Label(self.rs, text="Input X Size:")
-        max_range_l.grid(row=1,column=1)
-        max_range_e = Entry(self.rs)
-        max_range_e.grid(row=1,column=2)
-
-        min_range_l = Label(self.rs, text="Input Y Size:")
-        min_range_l.grid(row=2,column=1)
-        min_range_e = Entry(self.rs)
-        min_range_e.grid(row=2,column=2)
+        setting_names = ["Input X Size", 
+                "Input Y Size"
+                ]
+        setting_labels = {}
+        setting_entrys = {}
+        r = 1
+        for s in setting_names:
+            setting_labels[s] = Label(self.rs, text=s)
+            setting_labels[s].grid(row=r,column=1)
+            setting_entrys[s] = Entry(self.rs)
+            setting_entrys[s].grid(row=r,column=2)
+            r +=1
 
 
     def pool_settings(self):
@@ -107,11 +109,19 @@ class NetBuilderGUI:
         title = Label(self.ps,text='Max Pooling Settings')
         title.grid(row=0,column=1,columnspan=2)
 
-        max_range_l = Label(self.ps, text="Pool X Size:")
-        max_range_l.grid(row=1,column=1)
+        setting_names = ["Pool X Size",
+                "Pool Y Size"
+                ]
+        setting_labels = {}
+        setting_entrys = {}
+        r = 1
+        for s in setting_names:
+            setting_labels[s] = Label(self.ps, text=s)
+            setting_labels[s].grid(row=r,column=1)
+            setting_entrys[s] = Entry(self.ps)
+            setting_entrys[s].grid(row=r,column=2)
+            r +=1
 
-        min_range_l = Label(self.ps, text="Pool Y Size:")
-        min_range_l.grid(row=2, column=1)
 
-# For Testing
-g = GUI_TEST()
+g = NetBuilderGUI()
+
