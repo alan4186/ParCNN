@@ -59,7 +59,7 @@ class InputLayer:
 
 class ConvLayer:
 
-    def __init__(self, name, kx_size, ky_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min, kernels):
+    def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min, kernels):
         self.layer_type = 'conv'
         self.name = name
         # make sure the kernel size is at least 1 
@@ -87,7 +87,7 @@ class ConvLayer:
         self.NUM_TREES = num_kernels 
         self.P_SR_DEPTH = kx_size
         self.RAM_SR_DEPTH = ix_size - kx_size
-        self.NUM_SR_ROWS = ky_size
+        self.NUM_SR_ROWS = ky_size * kz_size
         # Round the tree size up to the next power of 2 
         # to keep the tree code simple, extra resources should 
         # be optimized away.
