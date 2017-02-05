@@ -136,19 +136,20 @@ initial begin
 
   #220 // wait 22 clock cycles for layer_sr 
   #50 // wait 5 clock cycles for mult_adder tree
+  #10 // wait 1 clock cycle for Z dim adder tree
   
   // check output
 
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out);
-  if( pixel_out[31:0] == 32'd252) begin
+  if( pixel_out[31:0] == 32'd756) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
   end // end if/else
   $display($time);
   $display("Tree 2 pixel_out = %h", pixel_out);
-  if( pixel_out[63:32] == 32'd412) begin
+  if( pixel_out[63:32] == 32'd1084) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
@@ -157,14 +158,14 @@ initial begin
   #10
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out);
-  if( pixel_out[31:0] == 32'd276) begin
+  if( pixel_out[31:0] == 32'd828) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
   end // end if/else
   $display($time);
   $display("Tree 2 pixel_out = %h", pixel_out);
-  if( pixel_out[63:32] == 32'd452) begin
+  if( pixel_out[63:32] == 32'd1188) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
