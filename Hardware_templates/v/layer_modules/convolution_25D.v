@@ -58,7 +58,8 @@ end
 // sum the outputs in the Z direction
 for(i=0; i<NUM_TREES; i=i+1) begin : z_loop
   adder_tree_32bit #(
-    .TREE_SIZE(NUM_TREES)
+    //.TREE_SIZE(NUM_TREES)
+    .TREE_SIZE(Z_DEPTH)
   )
   adder_tree_inst (
     .clock(clock),
