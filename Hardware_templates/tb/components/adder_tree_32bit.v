@@ -8,7 +8,7 @@ parameter TREE_SIZE = 8;
 reg clock;
 reg reset;
 
-// mult-add operands
+// add operands
 reg [32*TREE_SIZE-1:0] in;
 
 wire [31:0] out;
@@ -42,7 +42,7 @@ initial begin
   in = {32'd9, 32'd8, 32'd7, 32'd0, 32'd16, 32'd6, 32'd7, 32'd8 }; // =61
   #10
   in = {32'd0, 32'd2, 32'd5, 32'd4, 32'd7, 32'd6, 32'd7, 32'd2 }; // =33
-  #20
+  #10
   $display($time); 
   if (out == 32'd36)
     $display("out = %d, success!", out);

@@ -1,10 +1,10 @@
-module mult_adder #(
+module adder_tree_32bit #(
   parameter TREE_SIZE = -1
 )
 (
   input clock, 
 	input reset, 
-	input [8*TREE_SIZE-1:0]  in,
+	input [32*TREE_SIZE-1:0]  in,
 	output [31:0] out	
 );
 
@@ -24,7 +24,7 @@ end // for
 
 // connect adder tree
 for(i= (TREE_SIZE*2)-2 ; i >=1 ; i=i-2) begin : sum_products
-  add_32bit ma_add_inst(
+  add_32bit add_inst(
     .clock(clock),
     .dataa(adder_tree_wire[i-1]),
     .datab(adder_tree_wire[i]),
