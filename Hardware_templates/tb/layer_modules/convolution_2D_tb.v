@@ -37,7 +37,7 @@ pixels_out:
 */
 
 `timescale 1 ps / 1 ps
-module convolution_tb();
+module convolution_2D_tb();
 
 parameter NUM_TREES = 2;
 parameter P_SR_DEPTH = 4;
@@ -68,7 +68,7 @@ assign kernel = {
                 };
 
 // DUT
-convolution #(
+convolution_2D #(
   .NUM_TREES(NUM_TREES),
   .P_SR_DEPTH(P_SR_DEPTH),
   .RAM_SR_DEPTH(RAM_SR_DEPTH),

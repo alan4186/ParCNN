@@ -1,4 +1,4 @@
-module convolution #(
+module convolution_2D #(
   parameter NUM_TREES = -1,
   // shift reg parameters
   parameter P_SR_DEPTH = -1, 
