@@ -58,9 +58,10 @@ pixels_out:
 */
 
 `timescale 1 ps / 1 ps
-module convolution_tb();
+module convolution_25D_tb();
 
 parameter NUM_TREES = 2;
+parameter Z_DEPTH = 2;
 parameter P_SR_DEPTH = 4;
 parameter RAM_SR_DEPTH = 2;
 parameter NUM_SR_ROWS = 4;
@@ -71,7 +72,7 @@ reg reset;
 
 reg [7:0] pixel_in;
 
-wire [8*NUM_TREES*MA_TREE_SIZE-1:0] kernel;
+wire [8*NUM_TREES*MA_TREE_SIZE*Z_DEPTH-1:0] kernel;
 
 wire [32*NUM_TREES-1:0] pixel_out;
 
@@ -99,6 +100,7 @@ assign kernel = {
 // DUT
 convolution_25D #(
   .NUM_TREES(NUM_TREES),
+  .Z_DEPTH(Z_DEPTH),
   .P_SR_DEPTH(P_SR_DEPTH),
   .RAM_SR_DEPTH(RAM_SR_DEPTH),
   .NUM_SR_ROWS(NUM_SR_ROWS),
@@ -107,9 +109,9 @@ convolution_25D #(
 dut(
   .clock(clock),
   .reset(reset),
-  .pixel_in(pixel_in),
+  .pixel_vector_in({pixel_in, pixel_in}),
   .kernel(kernel),
-  .pixel_out(pixel_out)
+  .pixel_vector_out(pixel_out)
 );
 
 
@@ -169,7 +171,7 @@ initial begin
   end // end if/else
 
 
-  #100
+  #500
   $stop;
 end
 
