@@ -21,6 +21,9 @@ class NetBuilderGUI:
         # Create Controls Frame
         self.controls_frame()
        
+        # Create Visualization Frame
+        self.visualization_frame()
+
         # Run GUI
         self.top.mainloop()
 
@@ -68,6 +71,7 @@ class NetBuilderGUI:
                 "Input Y Size",
                 "Kernel X Size",
                 "Kernel Y Size",
+                "Input/Kernel Z Size",
                 "Number of Kernels",
                 "Requantize Max",
                 "Requantize Min"
@@ -122,6 +126,7 @@ class NetBuilderGUI:
             setting_entrys[s].grid(row=r,column=2)
             r +=1
 
+    def visualization_frame(self):
 
 g = NetBuilderGUI()
 
