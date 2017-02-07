@@ -51,7 +51,7 @@ for(i=0; i<Z_DEPTH; i=i+1) begin : conv_25D_loop
                    8*NUM_TREES*MA_TREE_SIZE*i
                   ]
             ),
-    .pixel_out(conv_to_tree_wire_t[i])
+    .pixel_out(conv_to_tree_wire_t[i]) // work
   );
 end
 
@@ -64,8 +64,8 @@ for(i=0; i<NUM_TREES; i=i+1) begin : z_loop
   adder_tree_inst (
     .clock(clock),
     .reset(reset),
-    .in(conv_to_tree_wire[i]),
-//    .in(conv_to_tree_wire[Z_DEPTH-1:0][i*32+31:i*32]),
+    .in(conv_to_tree_wire[i]), 
+    //.in(conv_to_tree_wire_t[i]),
     .out(pixel_vector_out[i*32+31:i*32])
   );
 
