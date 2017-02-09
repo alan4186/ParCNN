@@ -5,8 +5,6 @@ import math
 class ConvLayer:
 
     def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min, kernels):
-        self.layer_type = 'conv'
-        self.name = name
         # make sure the kernel size is at least 1 
         # pixel smaller than the input in the x dimension and 
         # the same size as the input in the y dimension
@@ -26,13 +24,22 @@ class ConvLayer:
         if kz_size != iz_size:
             raise ValueError("The kernel and input must have " +
                     "the same Z dimension. kz_size = " +
-                    str(kz_size)+", iz_size = " + str(iz_size)
+                    str(kz_size)+", iz_size = " + str(iz_size))
 
         # check that the requantize range is valid
-        if rqmin >= rq_max:
+        if rq_min >= rq_max:
             raise ValueError("Invalid requantize range." +
             "rq_min must be less than rq_max. " + 
-            "rq_min = "+str(rq_min)+", rq_max = " +str(rq_max)
+            "rq_min = "+str(rq_min)+", rq_max = " +str(rq_max))
+
+
+        self.layer_type = 'conv'
+        self.name = name
+        self.ix_size = ix_size
+        self.iy_size = iy_size
+        self.z_size = kz_size
+        self.kx_size = kx_size
+        self.ky_size = ky_size
 
         #TODO kernel sanity check
         # Check kernel size
@@ -88,7 +95,18 @@ class ConvLayer:
 """
         return inst
 
-    def write_kernel_file(self):
-        #TODO write kernel wire declaration in seperate file
-        "under construction"
+    def write_kernel_wire(self):
+        #TODO reshape kernel into vector
 
+        kernel_width = self.Z_DIM*self.NUM_TREES*self.P_SR_SIZE*self.NUM_SR_ROWS - 1
+        kernel_wire = "wire ["+str(kernel_width)+":0] "+kernels_wire_name+";\n"
+        kernel_wire += "assign "+kernel_wire_name+" = { "
+        # convert vector to verilog formated string
+        for parameter in kernel_vector:
+            kernel_wire += "8'd" + str(parameter)+", "
+        kernel_wire = kernel_wire[:-2] +" };"
+        return kernel_wire 
+
+        
+
+        
