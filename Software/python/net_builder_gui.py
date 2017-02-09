@@ -1,6 +1,18 @@
 from collections import OrderedDict
 from Tkinter import *
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot 
+import numpy as np
+import numpy.matlib
+from itertools import product, combinations
+
+import matplotlib
+matplotlib.use('TkAgg')
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from network import Net
 # A class to describe the network that will be implemented in hardware
 class NetBuilderGUI:
 
@@ -127,6 +139,119 @@ class NetBuilderGUI:
             r +=1
 
     def visualization_frame(self):
+        # create frame to hold scrollbars and canvas
+        self.vf = Frame(self.top, width=450, height=450)
+        self.vf.grid(row=0,column=2)
+        self.vf.config(bd=3)
+        
+        # create cavas that will scroll
+        self.vf_canvas = Canvas(self.vf,bg='#FFFFFF',width=400,height=400,scrollregion=(0,0,5000,5000))
+        fig = matplotlib.pyplot.figure(facecolor='White')
+
+
+        num_layers=len(self.network.layers.items())
+        if len(self.network.layers) > 0:
+            i=1
+            # create figure
+            for pair in self.network.layers.items():
+                name = pair[0]
+                l = pair[1] 
+                if l.layer_type == "conv":
+                    #self.draw_conv_layer(32,32,50,10,10,[0,0,0],ax)
+                    ax= fig.add_subplot(1,num_layers,i,projection='3d')
+                    self.draw_conv_layer(l.name,l.ix_size, l.iy_size, l.z_size, l.kx_size, l.ky_size,[0,0,0],ax)
+                    i+=1
+
+        
+        canvas = FigureCanvasTkAgg(fig,master=self.vf)
+        #canvas = FigureCanvasTkAgg(fig,master=self.top)
+        plot_widget = canvas.get_tk_widget()
+        """ 
+        xScrollbar = Scrollbar(self.vf, orient=HORIZONTAL)
+        xScrollbar.grid(row=2, column=1, sticky=W+E)
+        xScrollbar.config(command=plot_widget.xview)
+        
+        yScrollbar = Scrollbar(self.vf, orient=VERTICAL)
+        yScrollbar.grid(row=1, column=2, sticky=N+S)
+        yScrollbar.config(command=plot_widget.yview)      
+        """
+        # disable geometry propagation now that scroll bars are in place
+        self.vf.grid_propagate(0)
+        
+        xScrollbar = Scrollbar(self.top, orient=HORIZONTAL)
+        xScrollbar.grid(row=1, column=2, sticky=W+E)
+        xScrollbar.config(command=plot_widget.xview)
+        
+        yScrollbar = Scrollbar(self.top, orient=VERTICAL)
+        yScrollbar.grid(row=0, column=3, sticky=N+S)
+        yScrollbar.config(command=plot_widget.yview)
+        
+        if num_layers: 
+            plot_widget.config(width=400*num_layers, height=400)
+        else:
+            plot_widget.config(width=400, height=400)
+        plot_widget.config(xscrollcommand=xScrollbar.set, yscrollcommand=yScrollbar.set,scrollregion=(0,0,5000,5000))
+        #plot_widget.pack(side=LEFT, expand=False)
+        plot_widget.grid(row=1, column=1)
+
+        #self.vf.config(width=400, height=400)
+
+        """
+        self.vf_canvas.config(width=400, height=400)
+        self.vf_canvas.config(xscrollcommand=xScrollbar.set, yscrollcommand=yScrollbar.set)
+        self.vf_canvas.pack(side=LEFT, expand=False,fill=None)
+        """ 
+
+    def draw_conv_layer(self,name,ix,iy,z,kx,ky,o,ax):
+        #ax = fig.gca(projection='3d')
+        ko_scale = 0.25
+        ko = [ix*ko_scale+o[0], iy*ko_scale+o[1], 0+o[2]]
+        self.draw_cube(ix,iy,z,o ,ax)
+        self.draw_cube(kx,ky,z,ko ,ax)
+        max_dim = np.max([ix,iy,z])*1.05 # will cause problems if multiple layers are in 1 plot
+        ax.set_xlim3d(0,max_dim)
+        ax.set_ylim3d(0,max_dim)
+        ax.set_zlim3d(0,max_dim)
+        ax.view_init(30,-30)
+
+        # Z annotation
+        ax.text(ix,z/2.0,0,str(z))
+        # Input X/Y annotations
+        ax.text(ix/2.0,0,iy,str(ix))
+        ax.text(ix,0,iy/2.0,str(iy))
+        # Kernel X/Y annotations
+        ax.text(kx/2.0+ko[0],0,ky+ko[1],str(kx))
+        ax.text(kx+ko[0],0,ky/2.0+ko[1],str(ky))
+
+        matplotlib.pyplot.axis('off')
+        matplotlib.pyplot.title(name)
+        #return fig
+
+    def draw_cube(self,x,y,z,o,ax):
+        o = [ o[0], o[2], o[1]]
+        corners = np.array([[0,0,0],
+        [0,0,1],
+        [0,1,1],
+        #[0,1,0], # leave out back corner
+        [1,1,0],
+        [1,1,1],
+        [1,0,1],
+        [1,0,0]
+        ])
+    
+        dim = np.matlib.repmat(np.array([x,z,y]),7,1)
+        corners = np.multiply(dim,corners) 
+        for s,e in combinations(corners,2):
+            sn = (s != np.array([0,0,0])).astype(int)
+            en = (e != np.array([0,0,0])).astype(int)
+        
+            if np.sum(np.power((sn-en),2)) == 1:
+                ax.plot3D(*zip(s+o,e+o), color='b')
+            
+
+        
+
+        
 
 g = NetBuilderGUI()
 
