@@ -2,14 +2,15 @@ from collections import OrderedDict
 from Tkinter import *
 import math
 
+from convLayer import ConvLayer
 # A class to describe the network that will be implemented in hardware
 class Net(object):
 
     def __init__(self):
         self.layers = OrderedDict()
 
-    def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, sharing_factor, rq_max, rq_min, kernels):
-        self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,sharing_factor, rq_max, rq_min, kernels)
+    def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min, kernels):
+        self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min, kernels)
 
     def add_relu(self):
         print 'under construction'
