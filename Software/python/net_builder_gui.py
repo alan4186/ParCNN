@@ -44,7 +44,7 @@ class NetBuilderGUI:
 
     def controls_frame(self):
         self.controls = Frame(self.top)
-        self.controls.pack(side =LEFT)
+        self.controls.grid(row=0,column=0,rowspan=2)
       
         ctrl_label = Label(self.controls, text='Layers:')
         ctrl_label.pack()
@@ -65,16 +65,14 @@ class NetBuilderGUI:
                 b.invoke()
             b.pack(anchor=W)
 
-        
-
     def update_settings(self):
         print "updating settings"
         frame_name = self.strvar.get()
         print frame_name
         for k in self.setting_frames.keys():
             v = self.setting_frames[k]
-            v.pack_forget()
-        self.setting_frames[frame_name].pack(side=RIGHT)
+            v.grid_forget()
+        self.setting_frames[frame_name].grid(row=0,column=1,rowspan=2)
 
         
     def conv_settings(self):
