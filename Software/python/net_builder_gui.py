@@ -20,6 +20,9 @@ class NetBuilderGUI:
         self.top=Tk()
         self.top.wm_title("CNN Builder")
 
+        # Create Network class inst
+        self.network = Net()
+
         # Create Settings Frames
         self.conv_settings()
         self.relu_settings()
@@ -79,7 +82,8 @@ class NetBuilderGUI:
         title = Label(self.cs,text='Convolution Settings')
         title.grid(row=0,column=1,columnspan=2)
 
-        setting_names = ["Input X Size", 
+        setting_names = ["Layer Name",
+                "Input X Size", 
                 "Input Y Size",
                 "Kernel X Size",
                 "Kernel Y Size",
@@ -88,16 +92,43 @@ class NetBuilderGUI:
                 "Requantize Max",
                 "Requantize Min"
                 ]
-        setting_labels = {}
-        setting_entrys = {}
+        self.setting_labels = {}
+        self.setting_entrys = {}
         r = 1
         for s in setting_names:
-            setting_labels[s] = Label(self.cs, text=s)
-            setting_labels[s].grid(row=r,column=1)
-            setting_entrys[s] = Entry(self.cs)
-            setting_entrys[s].grid(row=r,column=2)
+            self.setting_labels[s] = Label(self.cs, text=s)
+            self.setting_labels[s].grid(row=r,column=1)
+            self.setting_entrys[s] = Entry(self.cs)
+            self.setting_entrys[s].grid(row=r,column=2)
             r +=1
-         
+       
+        conv_layer_b = Button(self.cs, text="Add Layer", command=self.add_conv_layer)
+        conv_layer_b.grid(row=r,column=1,columnspan=2)
+        r+=1
+
+    def add_conv_layer(self):
+        name = self.setting_entrys["Layer Name"].get()
+        i_xs = int(self.setting_entrys["Input X Size"].get())
+        i_ys = int(self.setting_entrys["Input Y Size"].get())
+        k_xs = int(self.setting_entrys["Kernel X Size"].get())
+        k_ys = int(self.setting_entrys["Kernel Y Size"].get())
+        zs = int(self.setting_entrys["Input/Kernel Z Size"].get())
+        num_k = int(self.setting_entrys["Number of Kernels"].get())
+        rq_max = int(self.setting_entrys["Requantize Max"].get())
+        rq_min = int(self.setting_entrys["Requantize Min"].get())
+
+        np_kernels = []
+        self.network.add_conv(name, k_xs, k_ys, zs, num_k, i_xs, i_ys, zs, 1.0, rq_max, rq_min, np_kernels)
+
+        #self.vf_canvas.pack_forget()
+        #self.vf.grid_forget()
+        self.visualization_frame()
+
+        print self.network.layers
+        
+        # update settings to be compatable with this layer
+        self.setting_entrys["Input/Kernel Z Size"].delete(0,END)
+        self.setting_entrys["Input/Kernel Z Size"].insert(0,num_k)
         
     def relu_settings(self):
         self.rs = Frame(self.top)
