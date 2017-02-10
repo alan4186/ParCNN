@@ -42,6 +42,12 @@ class ConvLayer:
         self.ky_size = ky_size
         self.num_kernels = num_kernels
         
+        # tensor flow weight variable
+        self.tf_var = weight_variable([self.kx_size,
+            self.ky_size,
+            self.kz_size,
+            self.num_kernels
+            ])
         self.kernels_wire_name = self.name+"_kernels"
 
         # compute parameters
