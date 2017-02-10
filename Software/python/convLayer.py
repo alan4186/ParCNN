@@ -4,7 +4,7 @@ import math
 
 class ConvLayer:
 
-    def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min, kernels):
+    def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
         # make sure the kernel size is at least 1 
         # pixel smaller than the input in the x dimension and 
         # the same size as the input in the y dimension
@@ -40,13 +40,8 @@ class ConvLayer:
         self.z_size = kz_size
         self.kx_size = kx_size
         self.ky_size = ky_size
-
-        #TODO kernel sanity check
-        # Check kernel size
-
-        # store kernel data
-        # Kernel data should be unsigned decimal strings between [0,255]
-        self.kernels = kernels
+        self.num_kernels = num_kernels
+        
         self.kernels_wire_name = self.name+"_kernels"
 
         # compute parameters
@@ -96,17 +91,56 @@ class ConvLayer:
         return inst
 
     def write_kernel_wire(self):
-        #TODO reshape kernel into vector
+        tabs = '                       '
+        k_wire = tabs[:-1]+'};' # end of wire
+        dim = self.kernels.shape
+        # move down Z dimension
+        for z in range(0,dim[2]):
+            # move down kernel dimension
+            for k in range(0,dim[3]):
+                #move down row dimension
+                for r in range(0, dim[0]):
+                    """ 
+                    # dont move down column dim,
+                    # select entire rows at a time
+        
+                    # move down column dimension:
+                    for c in dim[1]:
+                    """
+                    k_slice = self.kernels[r,:,z,k]
+       
+                    row_wire=','
+                    # now, iterate over columns and write strings
+                    for c in k_slice[::-1]:
+                        row_wire = ", 8'd"+str(c)+row_wire
+                    k_wire = tabs + row_wire[2:] + '\n' + k_wire
+       
+                # Add annotation
+                annotation = "/* Kernel "+ str(k) + " z="+str(z)+" */"
+                k_wire = annotation + k_wire[len(annotation):]
 
-        kernel_width = self.Z_DIM*self.NUM_TREES*self.P_SR_SIZE*self.NUM_SR_ROWS - 1
-        kernel_wire = "wire ["+str(kernel_width)+":0] "+kernels_wire_name+";\n"
-        kernel_wire += "assign "+kernel_wire_name+" = { "
-        # convert vector to verilog formated string
-        for parameter in kernel_vector:
-            kernel_wire += "8'd" + str(parameter)+", "
-        kernel_wire = kernel_wire[:-2] +" };"
-        return kernel_wire 
+
+        k_width = self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS - 1
+        k_declaration = "wire ["+str(k_width)+":0] "+self.kernels_wire_name+";\n"
+        k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire
+
+        return k_wire 
 
         
+    def export(self, name, in_wire, out_wire):
 
+        write_kernel_wire()
+
+        return write_inst(name,in_wire,out_wire)
         
+    def update_kernels(self,np_kernels):
+        # Check kernel size
+        k_dim = np_kernels 
+        if k_dim != (self.kx_size,self.ky_size,self.kz_size,self.num_kernels):
+            raise ValueError("The given kernel size did not match the layer size.\n"+
+                    "Kernel size: "+str(k_dim) +
+                    "\nLayer size: "+str((self.kx_size,self.ky_size,self.kz_size,self.num_kernels))+"\n")
+            
+        # Kernel data should be unsigned decimal strings between [0,255]
+        self.kernels = np_kernels
+
