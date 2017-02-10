@@ -150,3 +150,7 @@ class ConvLayer:
         # Kernel data should be unsigned decimal strings between [0,255]
         self.kernels = np_kernels
 
+    def tf_function(self,layer_input):
+        # x: the input to the convolutional layer
+        # W: the tensorflow weight parameters of the layer
+        return tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')

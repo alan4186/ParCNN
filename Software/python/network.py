@@ -76,9 +76,12 @@ output [7:0] pixel_out
         # Build the Tensorflow graph
         #TODO parametric input size
         input_placeholder = tf.placeholder(tf.float32, shape=[None, 784])
+        target_placeholder = tf.placeholder(tf.float32, shape=[None,10])
+
+        # Build the Tensorflow graph
         layer_outputs = [input_placeholder]
         for l in self.layers:
-            layer_outputs.append(commands[l.layer_type](layer_outputs[-1],l.tf_var))
+            layer_outputs.append(l.tf_function(layer_outputs[-1]))
             
 
         cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
@@ -103,12 +106,7 @@ output [7:0] pixel_out
                 x: mnist.test.images, y_: mnist.test.labels}))
 
             #TODO save network
-
-    def conv2d(self,x,W):
-        # x: the input to the convolutional layer
-        # W: the tensorflow weight parameters of the layer
-        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='VALID')
-
+"""  Move these functions to their respective classes
     def add_bias(self,h, bias):
         # h: the input to the layer
         # bias: the tensorflow variable to add to the input
@@ -121,6 +119,7 @@ output [7:0] pixel_out
         #TODO implement variable dimension pools
         return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
             strides=[1, 2, 2, 1], padding='VALID')
+"""
 
     def set_train_steps(self,steps):
         self.training_steps = steps
