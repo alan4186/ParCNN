@@ -21,18 +21,20 @@ class NetBuilderGUI:
         self.top.wm_title("CNN Builder")
 
         # Create Network class inst
-        self.network = Net()
+        self.network = Net('gui project')
 
         # Create Settings Frames
         self.conv_settings()
         self.relu_settings()
         self.pool_settings()
+        self.train_settings()
         
         self.setting_frames=OrderedDict()
         self.setting_frames['conv'] = self.cs
         self.setting_frames['relu'] = self.rs
         self.setting_frames['pool'] = self.ps
-        
+        self.setting_frames['train'] = self.ts 
+
         # Create Controls Frame
         self.controls_frame()
        
@@ -53,6 +55,7 @@ class NetBuilderGUI:
             ("Convolution", "conv"),
             ("Relu", "relu"),
             ("Max Pooling", "pool"),
+            ("Training","train")
         ]
 
         self.strvar = StringVar()
@@ -64,6 +67,9 @@ class NetBuilderGUI:
             if mode == "conv":
                 b.invoke()
             b.pack(anchor=W)
+        
+        train_b = Button(self.controls,command=self.network.train, text='Train')
+        train_b.pack(side=BOTTOM)
 
     def update_settings(self):
         print "updating settings"
@@ -166,6 +172,32 @@ class NetBuilderGUI:
             setting_entrys[s] = Entry(self.ps)
             setting_entrys[s].grid(row=r,column=2)
             r +=1
+
+    def train_settings(self):
+        self.ts = Frame(self.top)
+        title = Label(self.ts,text='Training Settings')
+        title.grid(row=0,column=1,columnspan=2)
+
+        setting_names = ["Epochs",
+                "Training Data", 
+                "Training Labels", 
+                "Testing Data",
+                "Testing Labels"
+                ]
+        self.setting_labels = {}
+        self.setting_entrys = {}
+        r = 1
+        for s in setting_names:
+            self.setting_labels[s] = Label(self.ts, text=s)
+            self.setting_labels[s].grid(row=r,column=1)
+            self.setting_entrys[s] = Entry(self.ts)
+            self.setting_entrys[s].grid(row=r,column=2)
+            r +=1
+       
+        train_b = Button(self.ts, text="Train Network", command=self.network.train)
+        train_b.grid(row=r,column=1,columnspan=2)
+        r+=1
+
 
     def visualization_frame(self):
         # create frame to hold scrollbars and canvas
