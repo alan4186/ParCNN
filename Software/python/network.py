@@ -2,6 +2,7 @@ from collections import OrderedDict
 from Tkinter import *
 import math
 
+from tensorflow.examples.tutorials.mnist import input_data
 from convLayer import ConvLayer
 # A class to describe the network that will be implemented in hardware
 class Net:
@@ -63,6 +64,7 @@ output [7:0] pixel_out
     def train(self):
 
         # TODO get training data
+        mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
         
         # TODO split commands dictionary into seperate functions in the respective classes
         # Create dictionary to translate layer classes into functions
@@ -73,8 +75,7 @@ output [7:0] pixel_out
             'max_pool':self.max_pool
             } 
 
-        # Build the Tensorflow graph
-        #TODO parametric input size
+        #TODO parametric input/output size
         input_placeholder = tf.placeholder(tf.float32, shape=[None, 784])
         target_placeholder = tf.placeholder(tf.float32, shape=[None,10])
 
