@@ -1,9 +1,13 @@
 from collections import OrderedDict
-from Tkinter import *
-import math
 
+import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+
+# layer imports
 from convLayer import ConvLayer
+from reluLayer import ReluLayer
+from denseLayer import DenseLayer
+
 # A class to describe the network that will be implemented in hardware
 class Net:
 
@@ -14,16 +18,20 @@ class Net:
         # Training settings
         self.training_steps = steps
 
-    def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min, kernels):
-        self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min, kernels)
+    def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
+        self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min)
 
-    def add_relu(self):
-        print 'under construction'
+    def add_relu(self, name, q_max, q_min):
+        self.layers[name] = ReluLayer(name, q_max, q_min)
 
     def add_max_pool(self):
         print 'under construction'
 
         
+    def add_dense(self, name, ix_size, iy_size, iz_size, num_outputs, sharing_factor, rq_max, rq_min):
+        # use convolution with kernel_size = input size
+        self.layers[name] = DenseLayer(name, ix_size,iy_size,iz_size, num_outputs,sharing_factor, rq_max, rq_min)
+
     def export_cnn_module(self):
         #TODO create project directory
 
@@ -63,31 +71,27 @@ output [7:0] pixel_out
 
     def train(self):
 
-        # TODO get training data
+        # TODO get arbitrary training data
         mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
         
-        # TODO split commands dictionary into seperate functions in the respective classes
-        # Create dictionary to translate layer classes into functions
-        commands = { 
-            'conv':self.conv2d,
-            'relu':tf.nn.relu,
-            'bias':add_bias,
-            'max_pool':self.max_pool
-            } 
+
 
         #TODO parametric input/output size
-        input_placeholder = tf.placeholder(tf.float32, shape=[None, 784])
-        target_placeholder = tf.placeholder(tf.float32, shape=[None,10])
+        x = tf.placeholder(tf.float32, shape=[None, 784])
+        x_images= tf.reshape(x, [-1,28,28,1])
+        y_ = tf.placeholder(tf.float32, shape=[None,10]) # labels place holder
 
         # Build the Tensorflow graph
-        layer_outputs = [input_placeholder]
-        for l in self.layers:
+        layer_outputs = [x_images]
+        for name,l in self.layers.items():
             layer_outputs.append(l.tf_function(layer_outputs[-1]))
-            
+           
+        # Hard code output shape for MNIST
+        layer_outputs.append(tf.reshape(layer_outputs[-1],[-1,10]))
 
-        cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
+        cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(layer_outputs[-1], y_))
         train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-        correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
+        correct_prediction = tf.equal(tf.argmax(layer_outputs[-1],1), tf.argmax(y_,1))
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
         init_op = tf.global_variables_initializer()
 
@@ -106,8 +110,10 @@ output [7:0] pixel_out
             print("test accuracy %g"%accuracy.eval(feed_dict={
                 x: mnist.test.images, y_: mnist.test.labels}))
 
-            #TODO save network
-"""  Move these functions to their respective classes
+            #for name,l in self.layers.items():
+            #    l.update_tf_var()
+
+    """  Move these functions to their respective classes
     def add_bias(self,h, bias):
         # h: the input to the layer
         # bias: the tensorflow variable to add to the input
@@ -120,24 +126,8 @@ output [7:0] pixel_out
         #TODO implement variable dimension pools
         return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
             strides=[1, 2, 2, 1], padding='VALID')
-"""
+    """
 
     def set_train_steps(self,steps):
         self.training_steps = steps
-
-class InputLayer:
-    
-    def __init__(self, x_size, y_size):
-        self.x_size = x_size
-        self.y_size = y_size
-
-class ReluLayer:
-
-    def __init__(self):
-        print 'under construction'
-
-class MaxPoolingLayer:
-
-    def __init__(self):
-        print 'under construction'
 
