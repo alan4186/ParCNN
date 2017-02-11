@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from Tkinter import *
+import tensorflow as tf
 import math
 
 class ConvLayer:
@@ -41,13 +40,16 @@ class ConvLayer:
         self.kx_size = kx_size
         self.ky_size = ky_size
         self.num_kernels = num_kernels
-        
+      
+        # standard deviation for random weights
+        self.w_init_stddev = 0.1
         # tensor flow weight variable
-        self.tf_var = weight_variable([self.kx_size,
+        self.tf_var = tf.Variable(tf.truncated_normal([self.kx_size,
             self.ky_size,
-            self.kz_size,
+            self.z_size,
             self.num_kernels
-            ])
+            ], stddev=self.w_init_stddev))
+
         self.kernels_wire_name = self.name+"_kernels"
 
         # compute parameters
