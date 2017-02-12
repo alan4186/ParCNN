@@ -7,8 +7,6 @@ import numpy as np
 import numpy.matlib
 from itertools import product, combinations
 
-import matplotlib
-matplotlib.use('TkAgg')
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
