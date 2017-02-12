@@ -279,7 +279,7 @@ class NetBuilderGUI:
 
     def visualization_frame(self):
         # create frame to hold scrollbars and canvas
-        self.vf = Frame(self.top, width=450, height=450)
+        self.vf = Frame(self.top, width=816, height=416)
         self.vf.grid(row=0,column=1, rowspan=2)
         self.vf.config(bd=3)
         
@@ -344,12 +344,19 @@ class NetBuilderGUI:
         z = layer.z_size
         kx = layer.kx_size
         ky = layer.ky_size 
+        nk = layer.num_kernels
 
+        # prevent box from looking long and skinny
+        if z > 3*np.min([ix,iy]):
+            zs = 3*np.min([ix,iy])
+        else:
+            zs = z
+            
         ko_scale = 0.25
         ko = [ix*ko_scale+o[0], iy*ko_scale+o[1], 0+o[2]]
-        self.draw_cube(ix,iy,z,o ,ax)
-        self.draw_cube(kx,ky,z,ko ,ax)
-        max_dim = np.max([ix,iy,z])*1.05 # will cause problems if multiple layers are in 1 plot
+        self.draw_cube(ix,iy,zs,o ,ax)
+        self.draw_cube(kx,ky,zs,ko ,ax)
+        max_dim = np.max([ix,iy,zs])*1.05 # will cause problems if multiple layers are in 1 plot
         ax.set_xlim3d(0,max_dim)
         ax.set_ylim3d(0,max_dim)
         ax.set_zlim3d(0,max_dim)
@@ -363,6 +370,8 @@ class NetBuilderGUI:
         # Kernel X/Y annotations
         ax.text(kx/2.0+ko[0],0,ky+ko[1],str(kx))
         ax.text(kx+ko[0],0,ky/2.0+ko[1],str(ky))
+        # number of kernel annotation
+        ax.text(ix,z/2.0,-5,'Kernels: '+str(nk))
 
         matplotlib.pyplot.axis('off')
         matplotlib.pyplot.title(name)
