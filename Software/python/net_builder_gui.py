@@ -41,16 +41,14 @@ class NetBuilderGUI:
         # Create Visualization Frame
         self.visualization_frame()
 
+        self.top.grid_rowconfigure(1,minsize=350)
         # Run GUI
         self.top.mainloop()
 
     def controls_frame(self):
         self.controls = Frame(self.top)
-        self.controls.grid(row=0,column=0,rowspan=1)
+        self.controls.grid(row=0,column=0)
       
-        #ctrl_label = Label(self.controls, text='Layers:')
-        #ctrl_label.pack()
-
         MODES = [
             ("Convolution", "conv", self.c_update_settings),
             ("Relu", "relu", self.r_update_settings),
@@ -63,34 +61,35 @@ class NetBuilderGUI:
         self.strvar.set("conv") # initialize
 
         for text, mode, c in MODES:
-            b = Button(self.controls, text=text,
-                            command=c)
-            if mode == "conv":
-                b.invoke()
-            b.pack(side=LEFT, fill=BOTH)
+            #b = Button(self.controls, text=text, command=c)
+            b = Label(self.controls, text=text, bg='gray', bd=2, pady=15, padx=5,
+                    highlightthickness=2,highlightbackground='black')
+            b.bind("<1>", c)
+            #if mode == "conv":
+                #b.invoke()
+            b.pack(side=LEFT, fill=None)
 
     def update_settings(self,frame_name):
         for k in self.setting_frames.keys():
             v = self.setting_frames[k]
             v.grid_forget()
-        #self.setting_frames[frame_name].grid(row=0,column=1,rowspan=2)
-        self.setting_frames[frame_name].grid(row=1,column=0,rowspan=1)
+        self.setting_frames[frame_name].grid(row=1,column=0,rowspan=1,sticky=NSEW)
 
 
-    def c_update_settings(self):
+    def c_update_settings(self,e):
         self.update_settings('conv')
-    def r_update_settings(self):
+    def r_update_settings(self,e):
         self.update_settings('relu')
-    def p_update_settings(self):
+    def p_update_settings(self,e):
         self.update_settings('pool')
-    def d_update_settings(self):
+    def d_update_settings(self,e):
         self.update_settings('dense')
-    def t_update_settings(self):
+    def t_update_settings(self,e):
         self.update_settings('train')
          
     def conv_settings(self):
-        self.cs = Frame(self.top)
-        title = Label(self.cs,text='Convolution Settings')
+        self.cs = Frame(self.top, bg='gray')
+        title = Label(self.cs,text='Convolution Settings', bg='gray')
         title.grid(row=0,column=1,columnspan=2)
 
         setting_names = ["Layer Name",
@@ -107,13 +106,13 @@ class NetBuilderGUI:
         self.conv_entries= {}
         r = 1
         for s in setting_names:
-            self.conv_labels[s] = Label(self.cs, text=s)
+            self.conv_labels[s] = Label(self.cs, text=s,bg='gray')
             self.conv_labels[s].grid(row=r,column=1)
             self.conv_entries[s] = Entry(self.cs)
             self.conv_entries[s].grid(row=r,column=2)
             r +=1
        
-        conv_layer_b = Button(self.cs, text="Add Layer", command=self.add_conv_layer)
+        conv_layer_b = Button(self.cs, text="Add Layer", command=self.add_conv_layer,bg='gray')
         conv_layer_b.grid(row=r,column=1,columnspan=2)
         r+=1
 
@@ -297,15 +296,7 @@ class NetBuilderGUI:
         canvas = FigureCanvasTkAgg(fig,master=self.vf)
         #canvas = FigureCanvasTkAgg(fig,master=self.top)
         plot_widget = canvas.get_tk_widget()
-        """ 
-        xScrollbar = Scrollbar(self.vf, orient=HORIZONTAL)
-        xScrollbar.grid(row=2, column=1, sticky=W+E)
-        xScrollbar.config(command=plot_widget.xview)
-        
-        yScrollbar = Scrollbar(self.vf, orient=VERTICAL)
-        yScrollbar.grid(row=1, column=2, sticky=N+S)
-        yScrollbar.config(command=plot_widget.yview)      
-        """
+
         # disable geometry propagation now that scroll bars are in place
         self.vf.grid_propagate(0)
         
