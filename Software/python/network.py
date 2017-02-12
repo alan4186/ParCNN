@@ -21,6 +21,10 @@ class Net:
     def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
         self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min)
 
+    def add_bias(self, name, size):
+        #self.layers[name] = BiasLayer(name, size)
+        return None
+
     def add_relu(self, name, q_max, q_min):
         self.layers[name] = ReluLayer(name, q_max, q_min)
 
