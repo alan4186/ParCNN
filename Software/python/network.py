@@ -114,8 +114,9 @@ output [7:0] pixel_out
             print("test accuracy %g"%accuracy.eval(feed_dict={
                 x: mnist.test.images, y_: mnist.test.labels}))
 
-            #for name,l in self.layers.items():
-            #    l.update_tf_var()
+            # save the trained network
+            for name,l in self.layers.items():
+                l.save_trained_layer()
 
     """  Move these functions to their respective classes
     def add_bias(self,h, bias):

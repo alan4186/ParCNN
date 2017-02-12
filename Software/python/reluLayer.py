@@ -39,3 +39,7 @@ class ReluLayer:
        
     def tf_function(self,layer_input):
         return tf.nn.relu(layer_input)
+
+    def save_trained_layer(self):
+        # Do nothin, no network parameters to save
+        return None

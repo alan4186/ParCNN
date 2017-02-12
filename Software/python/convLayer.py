@@ -40,6 +40,7 @@ class ConvLayer:
         self.kx_size = kx_size
         self.ky_size = ky_size
         self.num_kernels = num_kernels
+        self.kernels = None # empty until trained network is saved
       
         # standard deviation for random weights
         self.w_init_stddev = 0.1
@@ -156,3 +157,6 @@ class ConvLayer:
         # x: the input to the convolutional layer
         # W: the tensorflow weight parameters of the layer
         return tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
+
+    def save_trained_layer(self):
+        self.kernels = self.tf_var.eval()

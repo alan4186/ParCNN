@@ -18,6 +18,7 @@ class DenseLayer:
         self.iz_size = iz_size
         self.i_size = ix_size * iy_size * iz_size
         self.o_size= output_size
+        self.parameters = None # empty until a trained network is saved
        
         # for visualization compatability
         self.kx_size = ix_size
@@ -142,3 +143,6 @@ class DenseLayer:
         return tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
         #out = tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
         #return tf.reshape(out,[-1,self.o_size])
+
+    def save_trained_layer(self):
+        self.parameters = self.tf_var.eval()
