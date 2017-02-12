@@ -70,7 +70,6 @@ class NetBuilderGUI:
             b.pack(side=LEFT, fill=BOTH)
 
     def update_settings(self,frame_name):
-        print "updating settings"
         for k in self.setting_frames.keys():
             v = self.setting_frames[k]
             v.grid_forget()
@@ -135,8 +134,6 @@ class NetBuilderGUI:
         #self.vf_canvas.pack_forget()
         #self.vf.grid_forget()
         self.visualization_frame()
-
-        print self.network.layers
         
         # update settings to be compatable with this layer
         self.conv_entries["Input/Kernel Z Size"].delete(0,END)
@@ -177,8 +174,6 @@ class NetBuilderGUI:
 
         self.visualization_frame()
 
-        print self.network.layers
-        
     def pool_settings(self):
         self.ps = Frame(self.top)
         
@@ -240,9 +235,6 @@ class NetBuilderGUI:
         #self.vf_canvas.pack_forget()
         #self.vf.grid_forget()
         self.visualization_frame()
-
-        print self.network.layers
-        
 
     def train_settings(self):
         self.ts = Frame(self.top)
