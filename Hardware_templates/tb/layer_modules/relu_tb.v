@@ -16,6 +16,7 @@ reg [7:0] zero;
 wire [8*SIZE-1:0] out;
 // DUT
 relu #(
+  .MIN_MSB(MIN_MSB),
   .SIZE(SIZE)
 )
 dut (
@@ -33,7 +34,7 @@ end
 initial begin
   clock = 1'b1;
   reset = 1'b1;
-  in = {8'd256, 8'd128, 8'd64, 8'd32};
+  in = {8'd255, 8'd128, 8'd64, 8'd32};
   zero = 8'd128;
 
   #10
@@ -44,7 +45,7 @@ initial begin
 
   #10
   $display($time); 
-  if (out == {8'd256, 8'd128, 8'd128, 8'd128})
+  if (out == {8'd255, 8'd128, 8'd128, 8'd128})
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
@@ -54,7 +55,7 @@ initial begin
 
   #10
   $display($time); 
-  if (out == {8'd256, 8'd128, 8'd64, 8'd32})
+  if (out == {8'd255, 8'd128, 8'd64, 8'd32})
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
@@ -64,7 +65,7 @@ initial begin
 
   #10
   $display($time); 
-  if (out == {8'd256, 8'd128, 8'd64, 8'd44})
+  if (out == {8'd255, 8'd128, 8'd64, 8'd44})
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
