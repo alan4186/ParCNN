@@ -19,7 +19,7 @@ dut (
   .reset(reset),
   .a(a),
   .b(b),
-  .out(out)
+  .sum(out)
 );
 
 always begin
@@ -69,7 +69,7 @@ initial begin
   else
     $display("out = %d, fail!", out);
 
-  #20
+  #80
   $stop;
 end
 

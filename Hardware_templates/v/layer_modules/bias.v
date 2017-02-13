@@ -11,24 +11,24 @@ module bias #(
   output [8*SIZE-1:0] sum
 );
 
-reg [SIZE-1:0] c;
-
+wire [SIZE-1:0] c;
 wire [8*SIZE-1:0] sum_8; // the 8 bit sum of the addition, only 7 msb needed
 
 genvar i;
+generate
 for(i=0; i<SIZE; i=i+1) begin : bias_loop
   add_8bit_unsign add_inst (
     .clock(clock),
     .dataa(a[i*8+7:i*8]),
     .datab(b[i*8+7:i*8]),
-    .result(sum_8[i*8+7:i*8]),
-    .carry(c[i])
+    .cout(c[i]),
+    .result(sum_8[i*8+7:i*8])
   );
 end //for
 
 // wire up carry bit
 for(i=0; i<SIZE; i=i+1) begin : carry_loop
-  assign sum[i*8+7:i*8] = {c[i], sum[i*8+7:i*8+1]};
+  assign sum[i*8+7:i*8] = {c[i], sum_8[i*8+7:i*8+1]};
 end // for
 
 
