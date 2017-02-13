@@ -14,7 +14,7 @@ class ReluLayer:
         
         # Parameters
         #TODO compute real zero value in 8 bits
-        self.Q_ZERO = 128
+        self.q_zero = 128
 
 
     def write_inst(self,name, in_wire, out_wire):
@@ -23,14 +23,16 @@ class ReluLayer:
 
         inst +="""
   relu #(
-    .Q_ZERO("""+str(self.Q_ZERO)+"""),
+    .SIZE("""+str(self.SIZE)+"""),
   )
   """+name+""" (
     .clock(clock),
     .reset(reset),
+    .zero(8'd"""+self.q_zero+"""),
     .in(wire8["""+str(in_wire)+"""]),
-    .out(wire32_"""+str(in_wire)+""")
+    .out(wire8["""+str(in_wire)+"""])
   );
+
 """
         return inst
         
