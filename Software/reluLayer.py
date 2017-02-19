@@ -22,7 +22,7 @@ class ReluLayer:
         # input = a vector of pixels from convolution layer
         # output = vector of same size as input
 
-        inst +="""
+        inst ="""
   relu #(
     .SIZE("""+str(self.SIZE)+"""),
   )

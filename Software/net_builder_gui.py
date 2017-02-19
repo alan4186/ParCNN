@@ -311,9 +311,11 @@ class NetBuilderGUI:
         self.vf.grid(row=0,column=1, rowspan=2)
         self.vf.config(bd=3)
         
+        num_layers=len(self.network.layers.items())
+        
         # create cavas that will scroll
-        self.vf_canvas = Canvas(self.vf,bg='#FFFFFF',width=400,height=400,scrollregion=(0,0,5000,5000))
-        fig = matplotlib.pyplot.figure(facecolor='White')
+        #self.vf_canvas = Canvas(self.vf,bg='#FFFFFF',width=400,height=400,scrollregion=(0,0,5000,5000))
+        fig = matplotlib.pyplot.figure(facecolor='White', figsize=(2,2*num_layers))
 
         draw_functions = {'conv':self.draw_conv_layer,
                 'bias':self.draw_bias_layer,
@@ -321,7 +323,6 @@ class NetBuilderGUI:
                 'dense':self.draw_dense_layer
                 }
 
-        num_layers=len(self.network.layers.items())
         if len(self.network.layers) > 0:
             i=1
             # create figure
@@ -332,9 +333,7 @@ class NetBuilderGUI:
                 draw_functions[l.layer_type](l,[0,0,0],ax)
                 i+=1
 
-        
         canvas = FigureCanvasTkAgg(fig,master=self.vf)
-        #canvas = FigureCanvasTkAgg(fig,master=self.top)
         plot_widget = canvas.get_tk_widget()
 
         # disable geometry propagation now that scroll bars are in place
@@ -349,14 +348,12 @@ class NetBuilderGUI:
         yScrollbar.config(command=plot_widget.yview)
         
         if num_layers: 
-            plot_widget.config(width=400*num_layers, height=400)
+            plot_widget.config(width=800, height=400,scrollregion=(0,0,400*num_layers+1,400*num_layers+1))
         else:
-            plot_widget.config(width=400, height=400)
-        plot_widget.config(xscrollcommand=xScrollbar.set, yscrollcommand=yScrollbar.set,scrollregion=(0,0,5000,5000))
-        #plot_widget.pack(side=LEFT, expand=False)
+            plot_widget.config(width=800, height=400, scrollregion=(0,0,900,500))
+        plot_widget.config(xscrollcommand=xScrollbar.set, yscrollcommand=yScrollbar.set)
         plot_widget.grid(row=1, column=1)
 
-        #self.vf.config(width=400, height=400)
 
     def draw_conv_layer(self, layer,o, ax):
         name = layer.name

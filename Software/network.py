@@ -37,7 +37,8 @@ class Net:
         self.layers[name] = DenseLayer(name, ix_size,iy_size,iz_size, num_outputs,sharing_factor, rq_max, rq_min)
 
     def export_cnn_module(self):
-        #TODO create project directory
+
+        out_dir = "../generated_modules"
 
         cnn_module = ''
         port_list = \
@@ -119,11 +120,6 @@ output [7:0] pixel_out
                 l.save_trained_layer()
 
     """  Move these functions to their respective classes
-    def add_bias(self,h, bias):
-        # h: the input to the layer
-        # bias: the tensorflow variable to add to the input
-        return bias+h
-
     def max_pool(self, x,dims):
         # x: the tensorflow input to the layer 
         # dims: an x/y tuple representing the pool dimensions

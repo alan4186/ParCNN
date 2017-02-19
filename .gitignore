@@ -15,5 +15,5 @@ trash/**/*
 Hardware/kernel_defs.h
 Hardware/network_params.h
 
-Software/python/MNIST_data/
-Software/python/mnist.pkl.gz
+Software/MNIST_data/
+Software/mnist.pkl.gz
