@@ -3,16 +3,17 @@ import math
 
 class ReluLayer:
 
-    def __init__(self, name, q_max, q_min):
+    def __init__(self, name, size, q_max, q_min):
         self.layer_type = 'relu'
         self.name = name
-
+        self.size = size
         self.q_max = q_max
         self.q_min = q_min
         
         self.tf_var = None
         
         # Parameters
+        self.SIZE = size
         #TODO compute real zero value in 8 bits
         self.q_zero = 128
 
