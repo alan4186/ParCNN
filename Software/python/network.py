@@ -5,6 +5,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 # layer imports
 from convLayer import ConvLayer
+from biasLayer import BiasLayer
 from reluLayer import ReluLayer
 from denseLayer import DenseLayer
 
@@ -22,11 +23,10 @@ class Net:
         self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min)
 
     def add_bias(self, name, size):
-        #self.layers[name] = BiasLayer(name, size)
-        return None
+        self.layers[name] = BiasLayer(name, size)
 
-    def add_relu(self, name, q_max, q_min):
-        self.layers[name] = ReluLayer(name, q_max, q_min)
+    def add_relu(self, name, size, q_max, q_min):
+        self.layers[name] = ReluLayer(name, size, q_max, q_min)
 
     def add_max_pool(self):
         print 'under construction'
@@ -109,7 +109,7 @@ output [7:0] pixel_out
                     train_accuracy = accuracy.eval(feed_dict={
                         x:batch[0], y_: batch[1] })
                     print("step %d, training accuracy %g"%(i, train_accuracy))
-                    train_step.run(feed_dict={x: batch[0], y_: batch[1]})
+                train_step.run(feed_dict={x: batch[0], y_: batch[1]})
 
             print("test accuracy %g"%accuracy.eval(feed_dict={
                 x: mnist.test.images, y_: mnist.test.labels}))

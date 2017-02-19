@@ -23,6 +23,7 @@ class NetBuilderGUI:
 
         # Create Settings Frames
         self.conv_settings()
+        self.bias_settings()
         self.relu_settings()
         self.pool_settings()
         self.dense_settings()
@@ -30,6 +31,7 @@ class NetBuilderGUI:
         
         self.setting_frames=OrderedDict()
         self.setting_frames['conv'] = self.cs
+        self.setting_frames['bias'] = self.bs
         self.setting_frames['relu'] = self.rs
         self.setting_frames['pool'] = self.ps
         self.setting_frames['dense'] = self.ds
@@ -51,6 +53,7 @@ class NetBuilderGUI:
       
         MODES = [
             ("Convolution", "conv", self.c_update_settings),
+            ("Bias", "bias", self.b_update_settings),
             ("Relu", "relu", self.r_update_settings),
             ("Max Pooling", "pool", self.p_update_settings),
             ("Fully Connected", "dense", self.d_update_settings),
@@ -78,6 +81,8 @@ class NetBuilderGUI:
 
     def c_update_settings(self,e):
         self.update_settings('conv')
+    def b_update_settings(self,e):
+        self.update_settings('bias')
     def r_update_settings(self,e):
         self.update_settings('relu')
     def p_update_settings(self,e):
@@ -137,7 +142,39 @@ class NetBuilderGUI:
         # update settings to be compatable with this layer
         self.conv_entries["Input/Kernel Z Size"].delete(0,END)
         self.conv_entries["Input/Kernel Z Size"].insert(0,num_k)
+
+    def bias_settings(self):
+        self.bs = Frame(self.top)
         
+        title = Label(self.bs,text='Bias Settings')
+        title.grid(row=0,column=1,columnspan=2)
+
+        setting_names = ["Layer Name",
+                "Input Size" 
+                ]
+        self.bias_labels = {}
+        self.bias_entries = {}
+        r = 1
+        for s in setting_names:
+            self.bias_labels[s] = Label(self.bs, text=s)
+            self.bias_labels[s].grid(row=r,column=1)
+            self.bias_entries[s] = Entry(self.bs)
+            self.bias_entries[s].grid(row=r,column=2)
+            r +=1
+
+        bias_layer_b = Button(self.bs, text="Add Layer", command=self.add_bias_layer)
+        bias_layer_b.grid(row=r,column=1,columnspan=2)
+
+    def add_bias_layer(self):
+        name = self.bias_entries["Layer Name"].get()
+        s = int(self.bias_entries["Input Size"].get())
+
+        self.network.add_bias(name, s)
+
+        self.visualization_frame()
+
+       
+    
     def relu_settings(self):
         self.rs = Frame(self.top)
         
@@ -145,6 +182,7 @@ class NetBuilderGUI:
         title.grid(row=0,column=1,columnspan=2)
 
         setting_names = ["Layer Name",
+                "Input Size", 
                 "Input X Size", 
                 "Input Y Size",
                 ]
@@ -163,13 +201,14 @@ class NetBuilderGUI:
 
     def add_relu_layer(self):
         name = self.relu_entries["Layer Name"].get()
-        i_xs = int(self.relu_entries["Input X Size"].get())
-        i_ys = int(self.relu_entries["Input Y Size"].get())
+        s = int(self.relu_entries["Input Size"].get())
+        #i_xs = int(self.relu_entries["Input X Size"].get())
+        #i_ys = int(self.relu_entries["Input Y Size"].get())
 
         # Arbitrary Q max/min
         q_max = 10
         q_min = -10
-        self.network.add_relu(name, q_max, q_min)
+        self.network.add_relu(name, s, q_max, q_min)
 
         self.visualization_frame()
 
@@ -277,6 +316,7 @@ class NetBuilderGUI:
         fig = matplotlib.pyplot.figure(facecolor='White')
 
         draw_functions = {'conv':self.draw_conv_layer,
+                'bias':self.draw_bias_layer,
                 'relu':self.draw_relu_layer,
                 'dense':self.draw_dense_layer
                 }
@@ -357,6 +397,25 @@ class NetBuilderGUI:
         matplotlib.pyplot.axis('off')
         matplotlib.pyplot.title(name)
         #return fig
+    
+    def draw_bias_layer(self, layer,o, ax):
+        name = layer.name
+        ix = 30
+        iy = 30 
+        z = 2
+
+        self.draw_cube(ix,iy,z,o ,ax)
+        max_dim = np.max([ix,iy,z])*1.05 # will cause problems if multiple layers are in 1 plot
+        ax.set_xlim3d(0,max_dim)
+        ax.set_ylim3d(0,max_dim)
+        ax.set_zlim3d(0,max_dim)
+        ax.view_init(30,-30)
+
+        # Z annotation
+        ax.text(ix,z/2.0,0,'bias')
+
+        matplotlib.pyplot.axis('off')
+        matplotlib.pyplot.title(name)
 
     def draw_relu_layer(self, layer,o, ax):
         name = layer.name
