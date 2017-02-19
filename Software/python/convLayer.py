@@ -138,9 +138,10 @@ class ConvLayer:
         
     def export(self, name, in_wire, out_wire):
 
-        write_kernel_wire()
-
-        return write_inst(name,in_wire,out_wire)
+        inst = write_kernel_wire()
+        inst += '\n'
+        inst += write_inst(name,in_wire,out_wire)
+        return inst
         
     def update_kernels(self,np_kernels):
         # Check kernel size
