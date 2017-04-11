@@ -37,8 +37,8 @@ class Net:
         self.layers[name] = DenseLayer(name, ix_size,iy_size,iz_size, num_outputs,sharing_factor, rq_max, rq_min)
 
     def export_cnn_module(self):
+        out_dir = "../generated_modules/"
 
-        out_dir = "../generated_modules"
 
         cnn_module = ''
         port_list = \
@@ -69,8 +69,8 @@ output [7:0] pixel_out
         cnn_module +="\nassign pixel_out = wire8["+str(wire_index)+"];\n\n"
 
         cnn_module += "endmodule"
-        with open("../"+self.project_name+"cnn.v",'w') as f:
-            f.write(cnn)
+        with open(out_dir+self.project_name+"_cnn.v",'w') as f:
+            f.write(cnn_module)
         
         return cnn_module
 
@@ -112,12 +112,16 @@ output [7:0] pixel_out
                     print("step %d, training accuracy %g"%(i, train_accuracy))
                 train_step.run(feed_dict={x: batch[0], y_: batch[1]})
 
-            print("test accuracy %g"%accuracy.eval(feed_dict={
+            print("floating point test accuracy %g"%accuracy.eval(feed_dict={
                 x: mnist.test.images, y_: mnist.test.labels}))
 
-            # save the trained network
+            
+             
             for name,l in self.layers.items():
-                l.save_trained_layer()
+                #TODO detemine requantize ranges
+
+                # save the trained network
+                l.save_layer()
 
     """  Move these functions to their respective classes
     def max_pool(self, x,dims):

@@ -40,7 +40,7 @@ class ConvLayer:
         self.kx_size = kx_size
         self.ky_size = ky_size
         self.num_kernels = num_kernels
-        self.kernels = None # empty until trained network is saved
+        self.np_kernels = None # empty until trained network is saved
       
         # standard deviation for random weights
         self.w_init_stddev = 0.1
@@ -49,7 +49,7 @@ class ConvLayer:
             self.ky_size,
             self.z_size,
             self.num_kernels
-            ], stddev=self.w_init_stddev))
+            ], stddev=self.w_init_stddev), name=self.name+'_var')
 
         self.kernels_wire_name = self.name+"_kernels"
 
@@ -102,7 +102,7 @@ class ConvLayer:
     def write_kernel_wire(self):
         tabs = '                       '
         k_wire = tabs[:-1]+'};' # end of wire
-        dim = self.kernels.shape
+        dim = self.np_kernels.shape
         # move down Z dimension
         for z in range(0,dim[2]):
             # move down kernel dimension
@@ -116,7 +116,7 @@ class ConvLayer:
                     # move down column dimension:
                     for c in dim[1]:
                     """
-                    k_slice = self.kernels[r,:,z,k]
+                    k_slice = self.np_kernels[r,:,z,k]
        
                     row_wire=','
                     # now, iterate over columns and write strings
@@ -138,11 +138,11 @@ class ConvLayer:
         
     def export(self, name, in_wire, out_wire):
 
-        inst = write_kernel_wire()
+        inst = self.write_kernel_wire()
         inst += '\n'
-        inst += write_inst(name,in_wire,out_wire)
+        inst += self.write_inst(name,in_wire,out_wire)
         return inst
-        
+    """        
     def update_kernels(self,np_kernels):
         # Check kernel size
         k_dim = np_kernels 
@@ -152,12 +152,22 @@ class ConvLayer:
                     "\nLayer size: "+str((self.kx_size,self.ky_size,self.kz_size,self.num_kernels))+"\n")
             
         # Kernel data should be unsigned decimal strings between [0,255]
-        self.kernels = np_kernels
-
+        self.np_kernels = np_kernels
+    """
     def tf_function(self,layer_input):
         # x: the input to the convolutional layer
         # W: the tensorflow weight parameters of the layer
         return tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
 
-    def save_trained_layer(self):
-        self.kernels = self.tf_var.eval()
+    def save_layer(self):
+        np_kernels = self.tf_var.eval()
+        # Check kernel size
+        k_dim = np_kernels.shape
+        if k_dim != (self.kx_size,self.ky_size,self.z_size,self.num_kernels):
+            raise ValueError("The given kernel size did not match the layer size.\n"+
+                    "Kernel size: "+str(k_dim) +
+                    "\nLayer size: "+str((self.kx_size,self.ky_size,self.kz_size,self.num_kernels))+"\n")
+            
+        # Kernel data should be unsigned decimal strings between [0,255]
+        self.np_kernels = np_kernels
+

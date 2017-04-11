@@ -12,6 +12,7 @@ class BiasLayer:
         self.tf_var = tf.Variable(tf.constant(self.b_init_stddev, shape=[size]))
 
         self.np_bias = None # should be a numpy array with integers [0,255]
+        self.bias_wire_name = self.name +"_bias"
         
         # Parameters
         self.SIZE = size
@@ -22,7 +23,7 @@ class BiasLayer:
         # input = a vector of pixels from convolution layer
         # output = vector of same size as input
 
-        inst +="""
+        inst ="""
   bias #(
     .SIZE("""+str(self.SIZE)+"""),
   )
@@ -51,14 +52,14 @@ class BiasLayer:
         return b_declaration + b_assign
    
     def export(self, name, in_wire, out_wire):
-        inst = write_bias_wire()
+        inst = self.write_bias_wire()
         inst += '\n' 
-        inst += write_inst(name,in_wire,out_wire)
+        inst += self.write_inst(name,in_wire,out_wire)
         return inst
        
     def tf_function(self,layer_input):
         return layer_input + self.tf_var
 
-    def save_trained_layer(self):
-        np_bias = self.tf_var.eval()
+    def save_layer(self):
+        self.np_bias = self.tf_var.eval()
         

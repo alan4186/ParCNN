@@ -29,20 +29,20 @@ class ReluLayer:
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .zero(8'd"""+self.q_zero+"""),
+    .zero(8'd"""+str(self.q_zero)+"""),
     .in(wire8["""+str(in_wire)+"""]),
-    .out(wire8["""+str(in_wire)+"""])
+    .out(wire8["""+str(out_wire)+"""])
   );
 
 """
         return inst
         
     def export(self, name, in_wire, out_wire):
-        return write_inst(name,in_wire,out_wire)
+        return self.write_inst(name,in_wire,out_wire)
        
     def tf_function(self,layer_input):
         return tf.nn.relu(layer_input)
 
-    def save_trained_layer(self):
+    def save_layer(self):
         # Do nothin, no network parameters to save
         return None
