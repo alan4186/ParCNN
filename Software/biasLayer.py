@@ -57,7 +57,8 @@ class BiasLayer:
         inst += self.write_inst(name,in_wire,out_wire)
         return inst
        
-    def tf_function(self,layer_input):
+    def tf_function(self,layer_input, dropout=1):
+        # ignore dropout, always add bias value
         return layer_input + self.tf_var
 
     def save_layer(self):

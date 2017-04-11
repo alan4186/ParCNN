@@ -19,6 +19,9 @@ class Net:
         # Training settings
         self.training_steps = steps
 
+        # Set default dropout probability
+        self.dropout_prob = 0.75
+
     def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
         self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min)
 
@@ -86,10 +89,13 @@ output [7:0] pixel_out
         x_images= tf.reshape(x, [-1,28,28,1])
         y_ = tf.placeholder(tf.float32, shape=[None,10]) # labels place holder
 
+        # Add the dropout probability placeholder
+        keep_prob = tf.placeholder(tf.float32)
+
         # Build the Tensorflow graph
         layer_outputs = [x_images]
         for name,l in self.layers.items():
-            layer_outputs.append(l.tf_function(layer_outputs[-1]))
+            layer_outputs.append(l.tf_function(layer_outputs[-1], keep_prob))
            
         # Hard code output shape for MNIST
         layer_outputs.append(tf.reshape(layer_outputs[-1],[-1,10]))
@@ -108,20 +114,23 @@ output [7:0] pixel_out
                 batch = mnist.train.next_batch(50)
                 if i%100 == 0:
                     train_accuracy = accuracy.eval(feed_dict={
-                        x:batch[0], y_: batch[1] })
+                        x:batch[0], y_: batch[1], keep_prob: 1.0})
                     print("step %d, training accuracy %g"%(i, train_accuracy))
-                train_step.run(feed_dict={x: batch[0], y_: batch[1]})
+                train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: self.dropout_prob})
 
             print("floating point test accuracy %g"%accuracy.eval(feed_dict={
-                x: mnist.test.images, y_: mnist.test.labels}))
+                x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
             
              
             for name,l in self.layers.items():
                 #TODO detemine requantize ranges
+                
 
                 # save the trained network
                 l.save_layer()
+
+            # Test Accuracy of Quantized Network
 
     """  Move these functions to their respective classes
     def max_pool(self, x,dims):
@@ -136,3 +145,5 @@ output [7:0] pixel_out
     def set_train_steps(self,steps):
         self.training_steps = steps
 
+    def set_dropout_prob(self,prob):
+        self.dropout_prob = prob

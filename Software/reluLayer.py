@@ -40,7 +40,8 @@ class ReluLayer:
     def export(self, name, in_wire, out_wire):
         return self.write_inst(name,in_wire,out_wire)
        
-    def tf_function(self,layer_input):
+    def tf_function(self,layer_input,dropout=1):
+        # ignore dropout probability
         return tf.nn.relu(layer_input)
 
     def save_layer(self):

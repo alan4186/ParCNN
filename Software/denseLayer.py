@@ -137,11 +137,11 @@ class DenseLayer:
         # Kernel data should be unsigned decimal strings between [0,255]
         self.kernels = np_kernels
     """
-    def tf_function(self,layer_input):
+    def tf_function(self,layer_input, dropout=1):
         # flatten the layer_input
         in_flat = tf.reshape(layer_input,[-1,self.i_size])
         # dont flaten the output to maintain compatability with hardware
-        return tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
+        return tf.nn.dropout(tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID'), dropout)
         #out = tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
         #return tf.reshape(out,[-1,self.o_size])
 
