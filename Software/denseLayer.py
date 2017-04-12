@@ -1,5 +1,6 @@
 import tensorflow as tf
 import math
+import hw_quantize_ops as hwqo
 
 class DenseLayer:
 
@@ -35,6 +36,7 @@ class DenseLayer:
             self.num_kernels
             ], stddev=self.w_init_stddev), name=self.name+"_var")
 
+        self.tf_var_q = None # empty until set by quantize function
         self.kernels_wire_name = self.name+"_kernels"
 
         # compute parameters
@@ -156,3 +158,7 @@ class DenseLayer:
             
         # Kernel data should be unsigned decimal strings between [0,255]
         self.np_kernels = np_kernels 
+        
+
+    def quantize(self, mn, mx, bw):
+        self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)

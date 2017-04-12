@@ -1,5 +1,6 @@
 import tensorflow as tf
 import math
+import hw_quantize_ops as hwqo
 
 class BiasLayer:
 
@@ -10,6 +11,7 @@ class BiasLayer:
        
         self.b_init_stddev = 0.1
         self.tf_var = tf.Variable(tf.constant(self.b_init_stddev, shape=[size]))
+        self.tf_var_q = None # empty until set by quantize function
 
         self.np_bias = None # should be a numpy array with integers [0,255]
         self.bias_wire_name = self.name +"_bias"
@@ -64,3 +66,5 @@ class BiasLayer:
     def save_layer(self):
         self.np_bias = self.tf_var.eval()
         
+    def quantize(self,mn,mx,bw):
+        self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)

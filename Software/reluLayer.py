@@ -10,12 +10,12 @@ class ReluLayer:
         self.q_max = q_max
         self.q_min = q_min
         
-        self.tf_var = None
+        self.tf_var = 0.0 # The value of zero relative to the input, will not be 0 for quantized ops
+        self.tf_var_q = None # empty until set by quantize function
+        
         
         # Parameters
         self.SIZE = size
-        #TODO compute real zero value in 8 bits
-        self.q_zero = 128
 
 
     def write_inst(self,name, in_wire, out_wire):
@@ -29,7 +29,7 @@ class ReluLayer:
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .zero(8'd"""+str(self.q_zero)+"""),
+    .zero(8'd"""+str(self.tf_var_q)+"""),
     .in(wire8["""+str(in_wire)+"""]),
     .out(wire8["""+str(out_wire)+"""])
   );
@@ -47,3 +47,6 @@ class ReluLayer:
     def save_layer(self):
         # Do nothin, no network parameters to save
         return None
+
+    def quantize(self, mn, mx, bw):
+        self.tf_var_q = tf_quantize(self.tf_var,mn,mx,bw)
