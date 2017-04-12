@@ -94,9 +94,52 @@ output [7:0] pixel_out
 
         # Build the Tensorflow graph
         layer_outputs = [x_images]
-        for name,l in self.layers.items():
-            layer_outputs.append(l.tf_function(layer_outputs[-1], keep_prob))
+
+        
+        # group several layers into one quantization range
+        # layers in the range_ender list will signal start of new range for the next layer
+        quantize_range_data = [(tf.reduce_max(tf.abs(x_images)), 0)]
+        range_enders= ['relu']
+
+       for name,l in self.layers.items():
+            # comput layer output
+            layer_out = l.tf_function(layer_outputs[-1], keep_prob)
+            # save layer output
+            layer_outputs.append(l.tf_function(layer_out, keep_prob))
+            # compute max of layer out and layer tf_var
+            layer_out_mx = tf.reduce_max(tf.abs(layer_out))
+            tf_var_mx = tf.reduce_max(l.tf_var)
+            mx = tf.maximum(layer_out_mx,tf_var_mx)
+            
+            if l.layer_type in range_enders:
+                quantize_rage_data.append((mx,1))
+            else
+                quantize_range_data.append((mx,0))
            
+        # determine quantization ranges for groups of layers
+        quantization_ranges = []
+        for mx,new_range in quantize_range_data:
+            if new_range == 1:
+                quantization_ranges.append(mx)
+            else
+                quantization_ranges(-1) = tf.maximum(quantization_ranges(-1),mx)
+            
+        # apply ranges and create quantized layers
+        range_index = 0
+        bw = 8.0
+        layer_output_q = [hwqo.tf_quantize(x_image,
+                                           -quantized_range_data(range_index),
+                                           quantized_ragne_data(range_index),
+                                           bw
+                                           )]
+
+        for mx,index_diff in quantize_range_data:
+
+
+
+
+            range_index += index_diff
+            
         # Hard code output shape for MNIST
         layer_outputs.append(tf.reshape(layer_outputs[-1],[-1,10]))
 
@@ -121,11 +164,27 @@ output [7:0] pixel_out
             print("floating point test accuracy %g"%accuracy.eval(feed_dict={
                 x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
-            
-             
+           
+
+
+            #layer_outputs_q = [(x_images_q,in_mm,in_mx)]
+            # assume symetric range
+            maximums = []
             for name,l in self.layers.items():
-                #TODO detemine requantize ranges
-                
+                if l.layer_type in range_changers:
+                    # create new range
+                    mx = tf.reduce_max(tf.abs(l.tf_function(layer_outputs[-1][0], 1.0)))
+                    maximums.append(mx)
+                else
+                    # compare value to old range and save extreme
+                    maximums(-1) = tf.maximum(maximums(-1),tf.reduce_max(tf.abs(l.tf_function(
+                    
+                    
+
+                # TODO check mn and mx against bias layers
+
+                # Quantize the tf_var
+                l.quantize(mn,mx,bw)
 
                 # save the trained network
                 l.save_layer()
