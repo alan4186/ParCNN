@@ -1,5 +1,6 @@
 import tensorflow as tf
 import math
+import hw_quantize_ops as hwqo
 
 class ReluLayer:
 
@@ -49,4 +50,9 @@ class ReluLayer:
         return None
 
     def quantize(self, mn, mx, bw):
-        self.tf_var_q = tf_quantize(self.tf_var,mn,mx,bw)
+        self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
+
+    def tf_function_q(self,layer_input):
+        return tf.nn.relu(layer_input)
+
+

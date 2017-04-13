@@ -176,3 +176,10 @@ class ConvLayer:
 
     def quantize(self, mn, mx, bw):
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
+
+    def tf_function_q(self,layer_input):
+        # x: the input to the convolutional layer
+        # W: the tensorflow weight parameters of the layer
+        return tf.nn.conv2d(layer_input, self.tf_var_q, strides=[1, 1, 1, 1], padding='VALID')
+
+

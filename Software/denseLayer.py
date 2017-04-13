@@ -162,3 +162,11 @@ class DenseLayer:
 
     def quantize(self, mn, mx, bw):
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
+
+    def tf_function_q(self,layer_input):
+        # flatten the layer_input
+        in_flat = tf.reshape(layer_input,[-1,self.i_size])
+        # dont flaten the output to maintain compatability with hardware
+        return tf.nn.conv2d(layer_input, self.tf_var_q, strides=[1, 1, 1, 1], padding='VALID')
+
+

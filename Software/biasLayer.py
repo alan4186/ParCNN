@@ -68,3 +68,8 @@ class BiasLayer:
         
     def quantize(self,mn,mx,bw):
         self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
+
+    def tf_function_q(self,layer_input):
+        return layer_input + self.tf_var_q
+
+
