@@ -27,7 +27,11 @@ def tf_quantize(f, f_min, f_max, q_bw):
 def tf_dequantize(q, f_min, f_max, q_bw):
     bits = tf.pow(2.0, q_bw)
     f_range = f_max - f_min
-    sc = f_range / bits
+    ######################
+    # CHANGED FOR TESTING, ADDED -1
+    ######################
+    #sc = f_range / (bits-1)
+    sc = f_range / (bits)
     return q * sc * sc
 
 
