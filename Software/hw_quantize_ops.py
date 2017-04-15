@@ -35,5 +35,8 @@ def tf_dequantize(q, f_min, f_max, q_bw):
     return q * sc * sc
 
 
+def tf_requantize(q,old_mx,new_mx):
+    return q * (old_mx / new_mx)
+
 def tf_reluq(t,zero):
     return tf.maximum(t,zero)
