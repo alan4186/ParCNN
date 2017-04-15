@@ -95,62 +95,62 @@ output [7:0] pixel_out
 
         # Build the Tensorflow graph
         layer_outputs = [x_images]
-
-        
-        # group several layers into one quantization range
-        # layers in the range_ender list will signal start of new range for the next layer
-        quantize_range_data = [(tf.reduce_max(tf.abs(x_images)), 0)]
-        range_enders= ['relu']
-
-        for name,l in self.layers.items():
+        for k in self.layers.keys():
             # compute layer output
-            layer_out = self.layers[name].tf_function(layer_outputs[-1], keep_prob)
+            layer_out = self.layers[k].tf_function(layer_outputs[-1], keep_prob)
             # save layer output
             layer_outputs.append(layer_out)
             # compute max of layer out and layer tf_var
             layer_out_mx = tf.reduce_max(tf.abs(layer_out))
-            tf_var_mx = tf.reduce_max(l.tf_var)
-            mx = tf.maximum(layer_out_mx,tf_var_mx)
+            tf_var_mx = tf.reduce_max(self.layers[k].tf_var)
+            # save the max range to the layer class
+            self.layers[k].output_q_range = tf.maximum(layer_out_mx,tf_var_mx)
             
-            if l.layer_type in range_enders:
-                quantize_range_data.append((mx,1))
-            else:
-                quantize_range_data.append((mx,0))
- 
+
         # Hard code output shape for MNIST
         layer_outputs.append(tf.reshape(layer_outputs[-1],[-1,10]))
           
         # determine quantization ranges for groups of layers
-        quantization_ranges = [quantize_range_data[0][0]]
-        for mx,new_range in quantize_range_data:
-            if new_range == 1:
-                quantization_ranges.append(mx)
-            else:
-                quantization_ranges[-1] = tf.maximum(quantization_ranges[-1],mx)
+        range_enders = ['relu']
+        # init first range with input range
+        mx = tf.reduce_max(tf.abs(x_images))
+        layer_groups = [[]]
+        layer_number = 0
+        for k in self.layers.keys():
+            layer_groups[layer_number].append(k)
+            mx = tf.maximum(mx,self.layers[k].output_q_range)
+            if self.layers[k].layer_type in range_enders:
+                # set new quantize range 
+                for k in layer_groups[layer_number]:
+                    self.layers[k].output_q_range = mx
+                # reset layer group
+                mx = 0.0
+                layer_number += 1
+                layer_groups.append([])
+
             
-        # apply ranges and create quantized layers
-        range_index = 0
+        # Build quantized network graph
         bw = 8.0
+        input_range = self.layers[layer_groups[0][0]].output_q_range
         layer_outputs_q = [hwqo.tf_quantize(x_images,
-                                           tf.multiply(quantization_ranges[range_index],-1.0),
-                                           quantization_ranges[range_index],
-                                           bw
-                                           )]
-        range_index += quantize_range_data[0][1]
-        qrd_index = 1 
-        print quantization_ranges
-        for k in self.layers.keys():
-            print range_index
-            mx = quantization_ranges[range_index]
-            self.layers[k].quantize(-mx,mx,bw)
-            range_index += quantize_range_data[qrd_index][1]
-            qrd_index += 1
-            
-        
-        # string together quantized layers
-        for k in self.layers.keys():
+                        tf.multiply(input_range,-1.0),
+                        input_range,
+                        bw
+                        )]
+
+        keys = self.layers.keys()
+        for layer_index in range(0,len(keys)):
+            k = keys[layer_index]
+            self.layers[k].quantize(bw)
             layer_out_q = self.layers[k].tf_function_q(layer_outputs_q[-1])
             layer_outputs_q.append(layer_out_q)
+            if self.layers[k].layer_type in range_enders:
+                old_mx = self.layers[k].output_q_range
+                next_k = keys[layer_index + 1]
+                new_mx = self.layers[next_k].output_q_range
+                # add requantization op
+                layer_outputs_q.append(hwqo.tf_requantize(layer_outputs_q[-1],old_mx,new_mx))
+
         
         # Hard code output shape for MNIST
         layer_outputs_q.append(tf.reshape(layer_outputs_q[-1],[-1,10]))
