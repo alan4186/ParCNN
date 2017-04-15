@@ -143,7 +143,7 @@ class ReluLayer:
         """
         return None
 
-    def quantize(self, mn, mx, bw):
+    def quantize(self, bw):
         """Quantize the rectified linear layer.
 
         The layer is quantized by determining the quantized value of 0 so
@@ -163,6 +163,8 @@ class ReluLayer:
         Example:
 
         """
+        mn = tf.multiply(self.output_q_range,-1.0)
+        mx = self.output_q_range
         self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
 
     def tf_function_q(self,layer_input):

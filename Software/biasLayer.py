@@ -169,7 +169,7 @@ class BiasLayer:
         """
         self.np_bias = self.tf_var.eval()
         
-    def quantize(self,mn,mx,bw):
+    def quantize(self, bw):
         """Quantize the floating point bias values.
 
         Calls the tf_quantize function from the hw_quantize_ops module and
@@ -189,6 +189,9 @@ class BiasLayer:
         Example:
 
         """
+        mn = tf.multiply(self.output_q_range,-1.0)
+        mx = self.output_q_range
+
         self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
 
     def tf_function_q(self,layer_input):

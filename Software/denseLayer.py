@@ -277,7 +277,7 @@ class DenseLayer:
         self.np_kernels = np_kernels 
         
 
-    def quantize(self, mn, mx, bw):
+    def quantize(self, bw):
         """Convert the floating point tensor to an integer tensor.
 
         Convert the tensor in tf_var into a quantized tensor. The range
@@ -301,6 +301,8 @@ class DenseLayer:
                 floating point tensor with an integer value.
 
         """
+        mn = tf.multiply(self.output_q_range,-1.0)
+        mx = self.output_q_range
 
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
 

@@ -319,7 +319,7 @@ class ConvLayer:
         # Kernel data should be unsigned decimal strings between [0,255]
         self.np_kernels = np_kernels
 
-    def quantize(self, mn, mx, bw):
+    def quantize(self, bw):
         """A wrapper for the quantization function.
 
         Calls the tf_quantize function from the hw_quantize_ops module and
@@ -339,6 +339,8 @@ class ConvLayer:
         Example:
 
         """
+        mn = tf.multiply(self.output_q_range,-1.0)
+        mx = self.output_q_range
 
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
 
