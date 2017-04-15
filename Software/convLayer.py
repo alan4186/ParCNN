@@ -4,7 +4,44 @@ import hw_quantize_ops as hwqo
 
 class ConvLayer:
 
-    def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
+    """A Convolutional layer for a neural network in several formats
+
+    This class implements a convolutional layer with tensorflow in floating
+    point and quantized 8 bit representation.  The class contains functions
+    to write the nessesary strings of a synthesizable verilog version of 
+    this layer. 
+    
+    """
+
+    def __init__(self, name, kx_size, ky_size, kz_size, num_kernels, 
+            ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
+        """
+        Construct convolutional layer class
+
+        The contructor for the convolutional layer class takes dimensions
+        of the kernels and the inputs to the layer and initializes the
+        class.
+        
+        Args:
+            name: A unique string to identify this layer.
+            kx_size: The size of the kernel's X dimension.
+            ky_size: The size of the kernel's Y dimension.
+            kz_size: The size of the kernel's Z dimension.
+            num_kernels: The number of kernels in the layer.
+            ix_size: The size of the input data's X dimension.
+            iy_size: The size of the input data's Y dimension.
+            sharing_factor: Currently Useless.
+
+        Returns:
+            A convLayer class object.
+
+        Raises:
+            ValueError
+
+        Examples:
+
+        """
+
         # make sure the kernel size is at least 1 
         # pixel smaller than the input in the x dimension and 
         # the same size as the input in the y dimension
@@ -43,6 +80,7 @@ class ConvLayer:
         self.num_kernels = num_kernels
         self.np_kernels = None # empty until trained network is saved
         self.np_q_kernels = None # empty until trained netwrok is saved
+        self.output_q_range = None # empyer until the trained network is quantized
       
         # standard deviation for random weights
         self.w_init_stddev = 0.1
@@ -73,6 +111,29 @@ class ConvLayer:
         
 
     def write_inst(self,name, in_wire, out_wire):
+        """Write the verilog instantiation of the convolution module.
+
+        Create a verilog string to instantiate the convolution module with
+        the same parameters as the tf_var_q variable.
+
+        Args:
+            name: A string with the name of the instantiated module.
+            in_wire: A string with the verilog wire variable for the module
+                input port.
+            out_wire: A string with the verilog wire variable for the 
+                module output port.
+
+        Returns: 
+            A string containing a valid verilog instantiation for the
+            convolution layer module.
+
+        Raises:
+
+        Example:
+
+        """
+
+
         inst = "wire [31:0] wire_32_"+str(in_wire)+";\n"
         inst +="""
   convolution_25D #(
@@ -103,6 +164,24 @@ class ConvLayer:
         return inst
 
     def write_kernel_wire(self):
+        """Convert the tensorflow variable to a verilog wire string.
+
+        Parse the quantized tensorflow tensor named tf_var_q into a string
+        with a verilog wire variable that can be input to the convolution
+        module.
+
+        Args:
+            None.
+
+        Returns:
+            A string with a verilog wire variable.
+
+        Raises:
+
+        Example:
+
+        """
+
         tabs = '                       '
         k_wire = tabs[:-1]+'};' # end of wire
         dim = self.np_kernels.shape
@@ -140,11 +219,35 @@ class ConvLayer:
 
         
     def export(self, name, in_wire, out_wire):
+        """Convert the tensorflow layer to a synthesizeable module.
+
+        Create the nessesary strings and files to sysntesize a convolution
+        module.  A string to instantiate the module is created and the 
+        kernels are converted to verilog wire variables and included at the
+        begining of the string.
+
+        Args:
+            name: A string with the name of the instantiated module
+            in_wire: A string with the verilog wire variable for the module
+                input port.
+            out_wire: A string with the verilog wire variable for the 
+                module output port.
+
+        Returns:
+            A string with a kernel verilog wire variable and a module
+            instantiation.
+
+        Raises:
+
+        Example:
+
+        """
 
         inst = self.write_kernel_wire()
         inst += '\n'
         inst += self.write_inst(name,in_wire,out_wire)
         return inst
+
     """        
     def update_kernels(self,np_kernels):
         # Check kernel size
@@ -158,11 +261,53 @@ class ConvLayer:
         self.np_kernels = np_kernels
     """
     def tf_function(self,layer_input, dropout=1):
-        # x: the input to the convolutional layer
-        # W: the tensorflow weight parameters of the layer
+        """A wrapper for the tensorflow 2D convolution function.
+        
+        Implements the 2D convolution with the tensorflow library. The type
+        of convolution performed is 'valid' with strides of 1.  The
+        layer_input tensor is convolved with the floating point tf_var
+        tensor.
+
+        Args:
+            layer_input: A tensor input to the layer
+            
+        Kwargs:
+            droput: A value in the range (0,1] representing the dropout
+                probability for the layer.  Default is 1.  The value should
+                be 1 for testing and inference.
+
+        Returns:
+            A tensor output representing the 2D convoluiton of the tf_var
+            and the layer_input.
+
+        Raises:
+
+        Example:
+
+        """
+
         return tf.nn.dropout(tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID'), dropout)
 
     def save_layer(self):
+        """Evaluate the tf_var and save result.
+
+        This function should be called in a tensroflow session.  The tf_var
+        will be evaluated and the numpy matrix output will be saved to the
+        np_kernels variable.
+
+        Args:
+            None.
+
+        Returns: 
+            None.
+
+        Raises:
+            ValueError.
+
+        Example:
+
+        """
+
         np_kernels = self.tf_var.eval()
         # Check kernel size
         k_dim = np_kernels.shape
@@ -175,11 +320,48 @@ class ConvLayer:
         self.np_kernels = np_kernels
 
     def quantize(self, mn, mx, bw):
+        """A wrapper for the quantization function.
+
+        Calls the tf_quantize function from the hw_quantize_ops module and
+        saves the output to the tf_var_q variable.  The quantization range
+        (mn and mx) should be symetric and the bit width (bw) is generally
+        8 bits.
+
+        Args:
+            mn: The floating point minimum of the quantization range.
+            mx: The floating point maximum of the quantization range.
+            bw: The bitwiths of the quantized values. Generally equals 8.
+
+        Returns:
+
+        Raises:
+
+        Example:
+
+        """
+
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
 
     def tf_function_q(self,layer_input):
-        # x: the input to the convolutional layer
-        # W: the tensorflow weight parameters of the layer
+        """A quantized version of tf_function.
+
+        Implements the tensorflow 2D convolution and uses the quantized
+        tf_var_q tensor instead of the floating point tf_var tensor.
+        Convolves layer_input (which should also be quantized) with 
+        tf_var_q.
+
+        Args:
+            layer_input: A tensor input to the layer
+
+        Returns:
+            A quantized tensor from the output of the 2D convolution.
+
+        Raises:
+
+        Example:
+
+        """
+
         return tf.nn.conv2d(layer_input, self.tf_var_q, strides=[1, 1, 1, 1], padding='VALID')
 
 

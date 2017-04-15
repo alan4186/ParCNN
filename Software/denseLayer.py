@@ -4,7 +4,41 @@ import hw_quantize_ops as hwqo
 
 class DenseLayer:
 
-    def __init__(self, name, ix_size, iy_size, iz_size, output_size, sharing_factor, rq_max, rq_min):
+    """A Densly connected layer for a neural network in several formats.
+
+    This class implements a densly connected layer with tensorflow floating
+    point and 8 bit quantized values.  This class contains the nessesary
+    functions to write a verilog module instantiation of this layer.
+
+    """
+
+    def __init__(self, name, ix_size, iy_size, iz_size, output_size, 
+            sharing_factor, rq_max, rq_min):
+        """DenseLayer Constructor
+
+        Initializes a DenseLayer object. Because the layer is dense, the
+        input size is the same as the kernel size, therefore the kernel size
+        arguments are ommited.
+
+        Args:
+            name: A unique string to identify this layer
+            ix_size: The size of the input X dimension
+            iy_size: The size of the input Y dimension
+            iz_size: The size of the input Z dimension.  It is equal to the
+                number of kernels in the previous layer.
+            output_size: The size of the 1D output vector.
+            sharing_factor: Currently Useless.
+
+        Returns:
+            A DenseLayer object.
+
+        Raises:
+            ValueError.
+
+        Examples:
+
+        """
+
         # check that the requantize range is valid
         if rq_min >= rq_max:
             raise ValueError("Invalid requantize range." +
@@ -20,6 +54,7 @@ class DenseLayer:
         self.i_size = ix_size * iy_size * iz_size
         self.o_size= output_size
         self.np_kernels = None # empty until a trained network is saved
+        self.output_q_range = None # empyer until the trained network is quantized
        
         # for visualization compatability
         self.kx_size = ix_size
@@ -56,6 +91,28 @@ class DenseLayer:
         
 
     def write_inst(self,name, in_wire, out_wire):
+        """Write a dense layer verilog module instantiation.
+
+        This function converts the properties of the dense layer into a 
+        synthesizeable verilog module instantiation.
+
+        Args:
+            name: A string containing the name of the verilog module
+            in_wire: The name of the verilog wire variable from the previous
+                layer.
+            out_wire: The name of the verilog wire to connect to the output 
+                port of the dense layer module.
+
+        Returns:
+            A string with the module instantiations needed to synthesize a
+            densly connected layer.
+
+        Raises:
+
+        Examples:
+
+        """
+
         inst = "wire [31:0] wire_32_"+str(in_wire)+";\n"
         inst +="""
   convolution_25D #(
@@ -85,6 +142,14 @@ class DenseLayer:
         return inst
 
     def write_kernel_wire(self):
+        """Export the tf_var to a verilog wire variable.
+
+        Save the weight parameters stored in tf_var as verilog wire variable
+        in a string. 
+
+        """
+
+
         tabs = '                       '
         k_wire = tabs[:-1]+'};' # end of wire
         dim = self.np_kernels.shape
@@ -122,6 +187,27 @@ class DenseLayer:
 
         
     def export(self, name, in_wire, out_wire):
+        """Convert the tensorflow version to a synthsizeable verilog
+
+        Convert the tensor in tf_var_q to a verilog wire and write the
+        module instantiation to a string.
+
+        Args:
+            name: A string containing the name of the verilog module
+            in_wire: The name of the verilog wire variable from the previous
+                layer.
+            out_wire: The name of the verilog wire to connect to the output 
+                port of the dense layer module.
+
+        Returns:
+            A string with the kernel tensor in a verilog wire variable
+            followed by module instantiations to implement the dense layer.
+
+        Raises:
+
+        Examples:
+
+        """
 
         inst = self.write_kernel_wire()
         inst +='\n'
@@ -140,6 +226,29 @@ class DenseLayer:
         self.kernels = np_kernels
     """
     def tf_function(self,layer_input, dropout=1):
+        """Wrap the tensorflow operations performed by the layer
+
+        This module implements the tensorflow operations to compute the
+        the output of a dense layer.  This layer will use similar verilog
+        as the 2D convolution layer and is implemented with the same 
+        convolution function using two inputs of the same size and the 
+        'valid' padding resulting in a fully connected layer with one output
+        for each kernel.
+
+        Args:
+            layer_input: The tensor output by the previous layer
+
+        Kwargs:
+            dropout: The probability used in the dropout function.  
+                Defalut is 1.  Testing and inference should use a value of
+                1, traingin can use a value in the range (0,1].
+
+        Raises:
+
+        Examples:
+
+        """
+
         # flatten the layer_input
         in_flat = tf.reshape(layer_input,[-1,self.i_size])
         # dont flaten the output to maintain compatability with hardware
@@ -148,6 +257,14 @@ class DenseLayer:
         #return tf.reshape(out,[-1,self.o_size])
 
     def save_layer(self):
+        """Evaluate the tensor version of the layer and save result.
+
+        Evaluate the floating point version of the layer and save the
+        resulting numpy matrix to the variable np_kernels.
+
+
+        """
+
         np_kernels = self.tf_var.eval()
         # Check kernel size
         k_dim = np_kernels.shape
@@ -161,9 +278,51 @@ class DenseLayer:
         
 
     def quantize(self, mn, mx, bw):
+        """Convert the floating point tensor to an integer tensor.
+
+        Convert the tensor in tf_var into a quantized tensor. The range
+        gieven by mn (the minimum) and mx (the maximum) must be symetric.  
+        The bitwith of the quantized tensor is given by bw but has only been
+        tested at 8 bits.  The verilog output will not synthesize if a
+        different bitwidth is used. The mn, mx and bw arguments should be
+        tensors but floating point numbers will probably work too as
+        tensorflow can converte them to tensors automatically.  The 
+        resluting quantized tensor is stored in tf_var_q.
+
+        Quantization is achieved by dividing the range into 2^bw linearly 
+        spaced values.  The resluting integers are signed.
+
+        Args:
+            mn: The minimum of the quantization range. Must equal -1 * mx.
+                Should be a constant tensor with a floating point value.
+            mx: The maximum of the quantization range. Must equal -1 * mn.
+                Should be a constant tensor with a floating point value.
+            bw: The bitwidth of the quantized reslut. Should be a constant
+                floating point tensor with an integer value.
+
+        """
+
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
 
     def tf_function_q(self,layer_input):
+        """Wrap the tensorflow ops for the quantized dense layer.
+        
+        This function is nearly identical to tf_function exept that this one
+        uses the quantized tensor tf_var_q as an input instead of the
+        floating point version.  Again, the tensorflow 2D convolution
+        function is used to implement a dense layer by using the 'valid'
+        padding and two inputs of equal size resulting in a densly connected
+        layer with an output for each kernel.
+
+        Args:
+            layer_input: The quantized tensor from the previous layer.
+
+        Returns:
+            The quantized tensor resulting from the 2D convolution of the 
+            input tensors.
+
+        """
+
         # flatten the layer_input
         in_flat = tf.reshape(layer_input,[-1,self.i_size])
         # dont flaten the output to maintain compatability with hardware
