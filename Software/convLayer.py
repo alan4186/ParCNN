@@ -80,6 +80,7 @@ class ConvLayer:
         self.num_kernels = num_kernels
         self.np_kernels = None # empty until trained network is saved
         self.np_q_kernels = None # empty until trained netwrok is saved
+        self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
       
         # standard deviation for random weights
@@ -339,8 +340,8 @@ class ConvLayer:
         Example:
 
         """
-        mn = tf.multiply(self.output_q_range,-1.0)
-        mx = self.output_q_range
+        mn = tf.multiply(self.input_q_range,-1.0)
+        mx = self.input_q_range
 
         self.tf_var_q = hwqo.tf_quantize(self.tf_var, mn,mx,bw)
 
@@ -367,3 +368,30 @@ class ConvLayer:
         return tf.nn.conv2d(layer_input, self.tf_var_q, strides=[1, 1, 1, 1], padding='VALID')
 
 
+    def bitwidth_change(self, bw_in):
+        """Compute the bitwidth of the convolution output
+
+        Use the bitwidth of the input to compute the bitwidth of the output.
+        The output bitwidth does not need to be an integer and will be used
+        to requantize the output.
+
+        Args:
+            bw_in: The bitwidth of the input
+        
+        Returns:
+           bw_out: The bitwidth of the output
+
+        """
+        adder_depth = math.log(self.kx_size*self.ky_size*self.z_size, 2)
+        bw_out = 2 * bw_in + adder_depth - 1
+        return bw_out
+
+    def set_q_out_range(self):
+        """Compute the maximum quantized output
+
+        Use the input_q_range value to compute the output_q_range value.
+
+        """
+        print self.input_q_range
+        self.output_q_range = hwqo.conv_max(
+                self.input_q_range, self.kx_size*self.ky_size*self.z_size)

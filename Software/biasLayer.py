@@ -44,6 +44,7 @@ class BiasLayer:
         self.tf_var_q = None # empty until set by quantize function
 
         self.np_bias = None # should be a numpy array with integers [0,255]
+        self.input_q_range = None # empyer until the trained network is quantized    
         self.output_q_range = None # empyer until the trained network is quantized    
         
         self.bias_wire_name = self.name +"_bias"
@@ -189,8 +190,8 @@ class BiasLayer:
         Example:
 
         """
-        mn = tf.multiply(self.output_q_range,-1.0)
-        mx = self.output_q_range
+        mn = tf.multiply(self.input_q_range,-1.0)
+        mx = self.input_q_range
 
         self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
 
@@ -216,5 +217,26 @@ class BiasLayer:
 
         return layer_input + self.tf_var_q
 
+    def bitwidth_change(self, bw_in):
+        """Compute the bias layer output bitwidth
 
+        The input bitwidth is used to compute the output bitwidth of the 
+        Bias layer. The bitwidth will be used to requantize the output.  The
+        bitwidths do not need to be integers.
+
+        The bitwidths represent the log2 of the maximum possible values.
+
+        Args:
+            bw_in: The bitwidth of the input to the bias layer
+        Returns:
+            bw_out: The bitwidth of the output of the bias layer
+
+        """
+        bw_out = bw_in + 1
+        return bw_out
+
+    def set_q_out_range(self):
+        """Compute quantized output range
+        """ 
+        self.output_q_range = self.input_q_range * 2
 

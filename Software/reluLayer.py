@@ -40,6 +40,7 @@ class ReluLayer:
         
         self.tf_var = 0.0 # The value of zero relative to the input, will not be 0 for quantized ops
         self.tf_var_q = None # empty until set by quantize function
+        self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
             
         
@@ -163,8 +164,8 @@ class ReluLayer:
         Example:
 
         """
-        mn = tf.multiply(self.output_q_range,-1.0)
-        mx = self.output_q_range
+        mn = tf.multiply(self.input_q_range,-1.0)
+        mx = self.input_q_range
         self.tf_var_q = hwqo.tf_quantize(self.tf_var,mn,mx,bw)
 
     def tf_function_q(self,layer_input):
@@ -181,4 +182,22 @@ class ReluLayer:
         """
         return tf.nn.relu(layer_input)
 
+    def bitwidth_change(self, bw_in):
+        """Compute the bitwidth of the relu layer output.
 
+        The rectified linear layer does not perform any multiplication or 
+        addition and therefor does not change the bitwidth of the input.
+        Simply return the given input bitwidth.
+
+        Args:
+            bw_in: The bitwidth of the input to the relu layer
+        Returns:
+            bw_in: The bitwidth of the input to the relu layer
+
+        """
+        return bw_in
+
+    def set_q_out_range(self):
+        """Compute quantized output range
+        """ 
+        self.output_q_range = self.input_q_range
