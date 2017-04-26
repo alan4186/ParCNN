@@ -30,10 +30,22 @@ def tf_quantize(f, f_min, f_max, q_bw):
 
     bits = tf.pow(2.0, q_bw) - 1
     f_range = f_max - f_min
+    #########
+    # Experimental Change
+    #########
+    """
     q = tf.round( (f - f_min) * bits / f_range)
     q_offset = tf.round( f_min * bits / f_range)
     return q + q_offset
+    """
+    q =( (f - f_min) * bits / f_range)
+    q_offset = ( f_min * bits / f_range)
+    return tf.round(q + q_offset)
 
+
+    #########
+    # End change
+    #########
 def tf_dequantize(q, f_min, f_max, q_bw):
     """ Convert a quantized tensor to its floating point representation
 
