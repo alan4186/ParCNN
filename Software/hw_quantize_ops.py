@@ -54,6 +54,8 @@ def tf_dequantize(q, f_min, f_max, q_bw):
         A float32 tensor the same size as q
 
     """
+
+    bits = tf.pow(2.0, q_bw) - 1
     f_range = f_max - f_min
     sc = f_range / (bits)
     f = q - tf.round(f_min/sc)
