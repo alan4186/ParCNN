@@ -392,6 +392,6 @@ class ConvLayer:
         Use the input_q_range value to compute the output_q_range value.
 
         """
-        print self.input_q_range
+
         self.output_q_range = hwqo.conv_max(
                 self.input_q_range, self.kx_size*self.ky_size*self.z_size)

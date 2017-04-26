@@ -21,8 +21,8 @@ class Net:
         self.training_steps = steps
 
         # Set default dropout probability
-        #self.dropout_prob = 0.75
-        self.dropout_prob = 1.0
+        self.dropout_prob = 0.75
+        #self.dropout_prob = 1.0
 
     def add_conv(self, name, kx_size, ky_size, kz_size, num_kernels, ix_size, iy_size, iz_size, sharing_factor, rq_max, rq_min):
         self.layers[name] = ConvLayer(name,kx_size,ky_size,kz_size,num_kernels,ix_size,iy_size,iz_size,sharing_factor, rq_max, rq_min)
@@ -104,7 +104,7 @@ output [7:0] pixel_out
             # compute layer output
             layer_out = self.layers[k].tf_function(layer_outputs[-1], keep_prob)
             # tesorflow summary
-            tf.summary.histogram('layer_outputs',layer_out)
+            tf.summary.histogram(k+'_layer_output',layer_out)
             # save layer output
             layer_outputs.append(layer_out)
             # compute max of layer out and layer tf_var
@@ -168,7 +168,17 @@ output [7:0] pixel_out
                 next_k = keys[layer_index + 1]
                 new_mx = self.layers[next_k].input_q_range
                 old_bw = self.layers[k].bitwidth_change(8.0)
-                print old_bw
+
+                # force the rq scale factor to be a power of 2 
+                rq_scale_factor = old_mx/new_mx*255/((2**old_bw)-1)
+                rq_scale_factor2 = 2**tf.ceil(tf.log(rq_scale_factor)/tf.log(2.0))
+                # compute the new new_mx based on the new scale factor
+                new_mx = old_mx*255/((2**old_bw)-1)/rq_scale_factor2
+                tf.summary.scalar(k+'_new_mx',new_mx)
+                tf.summary.scalar(k+'_old_mx',old_mx)
+                tf.summary.scalar(k+'_rq_scale_factor',rq_scale_factor)
+                tf.summary.scalar(k+'_rq_scale_factor2',rq_scale_factor2)
+
                 # add requantization op
                 rq_out = hwqo.tf_requantize(layer_outputs_q[-1],old_mx,new_mx,old_bw,8.0)
                 layer_outputs_q.append(rq_out)
@@ -204,6 +214,7 @@ output [7:0] pixel_out
         net_out = layer_outputs[-1]
         net_out_q = layer_outputs_q[-1]
         net_out_dq = hwqo.tf_dequantize(net_out_q,-1*self.layers['bfc'].output_q_range,self.layers['bfc'].output_q_range,9.0)
+
 
         tf.summary.histogram('l1_error',l1err)
         tf.summary.histogram('net_out',net_out)
@@ -256,7 +267,8 @@ output [7:0] pixel_out
             for k in self.layers.keys():
                 # save the trained network
                 self.layers[k].save_layer()
-
+            
+            """
             print 'input/output ranges'
             for k in self.layers.keys():
                 print k
@@ -265,6 +277,8 @@ output [7:0] pixel_out
                 print self.layers[k].output_q_range.eval(feed_dict={
                     x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
                 print ' '
+
+            """
 
             """
             print 'l1'
@@ -298,9 +312,11 @@ output [7:0] pixel_out
                 #    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
             """
 
+            """
             for s in scales:
                 print s.eval(feed_dict={
                     x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
+            """
 
     """  Move these functions to their respective classes
     def max_pool(self, x,dims):
