@@ -17,3 +17,7 @@ Hardware/network_params.h
 
 Software/MNIST_data/
 Software/mnist.pkl.gz
+
+# doxygen docs
+Software/html/*
+Software/latex/*
