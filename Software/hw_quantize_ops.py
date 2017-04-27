@@ -153,6 +153,7 @@ if __name__ == "__main__":
     init_op = tf.global_variables_initializer()
     with tf.Session() as sess:
         init_op.run()
+        print 'Error from 2 layers of convolution'
         print mxerr.eval()
 
 
@@ -161,14 +162,34 @@ if __name__ == "__main__":
     adq = tf_dequantize(aq,mn,mx,8.0)
     arq = tf_requantize(aq,mx,0.2,8.0,8.0)
     adrq = tf_dequantize(arq,-0.2,0.2,8.0)
-    test = tf_dequantize(59,-0.2,0.2,8.0)
+
+    b = tf.constant(mx,shape=[1])
+    bq = tf_quantize(b,mn,mx,8.0)
+    bdq = tf_dequantize(bq,mn,mx,8.0)
+    brq = tf_requantize(bq,mx,2*mx,8.0,8.0)
+    bdrq = tf_dequantize(brq,-2*mx,2*mx,8.0)
+
 
     init_op = tf.global_variables_initializer()
     with tf.Session() as sess:
+        print'\nA constant:'
         print a.eval()
+        print 'quantized version:'
         print aq.eval()
+        print 'dequantized version:'
         print adq.eval()
+        print 'requantized version with smaller range:'
         print arq.eval()
+        print 'dequantized requantized version:'
         print adrq.eval()
-        print test.eval()
 
+        print'\nA constant:'
+        print b.eval()
+        print 'quantized version:'
+        print bq.eval()
+        print 'dequantized version:'
+        print bdq.eval()
+        print 'requantized version with smaller range:'
+        print brq.eval()
+        print 'dequantized requantized version:'
+        print bdrq.eval()
