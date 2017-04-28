@@ -79,7 +79,7 @@ class ConvLayer:
         self.ky_size = ky_size
         self.num_kernels = num_kernels
         self.np_kernels = None # empty until trained network is saved
-        self.np_q_kernels = None # empty until trained netwrok is saved
+        self.np_kernels_q = None # empty until trained netwrok is saved
         self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
       
@@ -289,7 +289,7 @@ class ConvLayer:
 
         return tf.nn.dropout(tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID'), dropout)
 
-    def save_layer(self):
+    def save_layer(self, fd):
         """Evaluate the tf_var and save result.
 
         This function should be called in a tensroflow session.  The tf_var
@@ -297,7 +297,7 @@ class ConvLayer:
         np_kernels variable.
 
         Args:
-            None.
+            fd: The testing feed_dict used in the training loop.
 
         Returns: 
             None.
@@ -305,11 +305,11 @@ class ConvLayer:
         Raises:
             ValueError.
 
-        Example:
 
         """
 
         np_kernels = self.tf_var.eval()
+        np_kernels_q = self.tf_var_q.eval(feed_dict=fd)
         # Check kernel size
         k_dim = np_kernels.shape
         if k_dim != (self.kx_size,self.ky_size,self.z_size,self.num_kernels):
@@ -319,6 +319,7 @@ class ConvLayer:
             
         # Kernel data should be unsigned decimal strings between [0,255]
         self.np_kernels = np_kernels
+        self.np_kernels_q = np_kernels_q
 
     def quantize(self, bw):
         """A wrapper for the quantization function.

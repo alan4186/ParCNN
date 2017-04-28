@@ -54,6 +54,7 @@ class DenseLayer:
         self.i_size = ix_size * iy_size * iz_size
         self.o_size= output_size
         self.np_kernels = None # empty until a trained network is saved
+        self.np_kernels_q = None # empty until a trained network is saved
         self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
        
@@ -257,16 +258,22 @@ class DenseLayer:
         #out = tf.nn.conv2d(layer_input, self.tf_var, strides=[1, 1, 1, 1], padding='VALID')
         #return tf.reshape(out,[-1,self.o_size])
 
-    def save_layer(self):
+    def save_layer(self, fd):
         """Evaluate the tensor version of the layer and save result.
 
         Evaluate the floating point version of the layer and save the
-        resulting numpy matrix to the variable np_kernels.
+        resulting numpy matrix to the variable np_kernels.  The quantized 
+        version needs the test data feed_dict. The data in the dictionary
+        should be the testing data such as MNIST.test.images
+
+        Args:
+            fd: The feed_dict used in the test section of the training loop
 
 
         """
 
         np_kernels = self.tf_var.eval()
+        np_kernels_q = self.tf_var_q.eval(feed_dict=fd)
         # Check kernel size
         k_dim = np_kernels.shape
         if k_dim != (self.ix_size,self.iy_size,self.iz_size,self.o_size):
@@ -276,6 +283,7 @@ class DenseLayer:
             
         # Kernel data should be unsigned decimal strings between [0,255]
         self.np_kernels = np_kernels 
+        self.np_kernels_q = np_kernels_q
         
 
     def quantize(self, bw):

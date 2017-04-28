@@ -138,7 +138,7 @@ class ReluLayer:
         """
         return tf.nn.relu(layer_input)
 
-    def save_layer(self):
+    def save_layer(self, fd):
         """Save the layer parameters
 
         """

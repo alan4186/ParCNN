@@ -44,6 +44,7 @@ class BiasLayer:
         self.tf_var_q = None # empty until set by quantize function
 
         self.np_bias = None # should be a numpy array with integers [0,255]
+        self.np_bias_q = None # should be a numpy array with integers [0,255]
         self.input_q_range = None # empyer until the trained network is quantized    
         self.output_q_range = None # empyer until the trained network is quantized    
         
@@ -160,15 +161,19 @@ class BiasLayer:
         """
         return layer_input + self.tf_var
 
-    def save_layer(self):
+    def save_layer(self, fd):
         """Save the bias tensor.
 
         Evaluate the bias tensor and save the resulting numpy matrix in the
         np_bias variable.  This function must be called in a tensorflow 
         session.
 
+        Args: 
+            fd: The feed_dict contianing the test data.
+
         """
         self.np_bias = self.tf_var.eval()
+        self.np_bias_q = self.tf_var_q.eval(feed_dict=fd)
         
     def quantize(self, bw):
         """Quantize the floating point bias values.
