@@ -185,6 +185,8 @@ output [7:0] pixel_out
                 tf.summary.histogram(k+'_rq_out',rq_out)
 
                 scales.append( old_mx/new_mx*255/((2**old_bw)-1))
+        # quantize the last layer
+        self.layers[keys[-1]].quantize(bw)
 
         
         # Hard code output shape for MNIST
