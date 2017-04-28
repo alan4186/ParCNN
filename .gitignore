@@ -21,3 +21,6 @@ Software/mnist.pkl.gz
 # doxygen docs
 Software/html/*
 Software/latex/*
+
+# junk folders
+Software/ignore/*
