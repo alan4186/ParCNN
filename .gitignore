@@ -10,6 +10,8 @@ trash/**/*
 **/*.pyc
 **/*.pin
 
+# Folders with Quartus Projects
+debug_project/
 
 # configureable files
 Hardware/kernel_defs.h
@@ -24,3 +26,4 @@ Software/latex/*
 
 # junk folders
 Software/ignore/*
+
