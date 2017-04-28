@@ -48,10 +48,10 @@ class Net:
         cnn_module = ''
         port_list = \
 """module cnn (
-input clock,
-input reset,
-input [7:0] pixel_in,
-output [7:0] pixel_out
+  input clock,
+  input reset,
+  input [7:0] pixel_in,
+  output [7:0] pixel_out
 );
 """
         cnn_module = cnn_module + port_list

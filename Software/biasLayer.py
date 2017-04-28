@@ -113,7 +113,7 @@ class BiasLayer:
             A string with a verilog wire variable.
 
         """
-        b_declaration = 'wire [8*SIZE-1:0] '+self.bias_wire_name+';\n'
+        b_declaration = 'wire [8*'+str(self.SIZE)+'-1:0] '+self.bias_wire_name+';\n'
         b_assign = 'assign '+self.bias_wire_name +' = { '
 
 

@@ -125,7 +125,7 @@ class DenseLayer:
 
         """
 
-        inst = "wire [31:0] wire_32_"+str(in_wire)+";\n"
+        inst = "wire [31:0] wire32_"+str(in_wire)+";\n"
         inst +="""
   convolution_25D #(
     .NUM_TREES("""+str(self.NUM_TREES)+"""),
@@ -175,7 +175,8 @@ class DenseLayer:
     
 
         tabs = '                       '
-        k_wire = tabs[:-1]+'};' # end of wire
+        k_wire = tabs[:-2]+'};' # end of wire
+        trailing_comma = False
         dim = self.np_kernels_q.shape
         # move down Z dimension
         for z in range(0,dim[2]):
@@ -191,8 +192,13 @@ class DenseLayer:
                     for c in dim[1]:
                     """
                     k_slice = unsigned_kernel_q[r,:,z,k]
-       
-                    row_wire=','
+
+                    if trailing_comma:
+                        row_wire=','
+                    else:
+                        row_wire=''
+                        trailing_comma = True
+
                     # now, iterate over columns and write strings
                     for c in k_slice[::-1]:
                         row_wire = ", 8'd"+str(c)+row_wire
