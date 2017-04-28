@@ -262,7 +262,7 @@ output [7:0] pixel_out
 
             for k in self.layers.keys():
                 # save the trained network
-                self.layers[k].save_layer()
+                self.layers[k].save_layer({x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
             
             """
             print 'input/output ranges'
