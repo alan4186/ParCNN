@@ -1,6 +1,7 @@
 import tensorflow as tf
 import math
 import hw_quantize_ops as hwqo
+import numpy as np
 
 class DenseLayer:
 
@@ -144,17 +145,29 @@ class DenseLayer:
         return inst
 
     def write_kernel_wire(self):
-        """Export the tf_var to a verilog wire variable.
+        """Write the quantized kenels to a verilog wire assignment.
 
-        Save the weight parameters stored in tf_var as verilog wire variable
-        in a string. 
+        Write a verilog string with a wire declaration and assignment.
+        The numpy wuantized kernels are converted to verilog constants and 
+        concatenated in the assignment.
+
+        Args:
+            None.
+
+        Returns:
+            A string with a verilog wire variable.
 
         """
 
+        # convert negitive values to unsigned equvilants
+        unsigned_kernel_q = np.less(self.np_kernels_q,0) * 256.0
+        unsigned_kernel_q += self.np_kernels_q
+        unsigned_kernel_q = unsigned_kernel_q.astype(int)
+    
 
         tabs = '                       '
         k_wire = tabs[:-1]+'};' # end of wire
-        dim = self.np_kernels.shape
+        dim = self.np_kernels_q.shape
         # move down Z dimension
         for z in range(0,dim[2]):
             # move down kernel dimension
@@ -168,7 +181,7 @@ class DenseLayer:
                     # move down column dimension:
                     for c in dim[1]:
                     """
-                    k_slice = self.np_kernels[r,:,z,k]
+                    k_slice = unsigned_kernel_q[r,:,z,k]
        
                     row_wire=','
                     # now, iterate over columns and write strings

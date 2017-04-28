@@ -92,15 +92,30 @@ class BiasLayer:
         return inst
         
     def write_bias_wire(self):
-        """Convert tensor to verilog wire variable.
+        """Write the quantized biases to a verilog wire assignment.
 
-    
+        Write a verilog string with a wire declaration and an assignment.
+        the numpy quantized biases are converted to verilog conatants and
+        concatenated in the assignment.
+
+        Args:
+            None.
+
+        Returns:
+            A string with a verilog wire variable.
+
         """
         b_declaration = 'wire [8*SIZE-1:0] '+self.bias_wire_name+';\n'
         b_assign = 'assign '+self.bias_wire_name +' = { '
 
+
+        # Convert negative values to unsigned equivilants
+        unsigned_bias_q = np.less(self.np_bias_q,0) * 256.0
+        unsigned_bias_q += self.np_bias_q
+        unsigned_bias_q = unsigned_bias_q.astype(int)
+
         # flip the array so the indexes match bit slices
-        np_bias_flip = self.np_bias[::-1]
+        np_bias_flip = unsigned_bias_q[::-1]
 
         for i in range(0,np_bias_flip.size):
             b_assign += "8'd"+str(np_bias_flip[i])+', '

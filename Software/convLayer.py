@@ -1,6 +1,7 @@
 import tensorflow as tf
 import math
 import hw_quantize_ops as hwqo
+import numpy as np
 
 class ConvLayer:
 
@@ -165,11 +166,11 @@ class ConvLayer:
         return inst
 
     def write_kernel_wire(self):
-        """Convert the tensorflow variable to a verilog wire string.
+        """Write the quantized kenels to a verilog wire assignment.
 
-        Parse the quantized tensorflow tensor named tf_var_q into a string
-        with a verilog wire variable that can be input to the convolution
-        module.
+        Write a verilog string with a wire declaration and an assignment. 
+        The numpy quantized kernels are converted to verilog constants and 
+        concatenated in the assignment.  
 
         Args:
             None.
@@ -177,15 +178,16 @@ class ConvLayer:
         Returns:
             A string with a verilog wire variable.
 
-        Raises:
-
-        Example:
-
         """
+
+        # convert negitive values to the unsigned equivilant
+        unsigned_kernel_q = np.less(self.np_kernels_q,0) * 256.0
+        unsigned_kernel_q += self.np_kernels_q
+        unsigned_kernel_q = unsigned_kernel_q.astype(int)
 
         tabs = '                       '
         k_wire = tabs[:-1]+'};' # end of wire
-        dim = self.np_kernels.shape
+        dim = self.np_kernels_q.shape
         # move down Z dimension
         for z in range(0,dim[2]):
             # move down kernel dimension
@@ -199,7 +201,8 @@ class ConvLayer:
                     # move down column dimension:
                     for c in dim[1]:
                     """
-                    k_slice = self.np_kernels[r,:,z,k]
+                    #k_slice = self.np_kernels_q[r,:,z,k]
+                    k_slice = unsigned_kernel_q[r,:,z,k]
        
                     row_wire=','
                     # now, iterate over columns and write strings
