@@ -79,11 +79,14 @@ class ConvLayer:
         self.kx_size = kx_size
         self.ky_size = ky_size
         self.num_kernels = num_kernels
-        self.np_kernels = None # empty until trained network is saved
-        self.np_kernels_q = None # empty until trained netwrok is saved
-        self.input_q_range = None # empyer until the trained network is quantized
-        self.output_q_range = None # empyer until the trained network is quantized
-      
+        # empty until trained network is saved
+        self.np_kernels = None
+        # empty until trained netwrok is saved
+        self.np_kernels_q = None
+        # empty until the trained network is quantized
+        self.input_q_range = None 
+        # empty until the trained network is quantized
+        self.output_q_range = None
         # None if no requanitization is done after the layer.
         # If requantize is called after the layer, rq_scale_factor will
         # be set

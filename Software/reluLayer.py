@@ -37,12 +37,15 @@ class ReluLayer:
         self.size = size
         self.q_max = q_max
         self.q_min = q_min
-        
-        self.tf_var = 0.0 # The value of zero relative to the input, will not be 0 for quantized ops
-        self.tf_var_q = None # empty until set by quantize function
-        self.input_q_range = None # empyer until the trained network is quantized
-        self.output_q_range = None # empyer until the trained network is quantized
-            
+        # The value of zero relative to the input, 
+        # will not be 0 for quantized ops
+        self.tf_var = 0.0 
+        # empty until set by quantize function
+        self.tf_var_q = None 
+        # empty until the trained network is quantized
+        self.input_q_range = None 
+        # empty until the trained network is quantized
+        self.output_q_range = None             
         
         
         # Parameters

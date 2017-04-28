@@ -42,11 +42,13 @@ class BiasLayer:
                 tf.constant(self.b_init_val, shape=[size]))
 
         self.tf_var_q = None # empty until set by quantize function
-
-        self.np_bias = None # should be a numpy array with integers [0,255]
-        self.np_bias_q = None # should be a numpy array with integers [0,255]
-        self.input_q_range = None # empyer until the trained network is quantized    
-        self.output_q_range = None # empyer until the trained network is quantized    
+        self.np_bias = None 
+        # should be a numpy array with integers [0,255]
+        self.np_bias_q = None 
+        # empty until the trained network is quantized
+        self.input_q_range = None 
+        # empty until the trained network is quantized
+        self.output_q_range = None 
         # None if no requantization is done after the layer.
         # If requantize is called after the layer, rq_scale_factor will
         # be set
