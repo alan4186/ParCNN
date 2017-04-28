@@ -1,6 +1,7 @@
 import tensorflow as tf
 import math
 import hw_quantize_ops as hwqo
+import numpy as np
 
 class BiasLayer:
 
@@ -42,9 +43,9 @@ class BiasLayer:
                 tf.constant(self.b_init_val, shape=[size]))
 
         self.tf_var_q = None # empty until set by quantize function
-        self.np_bias = None 
+        self.np_bias = None
         # should be a numpy array with integers [0,255]
-        self.np_bias_q = None 
+        self.np_bias_q = None
         # empty until the trained network is quantized
         self.input_q_range = None 
         # empty until the trained network is quantized
@@ -52,7 +53,8 @@ class BiasLayer:
         # None if no requantization is done after the layer.
         # If requantize is called after the layer, rq_scale_factor will
         # be set
-        self.rq_scale_factor = None       
+        self.rq_scale_factor = None
+        self.np_rq_scale_factor = None
         
         self.bias_wire_name = self.name +"_bias"
         # Parameters
@@ -195,6 +197,8 @@ class BiasLayer:
         """
         self.np_bias = self.tf_var.eval()
         self.np_bias_q = self.tf_var_q.eval(feed_dict=fd)
+        if self.rq_scale_factor != None:
+            self.np_rq_scale_factor = self.rq_scale_factor.eval(feed_dict=fd).astype(int)
         
     def quantize(self, bw):
         """Quantize the floating point bias values.

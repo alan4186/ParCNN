@@ -172,6 +172,9 @@ output [7:0] pixel_out
                 # force the rq scale factor to be a power of 2 
                 rq_scale_factor = old_mx/new_mx*255/((2**old_bw)-1)
                 rq_scale_factor2 = 2**tf.ceil(tf.log(rq_scale_factor)/tf.log(2.0))
+                # save scale factor to the layer so the requantize layer can
+                # be inserted again in the export function
+                self.layers[k].rq_scale_factor = tf.ceil(tf.log(rq_scale_factor)/tf.log(2.0))
                 # compute the new new_mx based on the new scale factor
                 new_mx = old_mx*255/((2**old_bw)-1)/rq_scale_factor2
                 tf.summary.scalar(k+'_new_mx',new_mx)
@@ -182,9 +185,7 @@ output [7:0] pixel_out
                 # add requantization op
                 rq_out = hwqo.tf_requantize(layer_outputs_q[-1],old_mx,new_mx,old_bw,8.0)
                 layer_outputs_q.append(rq_out)
-                # save scale factor to layer so the requantize layer can
-                # be inserted again in the export function
-                self.layers[k].rq_scale_factor = rq_scale_factor2
+
                 tf.summary.histogram(k+'_rq_out',rq_out)
 
                 scales.append(rq_scale_factor2)

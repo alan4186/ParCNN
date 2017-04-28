@@ -66,6 +66,7 @@ class DenseLayer:
         # If requantize is called afte the layer, rq_scale_factor will
         # be set
         self.rq_scale_factor = None
+        self.np_rq_scale_factor = None
        
         # for visualization compatability
         self.kx_size = ix_size
@@ -305,6 +306,8 @@ class DenseLayer:
         # Kernel data should be unsigned decimal strings between [0,255]
         self.np_kernels = np_kernels 
         self.np_kernels_q = np_kernels_q
+        if self.rq_scale_factor != None:
+            self.np_rq_scale_factor = self.rq_scale_factor.eval(feed_dict=fd).astype(int)
         
 
     def quantize(self, bw):
