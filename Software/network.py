@@ -185,6 +185,10 @@ output [7:0] pixel_out
                 tf.summary.histogram(k+'_rq_out',rq_out)
 
                 scales.append( old_mx/new_mx*255/((2**old_bw)-1))
+            # add tf_vars to summary
+            tf.summary.histogram(k+'_tf_var',self.layers[k].tf_var)
+            tf.summary.histogram(k+'_tf_var_q',self.layers[k].tf_var_q)
+
         # quantize the last layer
         self.layers[keys[-1]].quantize(bw)
 
@@ -223,18 +227,8 @@ output [7:0] pixel_out
         tf.summary.histogram('net_out_q',net_out_q)
         tf.summary.histogram('net_out_dq',net_out_dq)
 
-        tf.summary.image('float_filters',tf.transpose(self.layers['c1'].tf_var, [3, 0, 1, 2]),max_outputs=8)
-        tf.summary.image('q_filters',tf.transpose(self.layers['c1'].tf_var_q, [3, 0, 1, 2]),max_outputs=8)
-
-        tf.summary.histogram('conv'+'_float',self.layers['c1'].tf_var)
-        tf.summary.histogram('conv'+'_q',self.layers['c1'].tf_var_q)
-
-        tf.summary.histogram('cbias'+'_float',self.layers['b1'].tf_var)
-        tf.summary.histogram('cbias'+'_q',self.layers['b1'].tf_var_q)
-
-        tf.summary.histogram('dense'+'_float',self.layers['fc'].tf_var)
-        tf.summary.histogram('dense'+'_q',self.layers['fc'].tf_var_q)
-
+        tf.summary.image('float_filters',tf.transpose(self.layers['c1'].tf_var, [3, 0, 1, 2]))
+        tf.summary.image('q_filters',tf.transpose(self.layers['c1'].tf_var_q, [3, 0, 1, 2]))
 
         merged = tf.summary.merge_all()
         test_writer = tf.summary.FileWriter('./test')
