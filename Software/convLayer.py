@@ -84,6 +84,11 @@ class ConvLayer:
         self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
       
+        # None if no requanitization is done after the layer.
+        # If requantize is called after the layer, rq_scale_factor will
+        # be set
+        self.rq_scale_factor = None
+
         # standard deviation for random weights
         self.w_init_stddev = 0.1
         # tensor flow weight variable

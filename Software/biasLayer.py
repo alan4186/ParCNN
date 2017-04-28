@@ -47,6 +47,10 @@ class BiasLayer:
         self.np_bias_q = None # should be a numpy array with integers [0,255]
         self.input_q_range = None # empyer until the trained network is quantized    
         self.output_q_range = None # empyer until the trained network is quantized    
+        # None if no requantization is done after the layer.
+        # If requantize is called after the layer, rq_scale_factor will
+        # be set
+        self.rq_scale_factor = None       
         
         self.bias_wire_name = self.name +"_bias"
         # Parameters

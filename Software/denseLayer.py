@@ -58,6 +58,10 @@ class DenseLayer:
         self.np_kernels_q = None # empty until a trained network is saved
         self.input_q_range = None # empyer until the trained network is quantized
         self.output_q_range = None # empyer until the trained network is quantized
+        # None if no requantization is done after the layer.
+        # If requantize is called afte the layer, rq_scale_factor will
+        # be set
+        self.rq_scale_factor = None
        
         # for visualization compatability
         self.kx_size = ix_size

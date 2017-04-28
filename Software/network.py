@@ -182,9 +182,13 @@ output [7:0] pixel_out
                 # add requantization op
                 rq_out = hwqo.tf_requantize(layer_outputs_q[-1],old_mx,new_mx,old_bw,8.0)
                 layer_outputs_q.append(rq_out)
+                # save scale factor to layer so the requantize layer can
+                # be inserted again in the export function
+                self.layers[k].rq_scale_factor = rq_scale_factor2
                 tf.summary.histogram(k+'_rq_out',rq_out)
 
-                scales.append( old_mx/new_mx*255/((2**old_bw)-1))
+                scales.append(rq_scale_factor2)
+
             # add tf_vars to summary
             tf.summary.histogram(k+'_tf_var',self.layers[k].tf_var)
             tf.summary.histogram(k+'_tf_var_q',self.layers[k].tf_var_q)
