@@ -7,10 +7,10 @@ kernels:
   [2][2][1][1]
 
   #2
-  [2][2][3][3]
-  [2][2][3][3]
-  [2][2][3][3]
-  [2][2][3][3]
+  [-2][-2][3][3]
+  [-2][-2][3][3]
+  [-2][-2][3][3]
+  [-2][-2][3][3]
 
 windows:
   cycle 1:
@@ -29,9 +29,9 @@ windows:
 pixels_out:
              window 1  | window 2
                        | 
-  kernel 1     180     |   292 
+  kernel 1     180     |   20 
             -----------+----------
-  kernel 2     204     |   332 
+  kernel 2     204     |   28
                        |
 
 */
@@ -56,10 +56,10 @@ wire [32*NUM_TREES-1:0] pixel_out;
 // assign kernels
 // see comment at top for kernel or window orientation,
 assign kernel = { 
-/* kernel 2 */    8'd3, 8'd3, 8'd2, 8'd2,
-                  8'd3, 8'd3, 8'd2, 8'd2,
-                  8'd3, 8'd3, 8'd2, 8'd2,
-                  8'd3, 8'd3, 8'd2, 8'd2,
+/* kernel 2 */    8'd3, 8'd3, 8'hfe, 8'hfe,
+                  8'd3, 8'd3, 8'hfe, 8'hfe,
+                  8'd3, 8'd3, 8'hfe, 8'hfe,
+                  8'd3, 8'd3, 8'hfe, 8'hfe,
 /* kernel 1 */    8'd2, 8'd2, 8'd1, 8'd1,
                   8'd2, 8'd2, 8'd1, 8'd1,
                   8'd1, 8'd1, 8'd2, 8'd2,
@@ -115,7 +115,7 @@ initial begin
   end // end if/else
   $display($time);
   $display("Tree 2 pixel_out = %h", pixel_out[63:32]);
-  if( pixel_out[63:32] == 32'd292) begin
+  if( pixel_out[63:32] == 32'd20) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
@@ -131,7 +131,7 @@ initial begin
   end // end if/else
   $display($time);
   $display("Tree 2 pixel_out = %h", pixel_out[63:32]);
-  if( pixel_out[63:32] == 32'd332) begin
+  if( pixel_out[63:32] == 32'd28) begin
     $display("Pass!");
   end else begin
     $display("Fail!");

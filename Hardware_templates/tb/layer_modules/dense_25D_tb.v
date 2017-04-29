@@ -5,11 +5,11 @@ kernels dut_1:
      / [3][3][3][3]
     /  [3][3][3][3]
    /   [3][3][3][3] z_dim = 1
-  /               / 
-  [1][1][2][2]   /
-  [1][1][2][2]  /
-  [2][2][1][1] /
-  [2][2][1][1]/  z_dim = 0
+  /                / 
+  [-1][-1][2][2]  /
+  [-1][-1][2][2] /
+  [2][2][-1][-1]/
+  [2][2][-1][-1]/  z_dim = 0
 
   #2
       /[4][4][4][4]
@@ -50,7 +50,7 @@ windows:
 pixels_out for dut_1:
              window 1  | window 2
                        | 
-  kernel 1     1260    |   1428 
+  kernel 1     1140    |   1292 
             -----------+----------
   kernel 2     1732    |   1964
                        |
@@ -109,10 +109,10 @@ assign kernel_1 = {
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
-/* kernel 1 z=0 */ 8'd2, 8'd2, 8'd1, 8'd1,
-                   8'd2, 8'd2, 8'd1, 8'd1,
-                   8'd1, 8'd1, 8'd2, 8'd2,
-                   8'd1, 8'd1, 8'd2, 8'd2
+/* kernel 1 z=0 */ 8'd2, 8'd2, 8'hff, 8'hff,
+                   8'd2, 8'd2, 8'hff, 8'hff,
+                   8'hff, 8'hff, 8'd2, 8'd2,
+                   8'hff, 8'hff, 8'd2, 8'd2
                   };
 
 assign kernel_2 = { 
@@ -128,10 +128,10 @@ assign kernel_2 = {
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
-/* kernel 1 z=0 */ 8'd2, 8'd2, 8'd1, 8'd1,
-                   8'd2, 8'd2, 8'd1, 8'd1,
-                   8'd1, 8'd1, 8'd2, 8'd2,
-                   8'd1, 8'd1, 8'd2, 8'd2
+/* kernel 1 z=0 */ 8'd2, 8'd2, 8'hff, 8'hff,
+                   8'd2, 8'd2, 8'hff, 8'hff,
+                   8'hff, 8'hff, 8'd2, 8'd2,
+                   8'hff, 8'hff, 8'd2, 8'd2
                   };
 
 
@@ -194,7 +194,7 @@ initial begin
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out_1[31:0]);
   $display("Tree 1 pixel_out = %d", pixel_out_1[31:0]);
-  if( pixel_out_1[31:0] == 32'd1260) begin
+  if( pixel_out_1[31:0] == 32'd1140) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
@@ -212,7 +212,7 @@ initial begin
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out_1[31:0]);
   $display("Tree 1 pixel_out = %d", pixel_out_1[31:0]);
-  if( pixel_out_1[31:0] == 32'd1428) begin
+  if( pixel_out_1[31:0] == 32'd1292) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
@@ -238,7 +238,7 @@ initial begin
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out_2[31:0]);
   $display("Tree 1 pixel_out = %d", pixel_out_2[31:0]);
-  if( pixel_out_2[31:0] == 32'd540) begin
+  if( pixel_out_2[31:0] == 32'd429) begin
     $display("Pass!");
   end else begin
     $display("Fail!");
@@ -256,7 +256,7 @@ initial begin
   $display($time);
   $display("Tree 1 pixel_out = %h", pixel_out_2[31:0]);
   $display("Tree 1 pixel_out = %d", pixel_out_2[31:0]);
-  if( pixel_out_2[31:0] == 32'd612) begin
+  if( pixel_out_2[31:0] == 32'd476) begin
     $display("Pass!");
   end else begin
     $display("Fail!");

@@ -1,6 +1,6 @@
 % Convolution Test Bench calculation
 Kernel1 = zeros(4,4,4);
-Kernel1(:,:,1) = [ 1 1 2 2; 1 1 2 2; 2 2 1 1; 2 2 1 1 ];
+Kernel1(:,:,1) = [ -1 -1 2 2; -1 -1 2 2; 2 2 -1 -1; 2 2 -1 -1 ];
 Kernel1(:,:,2) = ones(4,4)*3;
 Kernel1(:,:,3) = ones(4,4)*3;
 Kernel1(:,:,4) = ones(4,4)*3
@@ -35,13 +35,12 @@ b1 = sum(sum(sum(Kernel1(:,:,1:2) .* window_b(:,:,1:2))))
 b2 = sum(sum(sum(Kernel2(:,:,1:2) .* window_b(:,:,1:2))))
 
 %{
-
 Kernel1(:,:,1) =
 
-     1     1     2     2
-     1     1     2     2
-     2     2     1     1
-     2     2     1     1
+    -1    -1     2     2
+    -1    -1     2     2
+     2     2    -1    -1
+     2     2    -1    -1
 
 
 Kernel1(:,:,2) =
@@ -165,16 +164,16 @@ window_b(:,:,4) =
 
 Device #1
 
-a1 = 1764
+a1 = 1596
 a2 = 2428
-b1 = 1932
+b1 = 1748
 b2 = 2660
 
 Device #2
 
-a1 = 756
+a1 = 588
 a2 = 1084
-b1 = 828
+b1 = 644
 b2 = 1188
 
 %}
