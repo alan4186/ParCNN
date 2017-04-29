@@ -125,7 +125,7 @@ class DenseLayer:
 
         """
 
-        inst = "wire [31:0] wire32_"+str(in_wire)+";\n"
+        inst = "wire [32*"+str(self.NUM_TREES)+"-1:0] wire32_"+str(in_wire)+";\n"
         inst +="""
   convolution_25D #(
     .NUM_TREES("""+str(self.NUM_TREES)+"""),
