@@ -16,7 +16,6 @@ wire [7:0] q8 [SIZE-1:0];
 
 reg [7:0] q8_clipped [SIZE-1:0];
 
-assign q8 = (SHIFT>0) ? {pixel_in[8-SHIFT-1:0], SHIFT'd0}: pixel_in[8-SHIFT-1:0-SHIFT];
 assign ones = (32+8+SHIFT){1'b1};
 assign zeros = (32+8+SHIFT){1'b0};
 
@@ -26,9 +25,9 @@ generate
 for(i=0; i<SIZE; i=i+1) begin : rq_loop
   always@(*) begin
     if( SHIFT > 0 ) begin
-      {remainder[i], q8[i]} = pixel_in << SHIFT;
+      {remainder[i], q8[i]} = pixel_in[i] << SHIFT;
     end else begin
-      {remainder[i], q8[i]} = pixel_in[31:0-SHIFT];
+      {remainder[i], q8[i]} = pixel_in[i][31:0-SHIFT];
     end
 
     if(remainder[i][32-8+SHIFT]) begin
