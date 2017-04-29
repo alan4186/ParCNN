@@ -24,7 +24,7 @@ end // for
 
 // connect adder tree
 for(i= (TREE_SIZE*2)-2 ; i >=1 ; i=i-2) begin : sum_products
-  add_32bit add_inst(
+  add_32bit_signed add_inst(
     .clock(clock),
     .dataa(adder_tree_wire[i-1]),
     .datab(adder_tree_wire[i]),

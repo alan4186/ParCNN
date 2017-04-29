@@ -17,7 +17,7 @@ wire [8*SIZE-1:0] sum_8; // the 8 bit sum of the addition, only 7 msb needed
 genvar i;
 generate
 for(i=0; i<SIZE; i=i+1) begin : bias_loop
-  add_8bit_unsign add_inst (
+  add_8bit_signed add_inst (
     .clock(clock),
     .dataa(a[i*8+7:i*8]),
     .datab(b[i*8+7:i*8]),

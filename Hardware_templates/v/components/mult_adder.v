@@ -21,7 +21,7 @@ assign out = adder_tree_wire[0];
 genvar i;
 generate
 for(i = 0; i < MA_TREE_SIZE; i=i+1) begin : connect_mul
-   mult_8bit ma_mult_inst(
+   mult_8bit_signed ma_mult_inst(
     .clock(clock),
     .dataa(in[8*(i+1)-1:i*8]),
     .datab(kernel[8*(i+1)-1:i*8]),
