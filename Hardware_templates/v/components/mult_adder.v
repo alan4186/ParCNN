@@ -1,3 +1,4 @@
+`define SIGNED_INT 1
 module mult_adder #(
   parameter MA_TREE_SIZE = -1
 )
@@ -51,7 +52,7 @@ endgenerate
 genvar j;
 generate
 for(j= (MA_TREE_SIZE*2)-2 ; j >=1 ; j=j-2) begin : sum_products
-  add_32bit ma_add_inst(
+  add_32bit_signed ma_add_inst(
     .clock(clock),
     .dataa(adder_tree_wire[j-1]),
     .datab(adder_tree_wire[j]),
