@@ -84,18 +84,30 @@ class BiasLayer:
 
 
         """
-        inst ="""
+
+        inst = "wire [9*"+str(self.SIZE)+"-1:0] wire9_"+str(in_wire)+";\n"
+        inst +="""
   bias #(
-    .SIZE("""+str(self.SIZE)+"""),
+    .SIZE("""+str(self.SIZE)+""")
   )
   """+name+""" (
     .clock(clock),
     .reset(reset),
     .a(wire8["""+str(in_wire)+"""]),
     .b("""+self.bias_wire_name+"""),
-    .sum(wire8["""+str(out_wire)+"""])
+    .sum(wire9_"""+str(in_wire)+"""["""+str(out_wire)+"""])
   );
 
+  requantize #(
+    .SHIFT("""+str(self.np_rq_scale_factor)+"""),
+    .SIZE("""+str(self.SIZE)+""")
+  )
+  rq_inst_"""+str(in_wire)+""" (
+     .clock(clock),
+     .reset(reset),
+     .pixel_in(wire9_"""+str(in_wire)+"""),
+     .pixel_out(wire8["""+str(out_wire)+"""])
+  );
 """
         return inst
         

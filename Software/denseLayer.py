@@ -142,12 +142,14 @@ class DenseLayer:
     .pixel_out(wire32_"""+str(in_wire)+""")
   );
 
-  requantize rq_inst_"""+str(in_wire)+""" (
+  requantize #(
+    .SHIFT("""+str(self.np_rq_scale_factor)+"""), 
+    .SIZE("""+str(self.NUM_TREES)+""")
+  )
+  rq_inst_"""+str(in_wire)+""" (
     .clock(clock),
     .reset(reset),
     .pixel_in(wire32_"""+str(in_wire)+"""),
-    .max_val("""+str(self.rq_max)+"""),
-    .min_val("""+str(self.rq_min)+"""),
     .pixel_out(wire8["""+str(out_wire)+"""])
   );
 """
