@@ -32,31 +32,31 @@ initial begin
   clock = 1'b1;
   reset = 1'b1;
 
-  in = {32'd1, 32'd2, 32'd3, 32'd4, 32'd5, 32'd6, 32'd7, 32'd8 }; // =36
+  in = {32'd1, 32'd2, 32'd3, 32'd4, 32'd120, 32'd6, 32'd66, 32'd8 }; // =210
 
   #10
   reset = 1'b0;
   #10
   reset = 1'b1;
   #10
-  in = {32'd9, 32'd8, 32'd7, 32'd0, 32'd16, 32'd6, 32'd7, 32'd8 }; // =61
+  in = {32'd9, 32'd8, 32'd249, 32'd0, 32'd240, 32'd6, 32'd7, 32'd8 }; // =38
   #10
-  in = {32'd0, 32'd2, 32'd5, 32'd4, 32'd7, 32'd6, 32'd7, 32'd2 }; // =33
+  in = {32'd0, 32'd2, 32'd216, 32'd4, 32'd7, 32'd243, 32'd7, 32'd2 }; // =-31 = 32'hffffffe1
   #10
   $display($time); 
-  if (out == 32'd36)
+  if (out == 32'd210)
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
   #10
   $display($time); 
-  if (out == 32'd61)
+  if (out == 32'd38)
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
   #10
   $display($time); 
-  if (out == 32'd33)
+  if (out == 32'hffffffe1)
     $display("out = %d, success!", out);
   else
     $display("out = %d, fail!", out);
