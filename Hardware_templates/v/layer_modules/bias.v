@@ -1,6 +1,4 @@
-// This module adds 2 8 bit numbers and requantizes the
-// result to 8 bits.  So the range of the output is double
-// the range of the input.  The range must be centered at Zero
+// This module adds 2 8 bit numbers and outputs a 9 bit number
 module bias #(
   parameter SIZE = -1
 )(
@@ -8,7 +6,7 @@ module bias #(
   input reset,
   input [8*SIZE-1:0] a,
   input [8*SIZE-1:0] b,
-  output [8*SIZE-1:0] sum
+  output [9*SIZE-1:0] sum
 );
 
 wire [SIZE-1:0] c;
@@ -28,21 +26,9 @@ end //for
 
 // wire up carry bit
 for(i=0; i<SIZE; i=i+1) begin : carry_loop
-  assign sum[i*8+7:i*8] = {c[i], sum_8[i*8+7:i*8+1]};
+  assign sum[i*9+8:i*9] = {c[i], sum_8[i*8+7:i*8]};
 end // for
 
-
-
- /* 
-  // check for overflow 
-  always@(posedge clock) begin
-    if(v[i])
-      sum[i*8+7:i*8] <= 8'd255;
-    else
-      sum[i*8+7:i*8] <= sum_v[i*8+7:i*8];
-  end // always
-end // for
-*/
 endgenerate
 
 endmodule
