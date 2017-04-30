@@ -41,32 +41,28 @@ module add_8bit_signed (
 	clock,
 	dataa,
 	datab,
-	cout,
 	result);
 
 	input	  clock;
-	input	[7:0]  dataa;
-	input	[7:0]  datab;
-	output	  cout;
-	output	[7:0]  result;
+	input	[8:0]  dataa;
+	input	[8:0]  datab;
+	output	[8:0]  result;
 
-	wire  sub_wire0;
-	wire [7:0] sub_wire1;
-	wire  cout = sub_wire0;
-	wire [7:0] result = sub_wire1[7:0];
+	wire [8:0] sub_wire0;
+	wire [8:0] result = sub_wire0[8:0];
 
 	lpm_add_sub	LPM_ADD_SUB_component (
 				.clock (clock),
 				.dataa (dataa),
 				.datab (datab),
-				.cout (sub_wire0),
-				.result (sub_wire1)
+				.result (sub_wire0)
 				// synopsys translate_off
 				,
 				.aclr (),
 				.add_sub (),
 				.cin (),
 				.clken (),
+				.cout (),
 				.overflow ()
 				// synopsys translate_on
 				);
@@ -76,7 +72,7 @@ module add_8bit_signed (
 		LPM_ADD_SUB_component.lpm_pipeline = 1,
 		LPM_ADD_SUB_component.lpm_representation = "SIGNED",
 		LPM_ADD_SUB_component.lpm_type = "LPM_ADD_SUB",
-		LPM_ADD_SUB_component.lpm_width = 8;
+		LPM_ADD_SUB_component.lpm_width = 9;
 
 
 endmodule
@@ -85,7 +81,7 @@ endmodule
 // CNX file retrieval info
 // ============================================================
 // Retrieval info: PRIVATE: CarryIn NUMERIC "0"
-// Retrieval info: PRIVATE: CarryOut NUMERIC "1"
+// Retrieval info: PRIVATE: CarryOut NUMERIC "0"
 // Retrieval info: PRIVATE: ConstantA NUMERIC "0"
 // Retrieval info: PRIVATE: ConstantB NUMERIC "0"
 // Retrieval info: PRIVATE: Function NUMERIC "0"
@@ -102,7 +98,7 @@ endmodule
 // Retrieval info: PRIVATE: WhichConstant NUMERIC "0"
 // Retrieval info: PRIVATE: aclr NUMERIC "0"
 // Retrieval info: PRIVATE: clken NUMERIC "0"
-// Retrieval info: PRIVATE: nBit NUMERIC "8"
+// Retrieval info: PRIVATE: nBit NUMERIC "9"
 // Retrieval info: PRIVATE: new_diagram STRING "1"
 // Retrieval info: LIBRARY: lpm lpm.lpm_components.all
 // Retrieval info: CONSTANT: LPM_DIRECTION STRING "ADD"
@@ -110,17 +106,15 @@ endmodule
 // Retrieval info: CONSTANT: LPM_PIPELINE NUMERIC "1"
 // Retrieval info: CONSTANT: LPM_REPRESENTATION STRING "SIGNED"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_ADD_SUB"
-// Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "8"
+// Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "9"
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT NODEFVAL "clock"
-// Retrieval info: USED_PORT: cout 0 0 0 0 OUTPUT NODEFVAL "cout"
-// Retrieval info: USED_PORT: dataa 0 0 8 0 INPUT NODEFVAL "dataa[7..0]"
-// Retrieval info: USED_PORT: datab 0 0 8 0 INPUT NODEFVAL "datab[7..0]"
-// Retrieval info: USED_PORT: result 0 0 8 0 OUTPUT NODEFVAL "result[7..0]"
+// Retrieval info: USED_PORT: dataa 0 0 9 0 INPUT NODEFVAL "dataa[8..0]"
+// Retrieval info: USED_PORT: datab 0 0 9 0 INPUT NODEFVAL "datab[8..0]"
+// Retrieval info: USED_PORT: result 0 0 9 0 OUTPUT NODEFVAL "result[8..0]"
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
-// Retrieval info: CONNECT: @dataa 0 0 8 0 dataa 0 0 8 0
-// Retrieval info: CONNECT: @datab 0 0 8 0 datab 0 0 8 0
-// Retrieval info: CONNECT: cout 0 0 0 0 @cout 0 0 0 0
-// Retrieval info: CONNECT: result 0 0 8 0 @result 0 0 8 0
+// Retrieval info: CONNECT: @dataa 0 0 9 0 dataa 0 0 9 0
+// Retrieval info: CONNECT: @datab 0 0 9 0 datab 0 0 9 0
+// Retrieval info: CONNECT: result 0 0 9 0 @result 0 0 9 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL add_8bit_signed.v TRUE
 // Retrieval info: GEN_FILE: TYPE_NORMAL add_8bit_signed.inc FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL add_8bit_signed.cmp FALSE

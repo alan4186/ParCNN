@@ -224,7 +224,7 @@ initial begin
   $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out_1[31:0]);
   $display("Tree 1 pixel_out = %0d", pixel_out_1[31:0]);
-  if( pixel_out_1[31:0] == 32'd1784) begin
+  if( pixel_out_1[31:0] == 32'd1748) begin
     $display("\t\t\tPASS!");
   end else begin
     $display("\t\t\tFAIL!");
