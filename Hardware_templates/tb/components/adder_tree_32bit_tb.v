@@ -42,9 +42,9 @@ initial begin
   #10
   reset = 1'b1;
   #10
-  in = {32'd9, 32'd8, 32'd249, 32'd0, 32'd240, 32'd6, 32'd7, 32'd8 }; // =38
+  in = {32'd9, 32'd8, 32'hfffffff9, 32'd0, 32'hfffffff0, 32'd6, 32'd7, 32'd8 }; // = 15
   #10
-  in = {32'd0, 32'd2, 32'd216, 32'd4, 32'd7, 32'd243, 32'd7, 32'd2 }; // =-31 = 32'hffffffe1
+  in = {32'd0, 32'd2, 32'hffffffce, 32'd4, 32'd7, 32'hfffffffd, 32'd7, 32'd2 }; // =-31 = 32'hffffffe1
   #10
   $display("Time = %0d",$time); 
   if (out == 32'd210)
