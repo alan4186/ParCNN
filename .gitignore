@@ -27,3 +27,7 @@ Software/latex/*
 # junk folders
 Software/ignore/*
 
+# Simulation outputs
+Simulation/work/*
+Simulation/transcript
+
