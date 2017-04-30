@@ -179,6 +179,9 @@ always begin
 end
 
 initial begin
+  $display("################");
+  $display("dense_25D_tb #");
+  $display("################");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -191,39 +194,39 @@ initial begin
   
   // check output
   $display("Testing Device #1 Z dimension = 4");
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out_1[31:0]);
-  $display("Tree 1 pixel_out = %d", pixel_out_1[31:0]);
+  $display("Tree 1 pixel_out = %0d", pixel_out_1[31:0]);
   if( pixel_out_1[31:0] == 32'd1140) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out_1[63:32]);
-  $display("Tree 2 pixel_out = %d", pixel_out_1[63:32]);
+  $display("Tree 2 pixel_out = %0d", pixel_out_1[63:32]);
   if( pixel_out_1[63:32] == 32'd1732) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out_1[31:0]);
-  $display("Tree 1 pixel_out = %d", pixel_out_1[31:0]);
+  $display("Tree 1 pixel_out = %0d", pixel_out_1[31:0]);
   if( pixel_out_1[31:0] == 32'd1292) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out_1[63:32]);
-  $display("Tree 2 pixel_out = %d", pixel_out_1[63:32]);
+  $display("Tree 2 pixel_out = %0d", pixel_out_1[63:32]);
   if( pixel_out_1[63:32] == 32'd1964) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #50 // arbitrary delay
@@ -235,44 +238,45 @@ initial begin
   #10 // wait 1 clock cycle for Z dim adder tree 
   // test device 2
   $display("Testing Device #2 Z dimension = 2");
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out_2[31:0]);
-  $display("Tree 1 pixel_out = %d", pixel_out_2[31:0]);
+  $display("Tree 1 pixel_out = %0d", pixel_out_2[31:0]);
   if( pixel_out_2[31:0] == 32'd429) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out_2[63:32]);
-  $display("Tree 2 pixel_out = %d", pixel_out_2[63:32]);
+  $display("Tree 2 pixel_out = %0d", pixel_out_2[63:32]);
   if( pixel_out_2[63:32] == 32'd772) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out_2[31:0]);
-  $display("Tree 1 pixel_out = %d", pixel_out_2[31:0]);
+  $display("Tree 1 pixel_out = %0d", pixel_out_2[31:0]);
   if( pixel_out_2[31:0] == 32'd476) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out_2[63:32]);
-  $display("Tree 2 pixel_out = %d", pixel_out_2[63:32]);
+  $display("Tree 2 pixel_out = %0d", pixel_out_2[63:32]);
   if( pixel_out_2[63:32] == 32'd876) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
 
   #500
+  $display("\n");
   $stop;
 end
 

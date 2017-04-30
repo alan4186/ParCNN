@@ -32,6 +32,9 @@ always begin
 end
 
 initial begin
+  $display("###########");
+  $display("relu_tb #");
+  $display("###########");
   clock = 1'b1;
   reset = 1'b1;
   in = {8'd255, 8'd128, 8'd64, 8'd32};
@@ -44,33 +47,34 @@ initial begin
   reset = 1'b1;
 
   #10
-  $display($time); 
+  $display("Time = %0d",$time);
   if (out == {8'd255, 8'd128, 8'd128, 8'd128})
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
 
   // next zero value
   zero = 8'd32;
 
   #10
-  $display($time); 
+  $display("Time = %0d",$time);
   if (out == {8'd255, 8'd128, 8'd64, 8'd32})
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
 
   // next zero value
   zero = 8'd44;
 
   #10
-  $display($time); 
+  $display("Time = %0d",$time);
   if (out == {8'd255, 8'd128, 8'd64, 8'd44})
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
 
   #20
+  $display("\n");
   $stop;
 end
 

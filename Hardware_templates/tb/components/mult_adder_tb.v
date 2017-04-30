@@ -29,6 +29,9 @@ always begin
 end
 
 initial begin
+  $display("#################");
+  $display("mult_adder_tb #");
+  $display("#################");
   clock = 1'b1;
   reset = 1'b1;
   in = 128'h03030303030303030303030303030303;
@@ -44,25 +47,26 @@ initial begin
   in = 128'h03030303030303030303030303030303;
   #20
   #10
-  $display($time); 
+  $display("Time = %0d",$time); 
   if (out == 32'd96)
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
   #10
-  $display($time); 
+  $display("Time = %0d",$time); 
   if (out == 32'd64)
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
   #10
-  $display($time); 
+  $display("Time = %0d",$time); 
   if (out == 32'd96)
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
 
   #20
+  $display("\n");
   $stop;
 end
 

@@ -37,6 +37,9 @@ always begin
 end
 
 initial begin
+  $display("###############");
+  $display("dense_sr_tb #");
+  $display("###############");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -44,7 +47,7 @@ initial begin
   #10 reset = 1'b1;
 
   #90 // check output
-  $display($time);
+  $display("Time = %0d",$time);
   $display("window_out =\n%h\n", window_out[23:0]);
   $display("%h\n", window_out[47:24]);
   $display("%h\n", window_out[71:48]);
@@ -52,13 +55,13 @@ initial begin
       window_out[47:24] == { 8'd3, 8'd4, 8'd5 } &
       window_out[71:48] == { 8'd0, 8'd1, 8'd2 }
     ) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #20
-  $display($time);
+  $display("Time = %0d",$time);
   $display("window_out =\n%h\n", window_out[23:0]);
   $display("%h\n", window_out[47:24]);
   $display("%h\n", window_out[71:48]);
@@ -66,13 +69,14 @@ initial begin
       window_out[47:24] == { 8'd5, 8'd6, 8'd7 } &
       window_out[71:48] == { 8'd2, 8'd3, 8'd4 }
     ) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
   #100
+  $display("\n");
   $stop;
 end
 

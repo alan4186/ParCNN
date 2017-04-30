@@ -97,6 +97,9 @@ always begin
 end
 
 initial begin
+  $display("#####################");
+  $display("convolution_2D_tb #");
+  $display("#####################");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -108,39 +111,40 @@ initial begin
   
   // check output
 
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out);
   if( pixel_out[31:0] == 32'd252) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out);
   if( pixel_out[63:32] == 32'hffffffd4) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out);
   if( pixel_out[31:0] == 32'd276) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out);
   if( pixel_out[63:32] == 32'hffffffcc) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
   #100
+  $display("\n");
   $stop;
 end
 

@@ -39,6 +39,10 @@ always begin
 end
 
 initial begin
+  $display("###############");
+  $display("layer_sr_tb #");
+  $display("###############");
+
   clock = 1'b1;
   reset = 1'b1;
   
@@ -46,7 +50,7 @@ initial begin
   #10 reset = 1'b1;
 
   #170 // check output
-  $display($time);
+  $display("Time = %0d",$time);
   $display("window_out =\n%h\n", window_out[23:0]);
   $display("%h\n", window_out[47:24]);
   $display("%h\n", window_out[71:48]);
@@ -54,13 +58,13 @@ initial begin
       window_out[47:24] == { 8'd7, 8'd8, 8'd9 } &
       window_out[71:48] == { 8'd0, 8'd1, 8'd2 }
     ) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #20
-  $display($time);
+  $display("Time = %0d",$time);
   $display("window_out =\n%h\n", window_out[23:0]);
   $display("%h\n", window_out[47:24]);
   $display("%h\n", window_out[71:48]);
@@ -68,13 +72,14 @@ initial begin
       window_out[47:24] == { 8'd9, 8'd10, 8'd11 } &
       window_out[71:48] == { 8'd2, 8'd3, 8'd4 }
     ) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
   #100
+  $display("\n");
   $stop;
 end
 

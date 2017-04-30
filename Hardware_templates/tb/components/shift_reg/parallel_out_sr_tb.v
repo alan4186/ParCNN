@@ -35,6 +35,9 @@ always begin
 end
 
 initial begin
+  $display("######################"); 
+  $display("parallel_out_sr_tb #");
+  $display("######################"); 
   clock = 1'b1;
   reset = 1'b1;
   
@@ -42,15 +45,16 @@ initial begin
   #10 reset = 1'b1;
 
   #30 // check output
-  $display($time);
+  $display("Time = %0d",$time);
   $display("p_out = %h", p_out);
   if( p_out == { 8'd0, 8'd1, 8'd2}) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #100
+  $display("\n");
   $stop;
 end
 

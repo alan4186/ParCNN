@@ -33,6 +33,9 @@ always begin
 end
 
 initial begin
+  $display("#############");
+  $display("ram_sr_tb #");
+  $display("#############");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -40,34 +43,35 @@ initial begin
   #10 reset = 1'b1;
 
   #30 // check output
-  $display($time);
+  $display("Time = %0d",$time);
   $display("shift_out = %h", shift_out);
   if( shift_out ==  8'd0) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("shift_out = %h", shift_out);
   if( shift_out ==  8'd1) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("shift_out = %h", shift_out);
   if( shift_out ==  8'd2) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
   #100
+  $display("\n");
   $stop;
 end
 

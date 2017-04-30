@@ -29,6 +29,9 @@ always begin
 end
 
 initial begin
+  $display("#######################");
+  $display("adder_tree_32bit_tb #");
+  $display("#######################");
   clock = 1'b1;
   reset = 1'b1;
 
@@ -43,25 +46,26 @@ initial begin
   #10
   in = {32'd0, 32'd2, 32'd216, 32'd4, 32'd7, 32'd243, 32'd7, 32'd2 }; // =-31 = 32'hffffffe1
   #10
-  $display($time); 
+  $display("Time = %0d",$time); 
   if (out == 32'd210)
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
   #10
-  $display($time); 
-  if (out == 32'd38)
-    $display("out = %d, success!", out);
+  $display("Time = %0d",$time); 
+  if (out == 32'd15)
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
   #10
-  $display($time); 
+  $display("Time = %0d",$time); 
   if (out == 32'hffffffe1)
-    $display("out = %d, success!", out);
+    $display("out = %0d\n\t\t\tPASS!", out);
   else
-    $display("out = %d, fail!", out);
+    $display("out = %0d\n\t\t\tFAIL!", out);
 
   #20
+  $display("\n");
   $stop;
 end
 

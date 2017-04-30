@@ -95,6 +95,10 @@ always begin
 end
 
 initial begin
+  $display("###############");
+  $display("dense_2D_tb #");
+  $display("###############");
+
   clock = 1'b1;
   reset = 1'b1;
   
@@ -106,39 +110,40 @@ initial begin
   
   // check output
 
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out[31:0]);
   if( pixel_out[31:0] == 32'd180) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out[63:32]);
   if( pixel_out[63:32] == 32'd20) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
   #10
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 1 pixel_out = %h", pixel_out[31:0]);
   if( pixel_out[31:0] == 32'd204) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
-  $display($time);
+  $display("Time = %0d",$time);
   $display("Tree 2 pixel_out = %h", pixel_out[63:32]);
   if( pixel_out[63:32] == 32'd28) begin
-    $display("Pass!");
+    $display("\t\t\tPASS!");
   end else begin
-    $display("Fail!");
+    $display("\t\t\tFAIL!");
   end // end if/else
 
 
   #100
+  $display("\n");
   $stop;
 end
 
