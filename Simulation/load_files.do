@@ -1,8 +1,6 @@
-###################################################################
-# A modelsim do file to simulate alquiet benches in this design. #
-# To run from bash:
-# vsim -c -do run_all_test_benches.do
-###################################################################
+#####################################################
+# Create Modelsim library and compile design files. #
+#####################################################
 
 # Create a library for working in
 vlib work
