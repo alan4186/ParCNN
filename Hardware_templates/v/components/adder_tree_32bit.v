@@ -1,3 +1,30 @@
+/* Sum a vector 32 bit of signed numbers
+*
+*  A vector of signed 32 bit integers is summed.  The values are assumed to
+*  be small enough that overflow will not occur.  In most cases this module
+*  will be used for values much less than 32 bits, in these cases overflow 
+*  will still be impossible.
+*
+*  Each value in the vector is concatenated and input in parallel to a 
+*  single port.  The values are summed in a tree.  The value of TREE_SIZE
+*  must be a pwer of 2 to create a symetric tree.  If the input vector is 
+*  not a power of 2, round up and input zeros to the extra values.  
+*  Extra values will be removed during optimization during synthesis.
+*
+*  The output latency of the module is log2(TREE_SIZE).  This module is
+*  pipelined and new inputs can be given every clock cycle.
+*
+*  Parameters:
+*    TREE_SIZE: The number of 32 bit values in the input vector
+*
+*  Inputs:
+*    in: A vector of 32 bit signed values of length TREE_SIZE
+*
+*  Outputs:
+*    out: The sum of the input vector in a signed 32 bit representation
+*
+*/
+
 module adder_tree_32bit #(
   parameter TREE_SIZE = -1
 )

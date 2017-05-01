@@ -1,4 +1,30 @@
-`define SIGNED_INT 1
+/* Perform element wise multiplication on 2 vectors and sum the result.
+*
+*  The inputs kernel and in represent vectors of signed 8 bit values.  The
+*  input vectors must be the same length. The input vectors are multiplied 
+*  element wise and fed into a 32 bit adder tree similar to the 
+*  adder_tree_32bit module.  The product of the two inputs is 16 bits wide
+*  when it is fed into the adder tree, leaving another 16 bits for overflow.
+*  As long as each input vector has less than 2^16 8 bit values, overflow 
+*  will be imposible.
+*
+*  The output latency of this module is log2(MA_TREE_SIZE).  This module is 
+*  pipelined and new inputs can be given every clock cycle.
+*
+*  Parameters:
+*    MA_TREE_SIZE: The number of 8 bit values in one input vector.
+*
+*  Inputs:
+*    in: A vector of signed 8 bit values with a length of MA_TREE_SIZE
+*    kernel: A vector of signed 8 bit values with a length of MA_TREE_SIZE
+*
+*  Outputs:
+*    out: The sum of the element wise multiplication of in and kernel stored
+*      in a signed 32 bit representation.
+*
+*/
+
+
 module mult_adder #(
   parameter MA_TREE_SIZE = -1
 )
@@ -9,7 +35,7 @@ module mult_adder #(
 	input [8*MA_TREE_SIZE-1:0]  kernel,
 	output [31:0] out	
 );
-
+`define SIGNED_INT 1
 
 // wire declarations
 wire [15:0] in_add_vector_wire [MA_TREE_SIZE-1:0];

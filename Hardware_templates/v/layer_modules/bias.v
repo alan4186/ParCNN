@@ -1,4 +1,23 @@
-// This module adds 2 8 bit numbers and outputs a 9 bit number
+/* Element wise addition of two signed 8 bit vectors
+*
+*  Element wise add two vectors of 2's compliment 8 bit numbers.  The output
+*  is a singed vector of 9 bit numbers.  This module is used to add bias
+*  values to the output of neural network layers.
+*
+*  The output latency of this module is 1 clock cycle.
+* 
+*  Paremeters:
+*    SIZE: The number of 8 bit values in one input vector.
+*
+*  Inputs:
+*    a: An input vector of signed 8 bit values
+*    b: An input vector of signed 8 bit values
+*
+*  Outputs:
+*    sum: The element wise addition of a and b in a singed 9 bit value
+*
+*/
+
 module bias #(
   parameter SIZE = -1
 )(
