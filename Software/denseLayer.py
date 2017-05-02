@@ -96,7 +96,8 @@ class DenseLayer:
         # Round the tree size up to the next power of 2 
         # to keep the tree code simple, extra resources should 
         # be optimized away.
-        self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * ix_size * iy_size,2)))
+        #self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * ix_size * iy_size,2)))
+        self.MA_TREE_SIZE = int(2**math.ceil(math.log(ix_size * iy_size,2)))
 
         self.rq_max = rq_max
         self.rq_min = rq_min
@@ -127,7 +128,7 @@ class DenseLayer:
 
         inst = "wire [32*"+str(self.NUM_TREES)+"-1:0] wire32_"+str(in_wire)+";\n"
         inst +="""
-  convolution_25D #(
+  dense_25D #(
     .NUM_TREES("""+str(self.NUM_TREES)+"""),
     .Z_DEPTH("""+str(self.Z_DEPTH)+"""),
     .P_SR_DEPTH("""+str(self.P_SR_DEPTH)+"""), 
