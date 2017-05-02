@@ -78,12 +78,11 @@ class ReluLayer:
 
         inst ="""
   relu #(
-    .SIZE("""+str(self.SIZE)+"""),
+    .SIZE("""+str(self.SIZE)+""")
   )
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .zero(8'd"""+str(self.tf_var_q)+"""),
     .in(wire8["""+str(in_wire)+"""]),
     .out(wire8["""+str(out_wire)+"""])
   );
