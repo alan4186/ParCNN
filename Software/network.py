@@ -42,7 +42,7 @@ class Net:
         self.layers[name] = DenseLayer(name, ix_size,iy_size,iz_size, num_outputs,sharing_factor, rq_max, rq_min)
 
     def export_cnn_module(self):
-        out_dir = "../generated_modules/"
+        out_dir = "../Generated_modules/"
 
 
         cnn_module = ''
@@ -152,10 +152,7 @@ class Net:
 
         keys = self.layers.keys()
 
-
         scales = []
-
-
 
         for layer_index in range(0,len(keys) - 1):
             k = keys[layer_index]
@@ -334,3 +331,4 @@ class Net:
 
     def set_dropout_prob(self,prob):
         self.dropout_prob = prob
+
