@@ -198,7 +198,8 @@ class ConvLayer:
         unsigned_kernel_q = unsigned_kernel_q.astype(int)
 
         tabs = '                       '
-        k_wire = tabs[:-2]+'};' # end of wire
+        #k_wire = tabs[:-2]+'};' # end of wire
+        k_wire = '}' # end of wire
         trailing_comma = False
         dim = self.np_kernels_q.shape
         # move down Z dimension
@@ -226,16 +227,17 @@ class ConvLayer:
                     for c in k_slice[::-1]:
                         row_wire = ", 8'd"+str(c)+row_wire
                     #k_wire = tabs + row_wire[2:] + '\n' + k_wire
-                    k_wire = tabs + row_wire[2:]  + k_wire
+                    k_wire = row_wire[2:]  + k_wire
        
                 # Add annotation
-                annotation = "/* Kernel "+ str(k) + " z="+str(z)+" */"
-                k_wire = annotation + k_wire[len(annotation):]
+                #annotation = "/* Kernel "+ str(k) + " z="+str(z)+" */"
+                #k_wire = annotation + k_wire[len(annotation):]
 
 
         k_width = (self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS*8) - 1
         k_declaration = "wire ["+str(k_width)+":0] "+self.kernels_wire_name+";\n"
-        k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire
+        #k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire[2:]
+        k_wire = "`define "+self.kernels_wire_name+" {" + k_wire
 
         return k_wire 
 
