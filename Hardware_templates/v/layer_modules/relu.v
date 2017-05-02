@@ -41,8 +41,9 @@ for(i=0; i<SIZE; i=i+1) begin : relu_loop
   always@(posedge clock) begin
     if(in[8*i+7]) begin
       out[i*8+7:i*8] <= 8'd0;
-    else
+    end else begin
       out[8*i+7:8*i] <= in[8*i+7:8*i];
+    end 
   end // always
 end // for
 endgenerate
