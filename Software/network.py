@@ -193,6 +193,27 @@ class Net:
 
         # quantize the last layer
         self.layers[keys[-1]].quantize(bw)
+        layer_out_q = self.layers[keys[-1]].tf_function_q(layer_outputs_q[-1])
+        tf.summary.histogram(keys[-1]+'_lo_q',layer_out_q)
+        layer_outputs_q.append(layer_out_q)
+        
+        old_mx = self.layers[keys[-1]].output_q_range
+        new_mx = tf.reduce_max(tf.abs(layer_outputs[-1]))
+        old_bw = self.layers[keys[-1]].bitwidth_change(8.0)
+
+        # force the rq scale factor to be a power of 2 
+        rq_scale_factor = old_mx/new_mx*255/((2**old_bw)-1)
+        rq_scale_factor2 = 2**tf.ceil(tf.log(rq_scale_factor)/tf.log(2.0))
+        # save scale factor to the layer so the requantize layer can
+        # be inserted again in the export function
+        self.layers[keys[-1]].rq_scale_factor = tf.ceil(tf.log(rq_scale_factor)/tf.log(2.0))
+        # compute the new new_mx based on the new scale factor
+        new_mx = old_mx*255/((2**old_bw)-1)/rq_scale_factor2
+        # add requantization op
+        rq_out = hwqo.tf_requantize(layer_outputs_q[-1],old_mx,new_mx,old_bw,8.0)
+        layer_outputs_q.append(rq_out)
+        tf.summary.histogram(keys[-1]+'_rq_out',rq_out)
+
 
         
         # Hard code output shape for MNIST
