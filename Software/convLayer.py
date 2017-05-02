@@ -225,7 +225,8 @@ class ConvLayer:
                     # now, iterate over columns and write strings
                     for c in k_slice[::-1]:
                         row_wire = ", 8'd"+str(c)+row_wire
-                    k_wire = tabs + row_wire[2:] + '\n' + k_wire
+                    #k_wire = tabs + row_wire[2:] + '\n' + k_wire
+                    k_wire = tabs + row_wire[2:]  + k_wire
        
                 # Add annotation
                 annotation = "/* Kernel "+ str(k) + " z="+str(z)+" */"
