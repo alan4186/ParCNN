@@ -115,7 +115,8 @@ class ConvLayer:
         # Round the tree size up to the next power of 2 
         # to keep the tree code simple, extra resources should 
         # be optimized away.
-        self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * kx_size * ky_size,2)))
+        #self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * kx_size * ky_size,2)))
+        self.MA_TREE_SIZE = int(2**math.ceil(math.log(kx_size * ky_size,2)))
 
         self.rq_max = rq_max
         self.rq_min = rq_min
@@ -231,7 +232,7 @@ class ConvLayer:
                 k_wire = annotation + k_wire[len(annotation):]
 
 
-        k_width = self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS - 1
+        k_width = (self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS*8) - 1
         k_declaration = "wire ["+str(k_width)+":0] "+self.kernels_wire_name+";\n"
         k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire
 
