@@ -1,5 +1,5 @@
 `timescale 1 ps / 1 ps
-module relu_tb();
+module requantize_tb();
 
 parameter SHIFT = 3;
 parameter SIZE = 4;
@@ -58,29 +58,32 @@ initial begin
 
   #10
   $display("Time = %0d",$time);
-  if (out == {8'd0, 8'hff, 8'd127, 8'd128})
-    $display("out = %0d\n\t\t\tPASS!", out);
+  if (out_1 == {8'd0, 8'hf8, 8'd127, 8'd128})
+    $display("out = %h\n\t\t\tPASS!", out_1);
   else
-    $display("out = %0d\n\t\t\tFAIL!", out);
+    $display("out = %h\n\t\t\tFAIL!", out_1);
+ 
+  if (out_2 == {8'd0, 8'hff, 8'd127, 8'd128})
+    $display("out = %h\n\t\t\tPASS!", out_2);
+  else
+    $display("out = %h\n\t\t\tFAIL!", out_2);
  
   // Next input 
-  in = {32'd127, 32'd128, 32'd400 32'hfffffd58};
+  in = {32'd127, 32'hffffff80, 32'd16, 32'hfffffd58};
 
   #10
   $display("Time = %0d",$time);
-  if (out == {8'd15, 8'hf0, 8'd50, 8'hab})
-    $display("out = %0d\n\t\t\tPASS!", out);
+  if (out_1 == {8'd127, 8'd128, 8'd127, 8'd128})
+    $display("out = %h\n\t\t\tPASS!", out_1);
   else
-    $display("out = %0d\n\t\t\tFAIL!", out);
+    $display("out = %h\n\t\t\tFAIL!", out_1);
 
-  /*
-  #10
-  $display("Time = %0d",$time);
-  if (out == {8'd255, 8'd128, 8'd64, 8'd44})
-    $display("out = %0d\n\t\t\tPASS!", out);
+  if (out_2 == {8'd15, 8'hf0, 8'd2, 8'hab})
+    $display("out = %h\n\t\t\tPASS!", out_2);
   else
-    $display("out = %0d\n\t\t\tFAIL!", out);
-  */
+    $display("out = %h\n\t\t\tFAIL!", out_2);
+
+
   #20
   $display("\n");
   $stop;
