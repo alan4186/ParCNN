@@ -8,7 +8,10 @@ VSIM=~/altera/15.0/modelsim_ase/linuxaloem/vsim
 # Load Desin
 $VSIM -batch -do load_files.do
 # add testbenches here, seperate with spaces
-TESTBENCHES=(adder_tree_32bit_tb mult_adder_tb ram_sr_tb parallel_out_sr_tb layer_sr_tb dense_sr_tb convolution_2D_tb convolution_25D_tb dense_2D_tb dense_25D_tb relu_tb bias_tb)
+TESTBENCHES=(adder_tree_32bit_tb mult_adder_tb ram_sr_tb\
+  parallel_out_sr_tb layer_sr_tb dense_sr_tb convolution_2D_tb\
+  convolution_25D_tb dense_2D_tb dense_25D_tb relu_tb bias_tb\
+  requantize_tb)
 
 # inlude any extra libraries needed in the braces after the -L, seperate with commas
 for i in ${TESTBENCHES[@]}; do
