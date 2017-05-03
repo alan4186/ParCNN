@@ -17,6 +17,6 @@ vlog -quiet $tb_dir/components/shift_reg/*.v
 vlog -quiet $v_dir/layer_modules/*.v
 vlog -quiet $v_dir/components/*.v
 vlog -quiet $v_dir/components/shift_reg/*.v
-vlog -quiet $v_dir/components/megafunctions/*_signed.v
+#vlog -quiet $v_dir/components/megafunctions/*_signed.v
 
 quit
