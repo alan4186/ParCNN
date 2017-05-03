@@ -166,7 +166,7 @@ class ConvLayer:
     .clock(clock),
     .reset(reset),
     .pixel_vector_in("""+str(in_wire)+"""),
-    .kernel("""+self.kernels_wire_name+"""),
+    .kernel(`"""+self.kernels_wire_name+"""),
     .pixel_vector_out(wire32_"""+str(in_wire)+""")
   );
 
