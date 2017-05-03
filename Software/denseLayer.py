@@ -54,6 +54,11 @@ class DenseLayer:
         self.iz_size = iz_size
         self.i_size = ix_size * iy_size * iz_size
         self.o_size= output_size
+
+        # nunber of elements in the port vectors (not the same as bits)
+        self.in_port_width = iz_size
+        self.out_port_width = output_size
+
         # empty until a trained network is saved
         self.np_kernels = None 
         # empty until a trained network is saved
@@ -127,6 +132,7 @@ class DenseLayer:
         """
 
         inst = "wire [32*"+str(self.NUM_TREES)+"-1:0] wire32_"+str(in_wire)+";\n"
+        inst += "wire [8*"+str(self.out_port_width)+"-1:0] "+str(out_wire)+";\n"
         inst +="""
   dense_25D #(
     .NUM_TREES("""+str(self.NUM_TREES)+"""),
@@ -138,9 +144,9 @@ class DenseLayer:
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .pixel_in(wire8["""+str(in_wire)+"""]),
+    .pixel_vector_in("""+str(in_wire)+"""),
     .kernel("""+self.kernels_wire_name+"""),
-    .pixel_out(wire32_"""+str(in_wire)+""")
+    .pixel_vector_out(wire32_"""+str(in_wire)+""")
   );
 
   requantize #(
@@ -151,7 +157,7 @@ class DenseLayer:
     .clock(clock),
     .reset(reset),
     .pixel_in(wire32_"""+str(in_wire)+"""),
-    .pixel_out(wire8["""+str(out_wire)+"""])
+    .pixel_out("""+str(out_wire)+""")
   );
 """
         return inst
@@ -214,7 +220,7 @@ class DenseLayer:
                 #k_wire = annotation + k_wire[len(annotation):]
 
 
-        k_width = self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS - 1
+        k_width = (8*self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS) - 1
         k_declaration = "wire ["+str(k_width)+":0] "+self.kernels_wire_name+";\n"
         #k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire
         k_wire = "`define "+self.kernels_wire_name+" {" + k_wire

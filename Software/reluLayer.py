@@ -35,6 +35,11 @@ class ReluLayer:
         self.layer_type = 'relu'
         self.name = name
         self.size = size
+
+        # number of elements in the ports (not the same as bits)
+        self.in_port_width = size
+        self.out_port_width = size
+
         self.q_max = q_max
         self.q_min = q_min
         # The value of zero relative to the input, 
@@ -75,16 +80,16 @@ class ReluLayer:
 
         """
 
-
-        inst ="""
+        inst = "wire [8*"+str(self.out_port_width)+"-1:0] "+str(out_wire)+";\n"
+        inst +="""
   relu #(
     .SIZE("""+str(self.SIZE)+""")
   )
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .in(wire8["""+str(in_wire)+"""]),
-    .out(wire8["""+str(out_wire)+"""])
+    .in("""+str(in_wire)+"""),
+    .out("""+str(out_wire)+""")
   );
 
 """
