@@ -104,7 +104,7 @@ class BiasLayer:
     .sum(wire9_"""+str(in_wire)+""")
   );
 
-  requantize #(
+  requantize_9bit #(
     .SHIFT("""+str(self.np_rq_scale_factor)+"""),
     .SIZE("""+str(self.SIZE)+""")
   )

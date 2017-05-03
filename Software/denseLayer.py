@@ -149,7 +149,7 @@ class DenseLayer:
     .pixel_vector_out(wire32_"""+str(in_wire)+""")
   );
 
-  requantize #(
+  requantize_32bit #(
     .SHIFT("""+str(self.np_rq_scale_factor)+"""), 
     .SIZE("""+str(self.NUM_TREES)+""")
   )

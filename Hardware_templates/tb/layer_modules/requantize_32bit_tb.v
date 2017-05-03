@@ -1,5 +1,5 @@
 `timescale 1 ps / 1 ps
-module requantize_tb();
+module requantize_32bit_tb();
 
 parameter SHIFT = 3;
 parameter SIZE = 4;
@@ -13,7 +13,7 @@ wire [8*SIZE-1:0] out_1;
 wire [8*SIZE-1:0] out_2;
 
 // DUT 1
-requantize #(
+requantize_32bit #(
   .SHIFT(SHIFT),
   .SIZE(SIZE)
 )
@@ -25,7 +25,7 @@ dut_1 (
 );
 
 // DUT 2
-requantize #(
+requantize_32bit #(
   .SHIFT(-SHIFT),
   .SIZE(SIZE)
 )
@@ -42,9 +42,9 @@ always begin
 end
 
 initial begin
-  $display("#################");
-  $display("requantize_tb #");
-  $display("#################");
+  $display("#######################");
+  $display("requantize_32bit_tb #");
+  $display("#######################");
 
   clock = 1'b1;
   reset = 1'b1;
