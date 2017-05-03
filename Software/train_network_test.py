@@ -1,6 +1,6 @@
 import network
 
-nn = network.Net('test',100000)
+nn = network.Net('test_cnn',10)
 
 nn.add_conv('c1',7,7,1,8,28,28,1,1,10,-10)
 nn.add_bias('b1',8)

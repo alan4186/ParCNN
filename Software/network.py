@@ -49,7 +49,7 @@ class Net:
 
         cnn_module = ''
         port_list = \
-"""module cnn (
+"""module """+str(self.project_name)+"""(
   input clock,
   input reset,
   input [8*"""+str(self.layers[first_layer].in_port_width)+"""-1:0] pixel_in,
@@ -78,7 +78,7 @@ class Net:
         cnn_module +="\nassign pixel_out = wire_"+str(wire_index)+";\n\n"
 
         cnn_module += "endmodule"
-        with open(out_dir+self.project_name+"_cnn.v",'w') as f:
+        with open(out_dir+self.project_name+".v",'w') as f:
             f.write(cnn_module)
         
         return cnn_module
