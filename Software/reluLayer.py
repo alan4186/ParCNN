@@ -35,6 +35,11 @@ class ReluLayer:
         self.layer_type = 'relu'
         self.name = name
         self.size = size
+
+        # number of elements in the ports (not the same as bits)
+        self.in_port_width = size
+        self.out_port_width = size
+
         self.q_max = q_max
         self.q_min = q_min
         # The value of zero relative to the input, 

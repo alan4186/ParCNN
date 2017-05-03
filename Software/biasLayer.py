@@ -37,6 +37,10 @@ class BiasLayer:
         self.layer_type = 'bias'
         self.name = name
         self.size = size
+
+        # number of elements in the ports
+        self.in_port_width = size
+        self.out_port_width = size
        
         self.b_init_val = 0.1
         self.tf_var = tf.Variable(
@@ -59,6 +63,7 @@ class BiasLayer:
         self.bias_wire_name = self.name +"_bias"
         # Parameters
         self.SIZE = size
+
         
 
 

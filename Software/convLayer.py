@@ -79,6 +79,11 @@ class ConvLayer:
         self.kx_size = kx_size
         self.ky_size = ky_size
         self.num_kernels = num_kernels
+
+        # number of elements in the port vectors (not the same as bits)
+        self.in_port_width = kz_size
+        self.out_port_width = num_kernels
+
         # empty until trained network is saved
         self.np_kernels = None
         # empty until trained netwrok is saved

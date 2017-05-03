@@ -54,6 +54,11 @@ class DenseLayer:
         self.iz_size = iz_size
         self.i_size = ix_size * iy_size * iz_size
         self.o_size= output_size
+
+        # nunber of elements in the port vectors (not the same as bits)
+        self.in_port_width = iz_size
+        self.out_port_width = output_size
+
         # empty until a trained network is saved
         self.np_kernels = None 
         # empty until a trained network is saved
