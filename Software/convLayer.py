@@ -152,6 +152,7 @@ class ConvLayer:
 
 
         inst = "wire [32*"+str(self.NUM_TREES)+"-1:0] wire32_"+str(in_wire)+";\n"
+        inst +="wire [8*"+str(self.out_port_width)+"-1:0] "+str(out_wire)+";\n"
         inst +="""
   convolution_25D #(
     .NUM_TREES("""+str(self.NUM_TREES)+"""),
@@ -164,20 +165,20 @@ class ConvLayer:
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .pixel_in(wire8["""+str(in_wire)+"""]),
+    .pixel_vector_in("""+str(in_wire)+"""),
     .kernel("""+self.kernels_wire_name+"""),
-    .pixel_out(wire32_"""+str(in_wire)+""")
+    .pixel_vector_out(wire32_"""+str(in_wire)+""")
   );
 
   requantize #(
     .SHIFT("""+str(self.np_rq_scale_factor)+"""),
     .SIZE("""+str(self.NUM_TREES)+""")
   )
-  rq_inst_"""+str(in_wire)+""" (
+  rq_inst_"""+str(name)+""" (
     .clock(clock),
     .reset(reset),
     .pixel_in(wire32_"""+str(in_wire)+"""),
-    .pixel_out(wire8["""+str(out_wire)+"""])
+    .pixel_out("""+str(out_wire)+""")
   );
 """
         return inst

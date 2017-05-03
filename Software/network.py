@@ -44,34 +44,38 @@ class Net:
     def export_cnn_module(self):
         out_dir = "../Generated_modules/"
 
+        first_layer = self.layers.keys()[0]
+        last_layer = self.layers.keys()[-1]
 
         cnn_module = ''
         port_list = \
 """module cnn (
   input clock,
   input reset,
-  input [7:0] pixel_in,
-  output [7:0] pixel_out
+  input [8*"""+str(self.layers[first_layer].in_port_width)+"""-1:0] pixel_in,
+  output [8*"""+str(self.layers[last_layer].out_port_width)+"""-1:0] pixel_out
 );
 """
         cnn_module = cnn_module + port_list
 
         # create wire declarations
         num_wires = len(self.layers.keys()) + 2
-        wire8 = "wire [7:0] wire8 ["+str(num_wires)+":0];\n\n"
+        #wire8 = "wire [7:0] wire8 ["+str(num_wires)+":0];\n\n"
+        cnn_module += "wire [8*"+str(self.layers[first_layer].in_port_width)+"-1:0] wire_0;\n"
+        cnn_module += "assign wire_0 = pixel_in;\n"
         
-        cnn_module = cnn_module + wire8 
+        #cnn_module = cnn_module + wire8 
         
         wire_index = 0
         # instantiate layer modules
         for pair in self.layers.items():
             v = pair[1]
             #inst = v.write_inst(pair[0], wire_index, wire_index+1)
-            inst = v.export(pair[0], wire_index, wire_index+1)
+            inst = v.export(pair[0], "wire_"+str(wire_index), "wire_"+str(wire_index+1))
             wire_index += 1 
             cnn_module += inst
 
-        cnn_module +="\nassign pixel_out = wire8["+str(wire_index)+"];\n\n"
+        cnn_module +="\nassign pixel_out = wire_"+str(wire_index)+";\n\n"
 
         cnn_module += "endmodule"
         with open(out_dir+self.project_name+"_cnn.v",'w') as f:

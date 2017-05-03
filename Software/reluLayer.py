@@ -80,16 +80,16 @@ class ReluLayer:
 
         """
 
-
-        inst ="""
+        inst = "wire [8*"+str(self.out_port_width)+"-1:0] "+str(out_wire)+";\n"
+        inst +="""
   relu #(
     .SIZE("""+str(self.SIZE)+""")
   )
   """+name+""" (
     .clock(clock),
     .reset(reset),
-    .in(wire8["""+str(in_wire)+"""]),
-    .out(wire8["""+str(out_wire)+"""])
+    .in("""+str(in_wire)+"""),
+    .out("""+str(out_wire)+""")
   );
 
 """
