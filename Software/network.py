@@ -253,8 +253,7 @@ class Net:
         tf.summary.histogram('net_out_q',net_out_q)
         tf.summary.histogram('net_out_dq',net_out_dq)
 
-        tf.summary.image('float_filters',tf.transpose(self.layers['c1'].tf_var, [3, 0, 1, 2]))
-        tf.summary.image('q_filters',tf.transpose(self.layers['c1'].tf_var_q, [3, 0, 1, 2]))
+
 
         merged = tf.summary.merge_all()
         test_writer = tf.summary.FileWriter('./test')
@@ -271,11 +270,13 @@ class Net:
                     print("step %d, training accuracy %g"%(i, train_accuracy))
                 train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: self.dropout_prob})
 
-            summary = merged.eval(feed_dict={
-                x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
+            #summary = merged.eval(feed_dict={
+            #    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
 
-            test_writer.add_summary(summary, i)
-            test_writer.add_graph(sess.graph)
+            #test_writer.add_summary(summary, i)
+            #test_writer.add_graph(sess.graph)
+
+
 
 
 
