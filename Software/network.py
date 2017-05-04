@@ -87,7 +87,6 @@ class Net:
 
         # TODO get arbitrary training data
         mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-        
 
 
         #TODO parametric input/output size
@@ -291,6 +290,21 @@ class Net:
                 # save the trained network
                 self.layers[k].save_layer({x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
             
+
+            tb_batch1 = mnist.train.next_batch(1)
+            tb_batch2 = mnist.train.next_batch(1)
+                        
+            self.tb_image1 = layer_outputs_q[0].eval(feed_dict={ 
+                x: tb_batch1[0], y_: tb_batch1[1], keep_prob: 1.0})
+            self.tb_image2 = layer_outputs_q[0].eval(feed_dict={ 
+                x: tb_batch2[0], y_: tb_batch2[1], keep_prob: 1.0})
+
+            self.tb_result1 = layer_outputs_q[-1].eval(feed_dict={
+                x: tb_batch1[0], y_: tb_batch1[1], keep_prob: 1.0})
+
+            self.tb_result2 = layer_outputs_q[-1].eval(feed_dict={
+                x: tb_batch2[0], y_: tb_batch2[1], keep_prob: 1.0})
+
             """
             print 'input/output ranges'
             for k in self.layers.keys():
@@ -357,3 +371,16 @@ class Net:
     def set_dropout_prob(self,prob):
         self.dropout_prob = prob
 
+    def compute_latency(self):
+        latency = 0
+        for name, layer in self.layers.items():
+            latency += layer.latency
+        self.latency = latency
+
+    def generate_test_bench(self):
+        """ Create a test bench to simulate the generate top module
+
+        """
+
+        # convert tb images to vectors
+        return

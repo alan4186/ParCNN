@@ -64,6 +64,8 @@ class BiasLayer:
         # Parameters
         self.SIZE = size
 
+        self.latency = 2 # 1 for bias, 1 for rq
+
         
 
 

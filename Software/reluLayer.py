@@ -56,6 +56,7 @@ class ReluLayer:
         # Parameters
         self.SIZE = size
 
+        self.latency = 1
 
     def write_inst(self,name, in_wire, out_wire):
         """Write a string with a veilog relu module instantiation.
