@@ -1,4 +1,4 @@
-module requantize #(
+module requantize_32bit #(
   parameter SHIFT,
   parameter SIZE
 )(
