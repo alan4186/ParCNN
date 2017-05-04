@@ -63,7 +63,7 @@ initial begin
   else
     $display("out = %h\n\t\t\tFAIL!", out_1);
  
-  if (out_2 == {8'd0, 8'hff, 8'd100, 8'h191})
+  if (out_2 == {8'd0, 8'hff, 8'd100, 8'h91})
     $display("out = %h\n\t\t\tPASS!", out_2);
   else
     $display("out = %h\n\t\t\tFAIL!", out_2);
