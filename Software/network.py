@@ -10,6 +10,9 @@ from biasLayer import BiasLayer
 from reluLayer import ReluLayer
 from denseLayer import DenseLayer
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 # A class to describe the network that will be implemented in hardware
 class Net:
 
@@ -291,6 +294,7 @@ class Net:
                 # save the trained network
                 self.layers[k].save_layer({x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
             
+            mnist.train.next_batch(33)
 
             tb_batch1 = mnist.train.next_batch(1)
             tb_batch2 = mnist.train.next_batch(1)
@@ -305,7 +309,6 @@ class Net:
 
             self.tb_result2 = layer_outputs_q[-1].eval(feed_dict={
                 x: tb_batch2[0], y_: tb_batch2[1], keep_prob: 1.0})
-
             """
             print 'input/output ranges'
             for k in self.layers.keys():
@@ -383,5 +386,88 @@ class Net:
 
         """
 
+        # reshape the images and plot one  
+        self.tb_image1 = np.reshape(self.tb_image1,(28,28))
+        self.tb_image2 = np.reshape(self.tb_image2,(28,28))
+        plt.imshow(self.tb_image1,cmap='gray')
+        plt.show()
+
+
         # convert tb images to vectors
-        return
+        tb_str1 = '}'
+        tb_str2 = '}'
+        for r in range(0,28):
+            for c in range(0,28):
+                tb_str1 += ", 8'd" + str(self.tb_image1[r,c])
+                tb_str2 += ", 8'd" + str(self.tb_image2[r,c])
+
+        tb_str1 = '{' + tb_str1[2:]
+        tb_str2 = '{' + tb_str2[2:]
+
+        self.compute_latency()
+
+        test_bench = "`define img1 " + tb_str1 + "\n`define img2 " + tb_str2
+        test_bench += '\n'
+        test_bench +="`timescale 1 ps / 1 ps\n"
+        test_bench += "module "+str(self.project_name) + "_tb();"
+        test_bench += "reg clock;\nreg reset;\n"
+        test_bench += "reg [8*784*2-1:0] pixel_in_sr;\n"
+        test_bench += "wire [8*10-1:0] out_vector;\n// DUT\n"
+        test_bench += str(self.project_name) +" dut(\n  .clock(clock),\n"
+        test_bench += "  .reset(reset),\n  .pixel_in(pixel_in_sr[7:0]),\n"
+        test_bench += "  .pixel_out(out_vector)\n);\n"
+        test_bench += "// pixel_in sr\nalways@(posedge clock) begin\n"
+        test_bench += "  pixel_in_sr <= {8'ha, pixel_in_sr[8*784*2-1:8]}\n"
+        test_bench += "end\n\nalways begin\n  #5 clock <= ~clock;\nend"
+        test_bench += "\ninitial begin\n"
+        test_bench += '  $display("'+len(self.project_name)*'#'+'####");\n'
+        test_bench += '  $display("'+str(self.project_name)+'_tb #");\n'
+        test_bench += '  $display("'+len(self.project_name)*'#'+'####");\n'
+        test_bench += "\n  clock = 1'b1;  reset = 1'b1;\n"
+        test_bench += "  pixel_in_sr = {8*784*2{1'b0}};\n"
+        test_bench += "  #10 reset = 1'b0;\n  #10 reset = 1'b1;\n"
+        test_bench += "  pixel_in_sr = {img2, img1};\n"
+        test_bench += "\n\n  #"+str(int(self.latency))
+        test_bench += " // wait for valid result\n"
+        test_bench += "  // check output\n"
+        test_bench += '  $display("Time = %0d",$time);\n'
+        test_bench += '  $display("Tree 1 pixel_out = %h", pixel_out);\n'
+        test_bench += "  if( pixel_out[31:0] == 32'd252) begin\n"
+        test_bench += '    $display("\\t\\t\\tPASS!");\n'
+        test_bench += '  end else begin\n    $display("\\t\\t\\tFAIL!");\n'
+        test_bench += "  end // end if/else\n\n"
+        test_bench += '  $display("Time = %0d",$time);\n'
+        test_bench += '  $display("Tree 2 pixel_out = %h", pixel_out);\n'
+        test_bench += "  if( pixel_out[63:32] == 32'hffffffd4) begin\n"
+        test_bench += '    $display("\\t\\t\\tPASS!");\n'
+        test_bench += '  end else begin\n'
+        test_bench += '    $display("\\t\\t\\tFAIL!");\n'
+        test_bench += '  end // end if/else\n\n'
+        test_bench += "\n\n  #"+str(int(self.latency)) 
+        test_bench += " // wait for next valid result\n"
+        test_bench += '  $display("Time = %0d",$time);\n'
+        test_bench += '  $display("Tree 1 pixel_out = %h", pixel_out);\n'
+        test_bench += "  if( pixel_out[31:0] == 32'd276) begin\n"
+        test_bench += '    $display("\\t\\t\\tPASS!");\n  end else begin\n'
+        test_bench += '    $display("\\t\\t\\tFAIL!");\n'
+        test_bench += "  end // end if/else\n\n"
+        test_bench += '  $display("Time = %0d",$time);\n'
+        test_bench += '  $display("Tree 2 pixel_out = %h", pixel_out);\n'
+        test_bench += "  if( pixel_out[63:32] == 32'hffffffcc) begin\n"
+        test_bench += '    $display("\\t\\t\\tPASS!");\n  end else begin\n'
+        test_bench += '    $display("\\t\\t\\tFAIL!");\n'
+        test_bench += 'end // end if/else\n\n'
+        test_bench += '  #100\n  $display("\\n");\n  $stop;\nend\n'
+        test_bench += 'endmodule'
+
+        tb_file = "../Generated_modules/"+str(self.project_name)+"_tb.v"
+
+        with open(tb_file,'w') as tbf:
+            tbf.write(test_bench)
+
+
+
+def compute_latency(self):
+    self.latency = 0
+    for name,l in self.layers.items():
+        self.latency += l.latency
