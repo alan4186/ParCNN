@@ -389,20 +389,31 @@ class Net:
         # reshape the images and plot one  
         self.tb_image1 = np.reshape(self.tb_image1,(28,28))
         self.tb_image2 = np.reshape(self.tb_image2,(28,28))
-        plt.imshow(self.tb_image1,cmap='gray')
-        plt.show()
 
 
         # convert tb images to vectors
-        tb_str1 = '}'
-        tb_str2 = '}'
+        tb_str1 = ''
+        tb_str2 = ''
         for r in range(0,28):
             for c in range(0,28):
-                tb_str1 += ", 8'd" + str(self.tb_image1[r,c])
-                tb_str2 += ", 8'd" + str(self.tb_image2[r,c])
+                tb_str1 += ", 8'd" + str(int(self.tb_image1[r,c]))
+                tb_str2 += ", 8'd" + str(int(self.tb_image2[r,c]))
 
-        tb_str1 = '{' + tb_str1[2:]
-        tb_str2 = '{' + tb_str2[2:]
+        tb_str1 = tb_str1[2:]
+        tb_str2 = tb_str2[2:]
+
+        tb_result1 = self.tb_result1 + (self.tb_result1<0)*128
+        tb_result2 = self.tb_result2 + (self.tb_result2<0)*128
+
+        out_vector1 = ''
+        out_vector2 = ''
+        # convert the outputs to vector of bytes
+        for c in range(0,10):
+            out_vector1 += ", 8'd" + str(int(tb_result1[0,c]))
+            out_vector2 += ", 8'd" + str(int(tb_result2[0,c]))
+
+        out_vector1 = '{' + out_vector1[2:] + '}'
+        out_vector2 = '{' + out_vector2[2:] + '}'
 
         self.compute_latency()
 
@@ -417,7 +428,7 @@ class Net:
         test_bench += "  .reset(reset),\n  .pixel_in(pixel_in_sr[7:0]),\n"
         test_bench += "  .pixel_out(out_vector)\n);\n"
         test_bench += "// pixel_in sr\nalways@(posedge clock) begin\n"
-        test_bench += "  pixel_in_sr <= {8'ha, pixel_in_sr[8*784*2-1:8]}\n"
+        test_bench += "  pixel_in_sr <= {8'ha, pixel_in_sr[8*784*2-1:8]};\n"
         test_bench += "end\n\nalways begin\n  #5 clock <= ~clock;\nend"
         test_bench += "\ninitial begin\n"
         test_bench += '  $display("'+len(self.project_name)*'#'+'####");\n'
@@ -426,37 +437,24 @@ class Net:
         test_bench += "\n  clock = 1'b1;  reset = 1'b1;\n"
         test_bench += "  pixel_in_sr = {8*784*2{1'b0}};\n"
         test_bench += "  #10 reset = 1'b0;\n  #10 reset = 1'b1;\n"
-        test_bench += "  pixel_in_sr = {img2, img1};\n"
+        test_bench += "  pixel_in_sr = {`img2, `img1};\n"
         test_bench += "\n\n  #"+str(int(self.latency))
         test_bench += " // wait for valid result\n"
         test_bench += "  // check output\n"
         test_bench += '  $display("Time = %0d",$time);\n'
-        test_bench += '  $display("Tree 1 pixel_out = %h", pixel_out);\n'
-        test_bench += "  if( pixel_out[31:0] == 32'd252) begin\n"
+        test_bench += '  $display("out_vector = %h", out_vector);\n'
+        test_bench += "  if( out_vector[31:0] == "+out_vector1+") begin\n"
         test_bench += '    $display("\\t\\t\\tPASS!");\n'
         test_bench += '  end else begin\n    $display("\\t\\t\\tFAIL!");\n'
         test_bench += "  end // end if/else\n\n"
-        test_bench += '  $display("Time = %0d",$time);\n'
-        test_bench += '  $display("Tree 2 pixel_out = %h", pixel_out);\n'
-        test_bench += "  if( pixel_out[63:32] == 32'hffffffd4) begin\n"
-        test_bench += '    $display("\\t\\t\\tPASS!");\n'
-        test_bench += '  end else begin\n'
-        test_bench += '    $display("\\t\\t\\tFAIL!");\n'
-        test_bench += '  end // end if/else\n\n'
-        test_bench += "\n\n  #"+str(int(self.latency)) 
+        test_bench += "  #"+str(int(self.latency)) 
         test_bench += " // wait for next valid result\n"
         test_bench += '  $display("Time = %0d",$time);\n'
-        test_bench += '  $display("Tree 1 pixel_out = %h", pixel_out);\n'
-        test_bench += "  if( pixel_out[31:0] == 32'd276) begin\n"
+        test_bench += '  $display("out_vector = %h", out_vector);\n'
+        test_bench += "  if( out_vector[31:0] == "+out_vector1+") begin\n"
         test_bench += '    $display("\\t\\t\\tPASS!");\n  end else begin\n'
         test_bench += '    $display("\\t\\t\\tFAIL!");\n'
         test_bench += "  end // end if/else\n\n"
-        test_bench += '  $display("Time = %0d",$time);\n'
-        test_bench += '  $display("Tree 2 pixel_out = %h", pixel_out);\n'
-        test_bench += "  if( pixel_out[63:32] == 32'hffffffcc) begin\n"
-        test_bench += '    $display("\\t\\t\\tPASS!");\n  end else begin\n'
-        test_bench += '    $display("\\t\\t\\tFAIL!");\n'
-        test_bench += 'end // end if/else\n\n'
         test_bench += '  #100\n  $display("\\n");\n  $stop;\nend\n'
         test_bench += 'endmodule'
 
