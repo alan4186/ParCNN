@@ -5,7 +5,9 @@ module dense_25D #(
   parameter P_SR_DEPTH = -1, 
   parameter NUM_SR_ROWS = -1, // the y dimension of the parallel out 'window'
   // mult adder tree parameters
-  parameter MA_TREE_SIZE = -1
+  parameter MA_TREE_SIZE = -1,
+  parameter PAD_SIZE = -1
+
 )(
   input clock,
   input reset,
@@ -37,7 +39,8 @@ for(i=0; i<Z_DEPTH; i=i+1) begin : dense_25D_loop
     .NUM_TREES(NUM_TREES),
     .P_SR_DEPTH(P_SR_DEPTH),
     .NUM_SR_ROWS(NUM_SR_ROWS),
-    .MA_TREE_SIZE(MA_TREE_SIZE)
+    .MA_TREE_SIZE(MA_TREE_SIZE),
+    .PAD_SIZE(PAD_SIZE)
   )
   dense_2d_inst (
     .clock(clock),

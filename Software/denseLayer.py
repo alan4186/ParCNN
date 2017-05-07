@@ -103,6 +103,7 @@ class DenseLayer:
         # be optimized away.
         #self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * ix_size * iy_size,2)))
         self.MA_TREE_SIZE = int(2**math.ceil(math.log(ix_size * iy_size,2)))
+        self.PAD_SIZE = self.MA_TREE_SIZE - (kx_size * ky_size)
 
         self.latency = ix_size * iy_size + math.log(self.MA_TREE_SIZE,2) + 1
 
@@ -141,7 +142,8 @@ class DenseLayer:
     .Z_DEPTH("""+str(self.Z_DEPTH)+"""),
     .P_SR_DEPTH("""+str(self.P_SR_DEPTH)+"""), 
     .NUM_SR_ROWS("""+str(self.NUM_SR_ROWS)+"""),
-    .MA_TREE_SIZE("""+str(self.MA_TREE_SIZE)+""")
+    .MA_TREE_SIZE("""+str(self.MA_TREE_SIZE)+"""),
+    .PAD_SIZE("""+str(self.PAD_SIZE)+""")
   )
   """+name+""" (
     .clock(clock),

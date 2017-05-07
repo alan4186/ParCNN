@@ -58,15 +58,15 @@ pixels_out for dut_1:
 */
 
 `timescale 1 ps / 1 ps
-module dense_25D_tb();
+module dense_25D_padded_tb();
 
 parameter NUM_TREES = 2;
 parameter Z_DEPTH_1 = 4;
 parameter Z_DEPTH_2 = 2;
 parameter P_SR_DEPTH = 4;
 parameter NUM_SR_ROWS = 4;
-parameter MA_TREE_SIZE = 16;
-parameter PAD_SIZE = 0;
+parameter MA_TREE_SIZE = 32;
+parameter PAD_SIZE = 16;
 
 reg clock;
 reg reset;
@@ -81,54 +81,54 @@ wire [32*NUM_TREES-1:0] pixel_out_2;
 
 // assign kernels
 // see comment at top for kernel or window orientation,
-assign kernel_1 = { 
+assign kernel_1 = { {PAD_SIZE{8'd0}},
 /* kernel 2 z=3 */ 8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
-                   8'd4, 8'd4, 8'd4, 8'd4,
+                   8'd4, 8'd4, 8'd4, 8'd4,{PAD_SIZE{8'd0}},
 /* kernel 1 z=3 */ 8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
-                   8'd3, 8'd3, 8'd3, 8'd3,
+                   8'd3, 8'd3, 8'd3, 8'd3,{PAD_SIZE{8'd0}},
 /* kernel 2 z=2 */ 8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
-                   8'd4, 8'd4, 8'd4, 8'd4,
+                   8'd4, 8'd4, 8'd4, 8'd4,{PAD_SIZE{8'd0}},
 /* kernel 1 z=2 */ 8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
-                   8'd3, 8'd3, 8'd3, 8'd3,
+                   8'd3, 8'd3, 8'd3, 8'd3,{PAD_SIZE{8'd0}},
 /* kernel 2 z=1 */ 8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
-                   8'd4, 8'd4, 8'd4, 8'd4,
+                   8'd4, 8'd4, 8'd4, 8'd4,{PAD_SIZE{8'd0}},
 /* kernel 1 z=1 */ 8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
-                   8'd3, 8'd3, 8'd3, 8'd3,
+                   8'd3, 8'd3, 8'd3, 8'd3,{PAD_SIZE{8'd0}},
 /* kernel 2 z=0 */ 8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
-                   8'd3, 8'd3, 8'd2, 8'd2,
+                   8'd3, 8'd3, 8'd2, 8'd2,{PAD_SIZE{8'd0}},
 /* kernel 1 z=0 */ 8'd2, 8'd2, 8'hff, 8'hff,
                    8'd2, 8'd2, 8'hff, 8'hff,
                    8'hff, 8'hff, 8'd2, 8'd2,
                    8'hff, 8'hff, 8'd2, 8'd2
                   };
 
-assign kernel_2 = { 
+assign kernel_2 = { {PAD_SIZE{8'd0}},
 /* kernel 2 z=1 */ 8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
                    8'd4, 8'd4, 8'd4, 8'd4,
-                   8'd4, 8'd4, 8'd4, 8'd4,
+                   8'd4, 8'd4, 8'd4, 8'd4,{PAD_SIZE{8'd0}},
 /* kernel 1 z=1 */ 8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
                    8'd3, 8'd3, 8'd3, 8'd3,
-                   8'd3, 8'd3, 8'd3, 8'd3,
+                   8'd3, 8'd3, 8'd3, 8'd3,{PAD_SIZE{8'd0}},
 /* kernel 2 z=0 */ 8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
                    8'd3, 8'd3, 8'd2, 8'd2,
-                   8'd3, 8'd3, 8'd2, 8'd2,
+                   8'd3, 8'd3, 8'd2, 8'd2,{PAD_SIZE{8'd0}},
 /* kernel 1 z=0 */ 8'd2, 8'd2, 8'hff, 8'hff,
                    8'd2, 8'd2, 8'hff, 8'hff,
                    8'hff, 8'hff, 8'd2, 8'd2,
@@ -182,9 +182,9 @@ always begin
 end
 
 initial begin
-  $display("################");
-  $display("dense_25D_tb #");
-  $display("################");
+  $display("#######################");
+  $display("dense_25D_padded_tb #");
+  $display("#######################");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -192,7 +192,7 @@ initial begin
   #10 reset = 1'b1;
 
   #160 // wait 16 clock cycles for dense_sr 
-  #50 // wait 5 clock cycles for mult_adder tree
+  #60 // wait 6 clock cycles for mult_adder tree
   #20 // wait 2 clock cycles for Z dim adder tree
   
   // check output
@@ -237,7 +237,7 @@ initial begin
   #10 reset = 1'b0;
   #10 reset = 1'b1;
   #160 // wait 16 clock cycles for dense_sr
-  #50 // wiat 5 clock cycles for mult_adder tree
+  #60 // wiat 6 clock cycles for mult_adder tree
   #10 // wait 1 clock cycle for Z dim adder tree 
   // test device 2
   $display("Testing Device #2 Z dimension = 2");
