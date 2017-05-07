@@ -53,7 +53,7 @@ class ConvLayer:
                     + str(kx_size) + ', Input X size: ' +str(ix_size))
 
         if iy_size-ky_size < 0:
-            raise ValueError('The kernel Y dimension must' 
+            raise ValueError('The kernel Y dimension must'
                     + 'be less than or equal to the input Y'
                     +  'dimension. Kernel Y size: '
                     + str(ky_size) + ', Input Y size: ' + str(iy_size))
@@ -122,6 +122,7 @@ class ConvLayer:
         # be optimized away.
         #self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * kx_size * ky_size,2)))
         self.MA_TREE_SIZE = int(2**math.ceil(math.log(kx_size * ky_size,2)))
+        self.PAD_SIZE = self.MA_TREE_SIZE - (kx_size * ky_size) 
 
         self.latency = kx_size * ky_size + (self.RAM_SR_DEPTH * (ky_size - 1)) + math.log(self.MA_TREE_SIZE,2) + 1
         self.rq_max = rq_max
@@ -161,7 +162,8 @@ class ConvLayer:
     .P_SR_DEPTH("""+str(self.P_SR_DEPTH)+"""), 
     .RAM_SR_DEPTH("""+str(self.RAM_SR_DEPTH)+"""),
     .NUM_SR_ROWS("""+str(self.NUM_SR_ROWS)+"""),
-    .MA_TREE_SIZE("""+str(self.MA_TREE_SIZE)+""")
+    .MA_TREE_SIZE("""+str(self.MA_TREE_SIZE)+"""),
+    .PAD_SIZE("""+str(self.PAD_SIZE)+""")
   )
   """+name+""" (
     .clock(clock),
@@ -209,6 +211,10 @@ class ConvLayer:
         k_wire = '}' # end of wire
         trailing_comma = False
         dim = self.np_kernels_q.shape
+
+        # pad the kenel with zeros to match MA_TREE_SIZE
+        num_zeros = 8 * (self.MA_TREE_SIZE - dim[0]*dim[1])
+        pad = " {" +str(int(num_zeros))+"{1'b0}}"
         # move down Z dimension
         for z in range(0,dim[2]):
             # move down kernel dimension
@@ -234,17 +240,16 @@ class ConvLayer:
                     for c in k_slice[::-1]:
                         row_wire = ", 8'd"+str(c)+row_wire
                     #k_wire = tabs + row_wire[2:] + '\n' + k_wire
-                    k_wire = row_wire[2:]  + k_wire
-       
+                    k_wire = row_wire  + k_wire[1:]
+
+                # Add padding to kernel
+                k_wire = pad + k_wire
+
                 # Add annotation
                 #annotation = "/* Kernel "+ str(k) + " z="+str(z)+" */"
                 #k_wire = annotation + k_wire[len(annotation):]
 
-
-        k_width = (self.Z_DEPTH*self.NUM_TREES*self.P_SR_DEPTH*self.NUM_SR_ROWS*8) - 1
-        k_declaration = "wire ["+str(k_width)+":0] "+self.kernels_wire_name+";\n"
-        #k_wire = k_declaration+"assign "+self.kernels_wire_name+" = {\n" + k_wire[2:]
-        k_wire = "`define "+self.kernels_wire_name+" {" + k_wire
+        k_wire = "`define "+self.kernels_wire_name+"{" + k_wire + ' }'
 
         return k_wire 
 

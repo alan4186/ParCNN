@@ -5,7 +5,8 @@ module convolution_2D #(
   parameter RAM_SR_DEPTH = -1, 
   parameter NUM_SR_ROWS = -1, // the y dimension of the parallel out 'window'
   // mult adder tree parameters
-  parameter MA_TREE_SIZE = -1
+  parameter MA_TREE_SIZE = -1,
+  parameter PAD_SIZE = -1
 )(
   input clock,
   input reset,
@@ -18,11 +19,16 @@ module convolution_2D #(
 
 // reg declarations
 // wire declarations
-wire [8*MA_TREE_SIZE-1:0] window_wire [NUM_TREES-1:0]; // MA_TREE_SIZE = 8*P_SR_DEPTH*NUM_SR_ROWS
-// assign statments
+wire [8*(MA_TREE_SIZE-PAD_SIZE)-1:0] window_wire [NUM_TREES-1:0]; // MA_TREE_SIZE = 8*P_SR_DEPTH*NUM_SR_ROWS
+wire [8*MA_TREE_SIZE-1:0] window_wire_padded [NUM_TREES-1:0]; // MA_TREE_SIZE = 8*P_SR_DEPTH*NUM_SR_ROWS
 
 genvar i;
 generate
+
+for(i=0; i<NUM_TREES; i=i+1) begin : pad_loop
+  assign window_wire_padded[i] = { {PAD_SIZE{8'd0}}, window_wire[i] };
+end
+
 // generate the trees
 for(i=0; i<NUM_TREES; i=i+1) begin : tree_loop
   mult_adder #(
@@ -31,7 +37,7 @@ for(i=0; i<NUM_TREES; i=i+1) begin : tree_loop
   ma_inst (
     .clock(clock),
     .reset(reset),
-    .in(window_wire[i]),
+    .in(window_wire_padded[i]),
     .kernel(kernel[i*8*MA_TREE_SIZE+8*MA_TREE_SIZE-1:i*8*MA_TREE_SIZE]),
     .out(pixel_out[i*32+31:i*32])
   );

@@ -37,14 +37,14 @@ pixels_out:
 */
 
 `timescale 1 ps / 1 ps
-module convolution_2D_tb();
+module convolution_2D_padded_tb();
 
 parameter NUM_TREES = 2;
 parameter P_SR_DEPTH = 4;
 parameter RAM_SR_DEPTH = 2;
 parameter NUM_SR_ROWS = 4;
-parameter MA_TREE_SIZE = 16;
-parameter PAD_SIZE = 0;
+parameter MA_TREE_SIZE = 32; // The Tree is larger than it needs to be
+parameter PAD_SIZE = 16; // Pad extra space with zeros
 
 reg clock;
 reg reset;
@@ -57,11 +57,12 @@ wire [32*NUM_TREES-1:0] pixel_out;
 
 // assign kernels
 // see comment at top for kernel or window orientation,
-assign kernel = { 
+assign kernel = { {16{8'd0}}, 
 /* kernel 2 */    8'd253, 8'd253, 8'd2, 8'd2,
                   8'd253, 8'd253, 8'd2, 8'd2,
                   8'd253, 8'd253, 8'd2, 8'd2,
                   8'd253, 8'd253, 8'd2, 8'd2,
+                  {16{8'd0}},
 /* kernel 1 */    8'd2, 8'd2, 8'd1, 8'd1,
                   8'd2, 8'd2, 8'd1, 8'd1,
                   8'd1, 8'd1, 8'd2, 8'd2,
@@ -99,9 +100,9 @@ always begin
 end
 
 initial begin
-  $display("#####################");
-  $display("convolution_2D_tb #");
-  $display("#####################");
+  $display("############################");
+  $display("convolution_2D_padded_tb #");
+  $display("############################");
   clock = 1'b1;
   reset = 1'b1;
   
@@ -109,7 +110,7 @@ initial begin
   #10 reset = 1'b1;
 
   #220 // wait 22 clock cycles for layer_sr 
-  #50 // wait 5 clock cycles for mult_adder tree
+  #60 // wait 6 clock cycles for mult_adder tree
   
   // check output
 

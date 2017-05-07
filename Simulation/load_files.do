@@ -19,4 +19,7 @@ vlog -quiet $v_dir/components/*.v
 vlog -quiet $v_dir/components/shift_reg/*.v
 #vlog -quiet $v_dir/components/megafunctions/*_signed.v
 
+# Compile the modules generated with scripts
+vlog -quiet ../Generated_modules/*.v
+
 quit

@@ -67,6 +67,7 @@ parameter P_SR_DEPTH = 4;
 parameter RAM_SR_DEPTH = 2;
 parameter NUM_SR_ROWS = 4;
 parameter MA_TREE_SIZE = 16;
+parameter PAD_SIZE = 0;
 
 reg clock;
 reg reset;
@@ -149,7 +150,8 @@ convolution_25D #(
   .P_SR_DEPTH(P_SR_DEPTH),
   .RAM_SR_DEPTH(RAM_SR_DEPTH),
   .NUM_SR_ROWS(NUM_SR_ROWS),
-  .MA_TREE_SIZE(MA_TREE_SIZE)
+  .MA_TREE_SIZE(MA_TREE_SIZE),
+  .PAD_SIZE(PAD_SIZE)
 )
 dut_1(
   .clock(clock),
@@ -165,7 +167,8 @@ convolution_25D #(
   .P_SR_DEPTH(P_SR_DEPTH),
   .RAM_SR_DEPTH(RAM_SR_DEPTH),
   .NUM_SR_ROWS(NUM_SR_ROWS),
-  .MA_TREE_SIZE(MA_TREE_SIZE)
+  .MA_TREE_SIZE(MA_TREE_SIZE),
+  .PAD_SIZE(PAD_SIZE)
 )
 dut_2(
   .clock(clock),
