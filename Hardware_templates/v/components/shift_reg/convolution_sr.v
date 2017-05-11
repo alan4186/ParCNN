@@ -1,12 +1,12 @@
 /*
-     Parallel SR     RAM SR 
+     Parallel SR     RAM SR
      Window
 in ->[0,0][1,0][2,0]->[0][1][2][3]->
     >[0,1][1,1][2,1]->[0][1][2][3]->
     >[0,2][1,2][2,2]>
 
 */
-module layer_sr #( 
+module convolution_sr #(
   parameter P_SR_DEPTH = -1,
   parameter RAM_SR_DEPTH = -1,
   parameter NUM_SR_ROWS = -1 // the y dimension of the parallel out 'window'
