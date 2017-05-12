@@ -103,9 +103,9 @@ class DenseLayer:
         # be optimized away.
         #self.MA_TREE_SIZE = int(2**math.ceil(math.log(8 * ix_size * iy_size,2)))
         self.MA_TREE_SIZE = int(2**math.ceil(math.log(ix_size * iy_size,2)))
-        self.PAD_SIZE = self.MA_TREE_SIZE - (kx_size * ky_size)
+        self.PAD_SIZE = self.MA_TREE_SIZE - (ix_size * iy_size)
 
-        self.latency = ix_size * iy_size + math.log(self.MA_TREE_SIZE,2) + 1
+        self.latency = ix_size * iy_size + math.log(self.MA_TREE_SIZE,2) + 1 + 1
 
         self.rq_max = rq_max
         self.rq_min = rq_min

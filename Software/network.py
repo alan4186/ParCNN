@@ -3,6 +3,7 @@ from collections import OrderedDict
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import hw_quantize_ops as hwqo
+import numpy as np
 
 # layer imports
 from convLayer import ConvLayer
@@ -10,8 +11,6 @@ from biasLayer import BiasLayer
 from reluLayer import ReluLayer
 from denseLayer import DenseLayer
 
-import numpy as np
-import matplotlib.pyplot as plt
 
 # A class to describe the network that will be implemented in hardware
 class Net:
@@ -375,12 +374,6 @@ class Net:
     def set_dropout_prob(self,prob):
         self.dropout_prob = prob
 
-    def compute_latency(self):
-        latency = 0
-        for name, layer in self.layers.items():
-            latency += layer.latency
-        self.latency = latency
-
     def generate_test_bench(self):
         """ Create a test bench to simulate the generate top module
 
@@ -462,10 +455,14 @@ class Net:
 
         with open(tb_file,'w') as tbf:
             tbf.write(test_bench)
+            print 'Done writing test bench.'
 
 
 
-def compute_latency(self):
-    self.latency = 0
-    for name,l in self.layers.items():
-        self.latency += l.latency
+    def compute_latency(self):
+        """Compute the latency in clock cycles
+
+        """
+        self.latency = 0
+        for name,l in self.layers.items():
+            self.latency += l.latency
