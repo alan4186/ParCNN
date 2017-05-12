@@ -40,9 +40,9 @@ always@(posedge clock or negedge reset) begin
     column_shift_in <= column_shift_in + 8'd1;
 end
 
-assign row_shift_in[7:0] = column_shift_in;
-assign row_shift_in[15:8] = column_shift_in + 1;
-assign row_shift_in[23:16] = column_shift_in + 2;
+assign row_shift_in[7:0] = column_shift_in + 8'd2;
+assign row_shift_in[15:8] = column_shift_in + 8'd1;
+assign row_shift_in[23:16] = column_shift_in;
 
 
 always begin
@@ -84,7 +84,7 @@ initial begin
 
   shift_row_up = 1'b0;
   enable = 1'b0;
-  #10
+  #40 // arbitrary wait
   enable =1'b1;
   $display("Time = %0d",$time);
   $display("row_shift_out = %h", row_shift_out);
