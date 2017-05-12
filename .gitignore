@@ -30,4 +30,6 @@ Software/ignore/*
 # Simulation outputs
 Simulation/work/*
 Simulation/transcript
+Simulation/*.wlf
+
 
