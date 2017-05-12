@@ -236,25 +236,10 @@ class Net:
 
         l1 = layer_outputs[1]
         l1q = layer_outputs_q[1]
-        l1dq = hwqo.tf_dequantize(layer_outputs_q[1],-1*self.layers['c1'].output_q_range,self.layers['c1'].output_q_range,self.layers['c1'].bitwidth_change(8.0))
-        l1err = layer_outputs[1] - l1dq
-        
-        l1maxerr = tf.reduce_max(tf.abs(l1err))
-
-        l1drq = hwqo.tf_dequantize(layer_outputs_q[2],-1*self.layers['b1'].input_q_range,self.layers['b1'].input_q_range,8.0)
-        l2err = layer_outputs[1] - l1drq
-        l2maxerr = tf.reduce_max(tf.abs(l2err))
 
         net_out = layer_outputs[-1]
         net_out_q = layer_outputs_q[-1]
         net_out_dq = hwqo.tf_dequantize(net_out_q,-1*self.layers['bfc'].output_q_range,self.layers['bfc'].output_q_range,9.0)
-
-
-        tf.summary.histogram('l1_error',l1err)
-        tf.summary.histogram('net_out',net_out)
-        tf.summary.histogram('net_out_q',net_out_q)
-        tf.summary.histogram('net_out_dq',net_out_dq)
-
 
 
         merged = tf.summary.merge_all()
@@ -383,6 +368,9 @@ class Net:
         self.tb_image1 = np.reshape(self.tb_image1,(28,28))
         self.tb_image2 = np.reshape(self.tb_image2,(28,28))
 
+        #self.tb_image1 = np.rot90(self.tb_image1,2)
+        #self.tb_image2 = np.rot90(self.tb_image2,2)
+
 
         # convert tb images to vectors
         tb_str1 = ''
@@ -391,6 +379,8 @@ class Net:
             for c in range(0,28):
                 tb_str1 += ", 8'd" + str(int(self.tb_image1[r,c]))
                 tb_str2 += ", 8'd" + str(int(self.tb_image2[r,c]))
+                #tb_str1 = ", 8'd" + str(int(self.tb_image1[r,c])) + tb_str1
+                #tb_str2 = ", 8'd" + str(int(self.tb_image2[r,c])) + tb_str2
 
         tb_str1 = tb_str1[2:]
         tb_str2 = tb_str2[2:]
@@ -431,20 +421,20 @@ class Net:
         test_bench += "  pixel_in_sr = {8*784*2{1'b0}};\n"
         test_bench += "  #10 reset = 1'b0;\n  #10 reset = 1'b1;\n"
         test_bench += "  pixel_in_sr = {`img2, `img1};\n"
-        test_bench += "\n\n  #"+str(int(self.latency))
+        test_bench += "\n\n  #"+str(int(self.latency*10))
         test_bench += " // wait for valid result\n"
         test_bench += "  // check output\n"
         test_bench += '  $display("Time = %0d",$time);\n'
         test_bench += '  $display("out_vector = %h", out_vector);\n'
-        test_bench += "  if( out_vector[31:0] == "+out_vector1+") begin\n"
+        test_bench += "  if( out_vector == "+out_vector1+") begin\n"
         test_bench += '    $display("\\t\\t\\tPASS!");\n'
         test_bench += '  end else begin\n    $display("\\t\\t\\tFAIL!");\n'
         test_bench += "  end // end if/else\n\n"
-        test_bench += "  #"+str(int(self.latency)) 
+        test_bench += "  #"+str(int(self.latency*10)) 
         test_bench += " // wait for next valid result\n"
         test_bench += '  $display("Time = %0d",$time);\n'
         test_bench += '  $display("out_vector = %h", out_vector);\n'
-        test_bench += "  if( out_vector[31:0] == "+out_vector1+") begin\n"
+        test_bench += "  if( out_vector == "+out_vector2+") begin\n"
         test_bench += '    $display("\\t\\t\\tPASS!");\n  end else begin\n'
         test_bench += '    $display("\\t\\t\\tFAIL!");\n'
         test_bench += "  end // end if/else\n\n"
