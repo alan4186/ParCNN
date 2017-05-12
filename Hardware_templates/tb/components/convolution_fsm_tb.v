@@ -11,6 +11,7 @@ reg clock;
 reg reset;
 reg input_start;
 
+wire sr_enable;
 wire shift_row_up;
 wire conv_done;
 
@@ -25,7 +26,9 @@ convolution_fsm #(
 dut (
   .clock(clock),
   .reset(reset),
+  .row_shift_in_rdy(1'b1),
   .input_start(input_start),
+  .sr_enable(sr_enable),
   .shift_row_up(shift_row_up),
   .conv_done(conv_done)
 );
@@ -41,6 +44,8 @@ initial begin
 
   clock = 1'b1;
   reset = 1'b1;
+  input_start = 1'b0;
+
   #10
   reset = 1'b0;
   #10

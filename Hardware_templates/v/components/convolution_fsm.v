@@ -8,8 +8,10 @@ module convolution_fsm #(
   input clock,
   input reset,
 
+  input row_shift_in_rdy,
   input input_start,
 
+  output sr_enable,
   output shift_row_up,
   output conv_done
 );
@@ -19,14 +21,13 @@ parameter COLUMN_MAX = RAM_SR_DEPTH;
 parameter ROW_MAX = NUM_SR_ROWS - P_SR_DEPTH + 1;
 
 wire conv_done_pre_tree;
+wire enable;
 // The counter is 16 bits because the max number of elements in a
 // convolution is 2^16, with more elements, overflow is possible.
 // This bitwidth allows for the worst case of a 1x2^16 kernel.
 reg [15:0] row_counter;
-reg [15:0] row_counter_next;
 // The column counter is 16 bits for the same reason as the row counter.
 reg [15:0] column_counter;
-reg [15:0] column_counter_next;
 
 `define STATE_BW 1
 reg [`STATE_BW-1:0] state;
@@ -37,6 +38,9 @@ assign shift_row_up = (column_counter == COLUMN_MAX-1) ? 1'b1 : 1'b0;
 assign conv_done_pre_tree = ( (column_counter == COLUMN_MAX-1) &
                      (row_counter == ROW_MAX-1) )  ? 1'b1 : 1'b0;
 
+// will eventually change to depend on more input signals
+assign enable = row_shift_in_rdy;
+assign sr_enable = enable;
 assign conv_done = conv_done_sr[MA_TREE_DEPTH-1];
 
 // Block to shift out conv_done signal with tree
@@ -65,37 +69,37 @@ always@(posedge clock or negedge reset) begin
 end //always
 
 // Block to set column and row counters
-always@(*) begin
-  case(state)
-    `STATE_BW'd0: begin // shift 1
-      if(input_start == 1'b0) begin
-        row_counter_next = row_counter;
-        column_counter_next = column_counter + 16'd1;
-      end else begin
-        row_counter_next = 16'd0;
-        column_counter_next = 16'd0;
-      end
-    end
-    `STATE_BW'd1: begin  // shift P_SR_DEPTH
-      if (input_start == 1'b0) begin
+always@(posedge clock or negedge reset) begin
+  if (reset == 1'b0) begin
+    row_counter <= 16'd0;
+    column_counter <= 16'd0;
+  end else if (enable == 1'b0) begin
+      row_counter <= row_counter;
+      column_counter <= column_counter;
+    end else if(input_start) begin
+      row_counter <= 16'd0;
+      column_counter <= 16'd0;
+    end else case(state)
+      `STATE_BW'd0: begin // column shift
+          row_counter <= row_counter;
+          column_counter <= column_counter + 16'd1;
+        end // state 0, column shift
+      `STATE_BW'd1: begin  // shift row shift
+        // (shift by P_SR_DEPTH)
         if (row_counter == ROW_MAX-1) begin
-          row_counter_next = 16'd0;
+          row_counter <= 16'd0;
         end else begin
-          row_counter_next = row_counter + 16'd1;
-        end
-        column_counter_next = 16'd0;
-      end else begin
-        row_counter_next = 16'd0;
-        column_counter_next = 16'd0;
-      end
-    end
-    default: begin
-      row_counter_next = 16'd0;
-      column_counter_next = 16'd0;
-    end
-  endcase
+          row_counter <= row_counter + 16'd1;
+        end // row max
+        column_counter <= 16'd0;
+      end // state 1 // row shift
+      default: begin
+        row_counter <= 16'd0;
+        column_counter <= 16'd0;
+      end // default
+    endcase
 end // always
-
+/*
 always@(posedge clock or negedge reset) begin
   if (reset == 1'b0) begin
     row_counter <= 16'd0;
@@ -105,6 +109,7 @@ always@(posedge clock or negedge reset) begin
     column_counter <= column_counter_next;
   end // if reset
 end // always
+*/
 
 endmodule
 
