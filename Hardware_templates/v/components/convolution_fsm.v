@@ -56,7 +56,11 @@ always@(posedge clock or negedge reset) begin
   end else begin
     case(state)
       `STATE_BW'd0: // shift 1
-        if(column_counter == COLUMN_MAX-2)
+        if(enable == 1'b0)
+          state <= state;
+        else if(input_start == 1'b1)
+          state <= `STATE_BW'd0;
+        else if(column_counter == COLUMN_MAX-2)
           state <= `STATE_BW'd1;
         else
           state <= `STATE_BW'd0;
@@ -73,43 +77,44 @@ always@(posedge clock or negedge reset) begin
   if (reset == 1'b0) begin
     row_counter <= 16'd0;
     column_counter <= 16'd0;
-  end else if (enable == 1'b0) begin
-      row_counter <= row_counter;
-      column_counter <= column_counter;
-    end else if(input_start) begin
-      row_counter <= 16'd0;
-      column_counter <= 16'd0;
-    end else case(state)
+  end else begin
+    case(state)
       `STATE_BW'd0: begin // column shift
+        if (enable == 1'b0) begin
+          row_counter <= row_counter;
+          column_counter <= column_counter;
+        end else if (input_start == 1'b1) begin
+          row_counter <= 16'd0;
+          column_counter <= 16'd0;
+        end else begin
           row_counter <= row_counter;
           column_counter <= column_counter + 16'd1;
-        end // state 0, column shift
+        end
+      end // state 0, column shift
       `STATE_BW'd1: begin  // shift row shift
-        // (shift by P_SR_DEPTH)
-        if (row_counter == ROW_MAX-1) begin
+        if (enable == 1'b0) begin
+          row_counter <= row_counter;
+          column_counter <= column_counter;
+        end else if (input_start == 1'b1) begin
           row_counter <= 16'd0;
+          column_counter <= 16'd0;
         end else begin
-          row_counter <= row_counter + 16'd1;
-        end // row max
-        column_counter <= 16'd0;
+          // (shift by P_SR_DEPTH)
+          if (row_counter == ROW_MAX-1) begin
+            row_counter <= 16'd0;
+          end else begin
+            row_counter <= row_counter + 16'd1;
+          end // row max
+          column_counter <= 16'd0;
+        end
       end // state 1 // row shift
       default: begin
         row_counter <= 16'd0;
         column_counter <= 16'd0;
       end // default
     endcase
+  end // reset if/else
 end // always
-/*
-always@(posedge clock or negedge reset) begin
-  if (reset == 1'b0) begin
-    row_counter <= 16'd0;
-    column_counter <= 16'd0;
-  end else begin
-    row_counter <= row_counter_next;
-    column_counter <= column_counter_next;
-  end // if reset
-end // always
-*/
 
 endmodule
 
