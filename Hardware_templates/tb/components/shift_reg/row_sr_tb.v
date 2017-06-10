@@ -16,7 +16,9 @@ wire full;
 wire empty;
 wire [7:0] shift_out;
 wire [ROW_SHIFT*8-1:0] p_shift_out;
+wire [15:0] counter;
 
+assign counter = dut.counter;
 
 // DUT
 row_sr #(
@@ -55,7 +57,7 @@ initial begin
   $display("row_sr_tb #");
   $display("#############");
 
-  clock = 1'b0;
+  clock = 1'b1;
   reset = 1'b1;
   shift_in_enable = 1'b0;
   shift_out_enable = 1'b0;
@@ -76,7 +78,7 @@ initial begin
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
   if( full ==  1'd0) begin
     $display("\t\t\tPASS!");
@@ -92,7 +94,7 @@ initial begin
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
   if( full ==  1'd1) begin
     $display("\t\t\tPASS!");
@@ -100,15 +102,18 @@ initial begin
     $display("\t\t\tFAIL!");
   end // end if/else
 
-  #20 // wait
+  #30 // arbitrary wait
+  // set shift_out_enable, latch output next clock cycle
   // test shift out
   shift_out_enable = 1'b1;
+
+  #10
   $display("Time = %0d",$time);
   $display("row_shift_rdy= %d", row_shift_rdy);
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
   if( shift_out ==  8'd0) begin
     $display("\t\t\tPASS!");
@@ -117,14 +122,16 @@ initial begin
   end // end if/else
   #10
   // test row shift out
-  shift_out_enable = 1'b0;
+  // show ahead fifo mode, the shift row up signal here requests row {7,6,5}
+  // the row {4,3,2} was already ready
+  shift_out_enable = 1'b1;
   shift_row_up = 1'b1;
   $display("Time = %0d",$time);
   $display("row_shift_rdy= %d", row_shift_rdy);
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16],p_shift_out[15:8], p_shift_out[7:0] );
   if( p_shift_out ==  {8'd4, 8'd3, 8'd2} ) begin
     $display("\t\t\tPASS!");
@@ -133,7 +140,8 @@ initial begin
   end // end if/else
 
   #10
-  shift_row_up = 1'b1;
+  shift_row_up = 1'b0; // only make one request for show ahead fifo
+  // another request hear would ask for row {10,9,8} which is out of bounds
   $display("Time = %0d",$time);
   $display("row_shift_rdy= %d", row_shift_rdy);
   $display("full = %d", full);
@@ -157,7 +165,7 @@ initial begin
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
   if( row_shift_rdy == 1'b0) begin
     $display("\t\t\tPASS!");
@@ -166,12 +174,14 @@ initial begin
   end // end if/else
 
   #20 // remove 2 more from queue.  Queue should be empty
+  shift_out_enable = 1'b0;
+  shift_in_enable = 1'b1; //set shift in enable for next test
   $display("Time = %0d",$time);
   $display("row_shift_rdy= %d", row_shift_rdy);
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
   if( empty == 1'b1) begin
     $display("\t\t\tPASS!");
@@ -179,23 +189,24 @@ initial begin
     $display("\t\t\tFAIL!");
   end // end if/else
 
-  #10
-  shift_in_enable = 1'b1;
+  #20
+  shift_out_enable = 1'b1;
   // test simultanious read and write
   $display("Time = %0d",$time);
   $display("row_shift_rdy= %d", row_shift_rdy);
   $display("full = %d", full);
   $display("empty = %d", empty);
   $display("shift_out = %d", shift_out);
-  $display("p+shift_out = %d, %d,%d",
+  $display("p_shift_out = %d, %d,%d",
     p_shift_out[23:16], p_shift_out[15:8], p_shift_out[7:0] );
-  if( empty == 1'b0 && p_shift_out == 8'd20 ) begin
+  //if( empty == 1'b0 && p_shift_out == 8'd20 ) begin
+  if( empty == 1'b0 && shift_out == 8'd21 ) begin
     $display("\t\t\tPASS!");
   end else begin
     $display("\t\t\tFAIL!");
   end // end if/else
 
-  #10
+  #100
   $stop;
 
 end
